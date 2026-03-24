@@ -9,7 +9,7 @@ export class LogisticsSetup extends Component {
         carriers: Array,
         containerTypes: Array,
         fixedCosts: Object,
-        activeQuoteId: { type: [Number, Boolean], optional: true },
+        activeQuoteId: { optional: true },
         incotermMatrix: Object,
         totalBoxes: Number,
         incoterm: String,
