@@ -3,12 +3,7 @@ import { Component, useState } from "@odoo/owl";
 
 export class ProductCard extends Component {
     static template = "crfp_pricing.ProductCard";
-    static props = {
-        line: Object,
-        boxTypes: Array,
-        onUpdate: Function,
-        onToggleInclude: Function,
-    };
+    static props = ["*"];
 
     setup() {
         this.state = useState({ showDetail: false });

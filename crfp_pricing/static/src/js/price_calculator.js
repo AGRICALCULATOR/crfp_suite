@@ -5,13 +5,7 @@ import { ProductCard } from "./product_card";
 export class PriceCalculator extends Component {
     static template = "crfp_pricing.PriceCalculator";
     static components = { ProductCard };
-    static props = {
-        lines: Array,
-        boxTypes: Array,
-        categories: Array,
-        onUpdateLine: Function,
-        onToggleInclude: Function,
-    };
+    static props = ["*"];
 
     getLinesByCategory(category) {
         return this.props.lines.filter(l => l.category === category);

@@ -44,7 +44,7 @@ export class CrfpCalculator extends Component {
             totalBoxes: 1386,
             portId: null,
             containerTypeId: null,
-            freightQuoteId: null,
+            freightQuoteId: false,
             etd: '',
             eta: '',
             vesselName: '',

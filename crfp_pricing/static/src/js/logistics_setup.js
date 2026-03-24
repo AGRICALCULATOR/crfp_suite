@@ -3,21 +3,7 @@ import { Component, useState } from "@odoo/owl";
 
 export class LogisticsSetup extends Component {
     static template = "crfp_pricing.LogisticsSetup";
-    static props = {
-        freightQuotes: Array,
-        ports: Array,
-        carriers: Array,
-        containerTypes: Array,
-        fixedCosts: Object,
-        activeQuoteId: { optional: true },
-        incotermMatrix: Object,
-        totalBoxes: Number,
-        incoterm: String,
-        onSelectQuote: Function,
-        onSaveQuote: Function,
-        onDeleteQuote: Function,
-        onFixedCostChange: Function,
-    };
+    static props = ["*"];
 
     setup() {
         this.state = useState({

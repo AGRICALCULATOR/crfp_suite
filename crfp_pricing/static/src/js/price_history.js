@@ -4,10 +4,7 @@ import { useService } from "@web/core/utils/hooks";
 
 export class PriceHistory extends Component {
     static template = "crfp_pricing.PriceHistory";
-    static props = {
-        products: Array,
-        historyData: Array,
-    };
+    static props = ["*"];
 
     setup() {
         this.state = useState({

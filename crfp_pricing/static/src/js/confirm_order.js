@@ -3,16 +3,7 @@ import { Component, useState } from "@odoo/owl";
 
 export class ConfirmOrder extends Component {
     static template = "crfp_pricing.ConfirmOrder";
-    static props = {
-        quotations: Array,
-        partners: Array,
-        currentQuotation: { type: Object, optional: true },
-        lines: Array,
-        palletConfigs: Array,
-        onLoadQuotation: Function,
-        onCreateSaleOrder: Function,
-        onPalletChange: Function,
-    };
+    static props = ["*"];
 
     setup() {
         this.state = useState({
