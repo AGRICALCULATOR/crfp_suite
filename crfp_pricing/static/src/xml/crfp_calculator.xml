@@ -3,223 +3,186 @@
     <t t-name="crfp_pricing.CrfpCalculator">
         <div class="crfp-app">
             <t t-if="state.loading">
-                <div class="crfp-loading">
-                    <i class="fa fa-spinner fa-spin fa-3x"/>
-                    <p>Loading CR Farm Calculator...</p>
-                </div>
+                <div class="crfp-loading"><i class="fa fa-spinner fa-spin fa-3x"/><p>Loading CR Farm Calculator...</p></div>
             </t>
             <t t-else="">
-                <!-- HEADER -->
+                <!-- ═══ HEADER ═══ -->
                 <header class="crfp-header">
                     <div class="crfp-logo-area">
                         <i class="fa fa-leaf crfp-logo-icon"/>
-                        <div>
-                            <h1>AgriPrice Calculator</h1>
-                            <p>CR FARM PRODUCTS VYM S.A</p>
-                        </div>
+                        <div><h1>AgriPrice Calculator</h1><p>CR FARM PRODUCTS VYM S.A</p></div>
                     </div>
                     <div class="crfp-hdr-right">
                         <div class="crfp-inc-badge">
-                            <span t-esc="state.incoterm"/>
-                            <span> · </span>
-                            <span t-esc="state.portId ? (state.ports.find(p => p.id === state.portId) || {}).code || '—' : '—'"/>
+                            <span t-esc="state.incoterm"/> · <span t-esc="portDisplay"/>
+                        </div>
+                        <div class="crfp-hdr-client">
+                            <select t-on-change="onPartnerChange" class="crfp-client-select">
+                                <option value="">-- Client --</option>
+                                <t t-foreach="state.partners" t-as="p" t-key="p.id">
+                                    <option t-att-value="p.id" t-att-selected="p.id === state.partnerId" t-esc="p.name"/>
+                                </t>
+                            </select>
                         </div>
                         <div class="crfp-list-mgr">
-                            <input type="text" t-att-value="state.quotationName"
-                                   placeholder="Quotation Name"
-                                   t-on-change="onQuotationNameChange"/>
-                            <button class="crfp-list-btn" t-on-click="saveQuotation">
-                                <i class="fa fa-save"/> Save
-                            </button>
-                            <button class="crfp-list-btn crfp-btn-new" t-on-click="newQuotation">
-                                <i class="fa fa-plus"/> New
-                            </button>
-                            <span class="crfp-modified-badge" t-if="state.modified">
-                                <i class="fa fa-exclamation-circle"/> Modified
-                            </span>
+                            <input type="text" t-att-value="state.quotationName" placeholder="Quotation Name" t-on-change="onQuotationNameChange"/>
+                            <button class="crfp-list-btn" t-on-click="saveQuotation"><i class="fa fa-save"/> Save</button>
+                            <button class="crfp-list-btn crfp-btn-new" t-on-click="newQuotation"><i class="fa fa-plus"/> New</button>
                         </div>
+                        <span class="crfp-modified-badge" t-if="state.modified"><i class="fa fa-exclamation-circle"/> Modified</span>
                     </div>
                 </header>
 
-                <!-- TAB NAV -->
-                <div class="crfp-tab-nav">
-                    <button t-att-class="{'crfp-tab-btn': true, 'active': state.activeTab === 'calculator'}"
-                            t-on-click="() => this.setTab('calculator')">
-                        <i class="fa fa-calculator"/> Price Calculator
-                    </button>
-                    <button t-att-class="{'crfp-tab-btn': true, 'active': state.activeTab === 'logistics'}"
-                            t-on-click="() => this.setTab('logistics')">
-                        <i class="fa fa-route"/> Logistics
-                    </button>
-                    <button t-att-class="{'crfp-tab-btn': true, 'active': state.activeTab === 'boxes'}"
-                            t-on-click="() => this.setTab('boxes')">
-                        <i class="fa fa-box"/> Box Costs
-                    </button>
-                    <button t-att-class="{'crfp-tab-btn': true, 'active': state.activeTab === 'confirm'}"
-                            t-on-click="() => this.setTab('confirm')">
-                        <i class="fa fa-clipboard-check"/> Confirm Order
-                    </button>
-                    <button t-att-class="{'crfp-tab-btn': true, 'active': state.activeTab === 'history'}"
-                            t-on-click="() => this.setTab('history')">
-                        <i class="fa fa-chart-line"/> Price History
-                    </button>
-                </div>
+                <!-- ═══ MAIN LAYOUT: Sidebar + Cards ═══ -->
+                <div class="crfp-calc-layout">
+                    <!-- ─── SIDEBAR ─── -->
+                    <aside class="crfp-sidebar">
+                        <!-- Global Parameters -->
+                        <div class="crfp-sb-sec">
+                            <div class="crfp-sb-hdr" t-on-click="() => this.toggleSection('global')">
+                                <span><i class="fa fa-sliders-h"/> Global Parameters</span>
+                                <i t-att-class="state.sections.global ? 'fa fa-chevron-up' : 'fa fa-chevron-down'"/>
+                            </div>
+                            <div class="crfp-sb-body" t-if="state.sections.global">
+                                <div class="crfp-pg">
+                                    <label><i class="fa fa-exchange-alt"/> Exchange Rate (CRC / $1)</label>
+                                    <input type="number" t-att-value="state.exchangeRate" t-on-change="onExchangeRateChange"/>
+                                </div>
+                                <div class="crfp-pg">
+                                    <label><i class="fa fa-handshake"/> Incoterm 2020</label>
+                                    <select t-on-change="onIncotermChange">
+                                        <t t-foreach="['EXW','FCA','FOB','CFR','CIF','CPT','CIP','DAP','DDP']" t-as="inc" t-key="inc">
+                                            <option t-att-value="inc" t-att-selected="inc === state.incoterm" t-esc="inc"/>
+                                        </t>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
 
-                <!-- TAB CONTENT -->
-                <div class="crfp-content">
-                    <!-- CALCULATOR TAB -->
-                    <div t-if="state.activeTab === 'calculator'" class="crfp-calc-layout">
-                        <!-- SIDEBAR -->
-                        <aside class="crfp-sidebar">
-                            <!-- Global Parameters -->
-                            <div class="crfp-sb-sec">
-                                <div class="crfp-sb-hdr"><i class="fa fa-sliders-h"/> Global Parameters</div>
-                                <div class="crfp-sb-body">
-                                    <div class="crfp-pg">
-                                        <label>Exchange Rate (CRC / $1)</label>
-                                        <input type="number" t-att-value="state.exchangeRate"
-                                               t-on-change="onExchangeRateChange"/>
-                                    </div>
-                                    <div class="crfp-pg">
-                                        <label>Incoterm 2020</label>
-                                        <select t-att-value="state.incoterm" t-on-change="onIncotermChange">
-                                            <option value="EXW">EXW - Ex Works</option>
-                                            <option value="FCA">FCA - Free Carrier</option>
-                                            <option value="FOB" selected="">FOB - Free on Board</option>
-                                            <option value="CFR">CFR - Cost &amp; Freight</option>
-                                            <option value="CIF">CIF - Cost, Ins. &amp; Freight</option>
-                                            <option value="CPT">CPT - Carriage Paid To</option>
-                                            <option value="CIP">CIP - Carr. &amp; Ins. Paid</option>
-                                            <option value="DAP">DAP - Delivered at Place</option>
-                                            <option value="DDP">DDP - Delivered Duty Paid</option>
-                                        </select>
+                        <!-- Freight Route -->
+                        <div class="crfp-sb-sec">
+                            <div class="crfp-sb-hdr" t-on-click="() => this.toggleSection('freight')">
+                                <span><i class="fa fa-ship"/> Freight Route</span>
+                                <i t-att-class="state.sections.freight ? 'fa fa-chevron-up' : 'fa fa-chevron-down'"/>
+                            </div>
+                            <div class="crfp-sb-body" t-if="state.sections.freight">
+                                <div class="crfp-pg">
+                                    <label><i class="fa fa-anchor"/> Destination Port</label>
+                                    <select t-on-change="onPortChange">
+                                        <option value="">-- Select port --</option>
+                                        <t t-foreach="state.ports" t-as="p" t-key="p.id">
+                                            <option t-att-value="p.id" t-att-selected="p.id === state.portId"
+                                                    t-esc="p.code + ' - ' + p.name + ' (' + p.country + ')'"/>
+                                        </t>
+                                    </select>
+                                </div>
+                                <div class="crfp-pg">
+                                    <label><i class="fa fa-boxes"/> Total Boxes in Container</label>
+                                    <input type="number" t-att-value="state.totalBoxes" t-on-change="onTotalBoxesChange" class="crfp-mono crfp-bold"/>
+                                </div>
+                                <div class="crfp-pg">
+                                    <label><i class="fa fa-ship"/> Active Freight Quote</label>
+                                    <select t-on-change="onFreightQuoteChange">
+                                        <option value="">-- No quote --</option>
+                                        <t t-foreach="state.freightQuotes" t-as="fq" t-key="fq.id">
+                                            <option t-att-value="fq.id" t-att-selected="fq.id === state.freightQuoteId"
+                                                    t-esc="(fq.carrier_name || '') + ' — $' + (fq.all_in_freight || 0).toFixed(0) + ' (' + ((fq.port_id &amp;&amp; fq.port_id[1]) || '') + ')'"/>
+                                        </t>
+                                    </select>
+                                </div>
+                                <!-- Logistics summary -->
+                                <div class="crfp-log-sum" t-if="logSummary.frTotal > 0">
+                                    <div class="crfp-lr"><span>Freight</span><span t-esc="'$' + fmt(logSummary.frTotal)"/></div>
+                                    <div class="crfp-lr"><span>Transport</span><span t-esc="'$' + fmt(logSummary.tUSD)"/></div>
+                                    <div class="crfp-lr"><span>THC Origin</span><span t-esc="'$' + fmt(logSummary.poUSD)"/></div>
+                                    <div class="crfp-lr"><span>Fumigation</span><span t-esc="'$' + fmt(logSummary.fuUSD)"/></div>
+                                    <div class="crfp-lr"><span>Broker</span><span t-esc="'$' + fmt(logSummary.agUSD)"/></div>
+                                    <div class="crfp-lr crfp-lr-total">
+                                        <span>Per Box</span>
+                                        <span t-esc="'$' + fmt(logSummary.frPB + logSummary.tPB + logSummary.poPB + logSummary.fuPB + logSummary.agPB, 4)"/>
                                     </div>
                                 </div>
                             </div>
+                        </div>
 
-                            <!-- Freight Route -->
-                            <div class="crfp-sb-sec">
-                                <div class="crfp-sb-hdr"><i class="fa fa-ship"/> Freight Route</div>
-                                <div class="crfp-sb-body">
-                                    <div class="crfp-pg">
-                                        <label>Destination Port</label>
-                                        <select t-on-change="onPortChange">
-                                            <option value="">-- Select port --</option>
-                                            <t t-foreach="state.ports" t-as="p" t-key="p.id">
-                                                <option t-att-value="p.id"
-                                                        t-att-selected="p.id === state.portId"
-                                                        t-esc="p.code + ' - ' + p.name + ' (' + p.country + ')'"/>
-                                            </t>
-                                        </select>
-                                    </div>
-                                    <div class="crfp-pg">
-                                        <label>Total Boxes in Container</label>
-                                        <input type="number" t-att-value="state.totalBoxes"
-                                               t-on-change="onTotalBoxesChange" class="crfp-mono crfp-bold"/>
-                                    </div>
-                                    <div class="crfp-pg">
-                                        <label>Active Freight Quote</label>
-                                        <div class="crfp-active-quote" t-esc="activeQuoteName"/>
-                                    </div>
-
-                                    <!-- Logistics Summary -->
-                                    <div class="crfp-log-sum" t-if="logisticsSummary.frTotal > 0">
-                                        <div class="crfp-lr"><span>Freight</span><span t-esc="'$' + fmt(logisticsSummary.frTotal)"/></div>
-                                        <div class="crfp-lr"><span>Transport</span><span t-esc="'$' + fmt(logisticsSummary.tUSD)"/></div>
-                                        <div class="crfp-lr"><span>THC Origin</span><span t-esc="'$' + fmt(logisticsSummary.poUSD)"/></div>
-                                        <div class="crfp-lr"><span>Fumigation</span><span t-esc="'$' + fmt(logisticsSummary.fuUSD)"/></div>
-                                        <div class="crfp-lr"><span>Broker</span><span t-esc="'$' + fmt(logisticsSummary.agUSD)"/></div>
-                                        <div class="crfp-lr crfp-lr-total">
-                                            <span>Per Box</span>
-                                            <span t-esc="'$' + fmt(logisticsSummary.frPB + logisticsSummary.tPB + logisticsSummary.poPB + logisticsSummary.fuPB + logisticsSummary.agPB, 4)"/>
-                                        </div>
-                                    </div>
-
-                                    <button class="crfp-link-btn" t-on-click="() => this.setTab('logistics')">
-                                        <i class="fa fa-route"/> Manage Logistics &amp; Rates
-                                    </button>
-                                </div>
+                        <!-- ★ BASE PRICES — single source of truth ★ -->
+                        <div class="crfp-sb-sec">
+                            <div class="crfp-sb-hdr" t-on-click="() => this.toggleSection('basePrices')">
+                                <span><i class="fa fa-tags"/> Base Prices (CRC)</span>
+                                <i t-att-class="state.sections.basePrices ? 'fa fa-chevron-up' : 'fa fa-chevron-down'"/>
                             </div>
+                            <div class="crfp-sb-body" t-if="state.sections.basePrices">
+                                <t t-foreach="state.lines" t-as="line" t-key="line.crfp_product_id">
+                                    <div class="crfp-bp-row">
+                                        <label t-esc="line.product_name"/>
+                                        <input type="number" t-att-value="line.raw_price_crc"
+                                               t-on-change="(ev) => this.onBasePriceChange(line.crfp_product_id, ev)"
+                                               class="crfp-mono"/>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
 
-                            <!-- History (saved quotations) -->
-                            <div class="crfp-sb-sec">
-                                <div class="crfp-sb-hdr"><i class="fa fa-history"/> Saved Quotations</div>
-                                <div class="crfp-sb-body">
-                                    <t t-foreach="state.quotations" t-as="q" t-key="q.id">
-                                        <div class="crfp-hist-item"
-                                             t-att-class="{'active': q.id === state.quotationId}"
-                                             t-on-click="() => this.loadQuotation(q.id)">
+                        <!-- Saved Quotations -->
+                        <div class="crfp-sb-sec">
+                            <div class="crfp-sb-hdr" t-on-click="() => this.toggleSection('history')">
+                                <span><i class="fa fa-history"/> Saved Quotations</span>
+                                <i t-att-class="state.sections.history ? 'fa fa-chevron-up' : 'fa fa-chevron-down'"/>
+                            </div>
+                            <div class="crfp-sb-body" t-if="state.sections.history">
+                                <t t-foreach="state.quotations" t-as="q" t-key="q.id">
+                                    <div class="crfp-hist-item" t-att-class="{'active': q.id === state.quotationId}">
+                                        <div class="crfp-hist-top" t-on-click="() => this.loadQuotation(q.id)">
                                             <strong t-esc="q.name"/>
                                             <span class="crfp-hdate" t-esc="q.create_date"/>
                                         </div>
-                                    </t>
-                                    <t t-if="!state.quotations.length">
-                                        <div class="crfp-empty-small">No saved quotations yet</div>
+                                        <button class="crfp-hist-open" t-if="q.id === state.quotationId"
+                                                t-on-click="() => this.openQuotationForm(q.id)">
+                                            <i class="fa fa-external-link-alt"/> Open in Quotations
+                                        </button>
+                                    </div>
+                                </t>
+                                <t t-if="!state.quotations.length">
+                                    <div class="crfp-empty-small">No saved quotations yet</div>
+                                </t>
+                            </div>
+                        </div>
+                    </aside>
+
+                    <!-- ─── PRODUCT CARDS (main area) ─── -->
+                    <main class="crfp-calc-main">
+                        <div class="crfp-sec-hdr">
+                            <h2 t-esc="state.quotationName || 'New Quotation'"/>
+                            <button class="crfp-toggle-view" t-on-click="toggleCompact">
+                                <i class="fa fa-th-large"/> Toggle View
+                            </button>
+                        </div>
+                        <t t-foreach="categories" t-as="cat" t-key="cat">
+                            <t t-set="catLines" t-value="getLinesByCat(cat)"/>
+                            <t t-if="catLines.length">
+                                <div class="crfp-cat-hdr">
+                                    <i t-att-class="'fa ' + getCatIcon(cat)"/>
+                                    <span t-esc="getCatLabel(cat)"/>
+                                    <span class="crfp-cat-count" t-esc="'(' + catLines.length + ')'"/>
+                                </div>
+                                <div t-att-class="state.compactView ? 'crfp-pgrid crfp-compact' : 'crfp-pgrid'">
+                                    <t t-foreach="catLines" t-as="line" t-key="line.crfp_product_id">
+                                        <ProductCard line="line" boxTypes="state.boxTypes"
+                                                     onUpdate="(pid, f, v) => this.updateLine(pid, f, v)"
+                                                     onToggleInclude="(pid) => this.toggleInclude(pid)"/>
                                     </t>
                                 </div>
-                            </div>
-                        </aside>
-
-                        <!-- MAIN: Product Cards -->
-                        <PriceCalculator
-                            lines="state.lines"
-                            boxTypes="state.boxTypes"
-                            categories="categories"
-                            onUpdateLine.bind="updateLine"
-                            onToggleInclude.bind="toggleInclude"/>
-                    </div>
-
-                    <!-- LOGISTICS TAB -->
-                    <t t-if="state.activeTab === 'logistics'">
-                        <LogisticsSetup
-                            freightQuotes="state.freightQuotes"
-                            ports="state.ports"
-                            carriers="state.carriers"
-                            containerTypes="state.containerTypes"
-                            fixedCosts="state.fc"
-                            activeQuoteId="state.freightQuoteId"
-                            incotermMatrix="state.incotermMatrix"
-                            totalBoxes="state.totalBoxes"
-                            incoterm="state.incoterm"
-                            onSelectQuote.bind="selectFreightQuote"
-                            onSaveQuote.bind="saveFreightQuote"
-                            onDeleteQuote.bind="deleteFreightQuote"
-                            onFixedCostChange.bind="onFixedCostChange"/>
-                    </t>
-
-                    <!-- BOX COSTS TAB -->
-                    <t t-if="state.activeTab === 'boxes'">
-                        <BoxCostManager boxTypes="state.boxTypes"/>
-                    </t>
-
-                    <!-- CONFIRM ORDER TAB -->
-                    <t t-if="state.activeTab === 'confirm'">
-                        <ConfirmOrder
-                            quotations="state.quotations"
-                            partners="state.partners"
-                            currentQuotation="null"
-                            lines="state.lines"
-                            palletConfigs="state.palletConfigs"
-                            onLoadQuotation.bind="loadQuotation"
-                            onCreateSaleOrder.bind="createSaleOrder"
-                            onPalletChange.bind="onPalletChange"/>
-                    </t>
-
-                    <!-- PRICE HISTORY TAB -->
-                    <t t-if="state.activeTab === 'history'">
-                        <PriceHistory
-                            products="state.products"
-                            historyData="state.historyData"/>
-                    </t>
+                            </t>
+                        </t>
+                    </main>
                 </div>
 
-                <!-- BOTTOM ACTIONS (calculator tab only) -->
-                <div class="crfp-actions" t-if="state.activeTab === 'calculator'">
-                    <button class="crfp-btn crfp-btn-calc" t-on-click="recalcAll">
-                        <i class="fa fa-sync-alt"/> Recalculate All
-                    </button>
-                    <button class="crfp-btn crfp-btn-save" t-on-click="saveQuotation">
-                        <i class="fa fa-save"/> Save Quotation
+                <!-- ═══ BOTTOM ACTIONS ═══ -->
+                <div class="crfp-actions">
+                    <button class="crfp-btn crfp-btn-calc" t-on-click="recalcAll"><i class="fa fa-sync-alt"/> Recalculate All</button>
+                    <button class="crfp-btn crfp-btn-save" t-on-click="saveQuotation"><i class="fa fa-save"/> Save Quotation</button>
+                    <button class="crfp-btn crfp-btn-open" t-if="state.quotationId" t-on-click="() => this.openQuotationForm()">
+                        <i class="fa fa-file-alt"/> Open Quotation
                     </button>
                 </div>
             </t>

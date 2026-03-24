@@ -8,8 +8,7 @@ class CrfpQuotation(models.Model):
     _order = 'create_date desc'
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
-    name = fields.Char(string='Quotation Name', required=True,
-                       help='Client or descriptive name for this quotation')
+    name = fields.Char(string='Quotation Name', required=True)
     state = fields.Selection([
         ('draft', 'Draft'),
         ('confirmed', 'Confirmed'),
@@ -19,8 +18,7 @@ class CrfpQuotation(models.Model):
     ], string='Status', default='draft', tracking=True)
 
     # Commercial
-    partner_id = fields.Many2one('res.partner', string='Client',
-                                 domain=[('customer_rank', '>', 0)])
+    partner_id = fields.Many2one('res.partner', string='Client')
     client_type = fields.Selection([
         ('distribuidor', 'Distributor'),
         ('mayorista', 'Wholesaler'),
@@ -37,14 +35,11 @@ class CrfpQuotation(models.Model):
         ('CIP', 'CIP'), ('DAP', 'DAP'), ('DDP', 'DDP'),
     ], string='Incoterm', default='FOB', required=True)
 
-    # Logistics reference
-    freight_quote_id = fields.Many2one('crfp.freight.quote',
-                                        string='Active Freight Quote')
+    # Logistics
+    freight_quote_id = fields.Many2one('crfp.freight.quote', string='Active Freight Quote')
     port_id = fields.Many2one('crfp.port', string='Destination Port')
-    container_type_id = fields.Many2one('crfp.container.type',
-                                        string='Container Type')
-    total_boxes = fields.Integer(string='Total Boxes in Container',
-                                 default=1386)
+    container_type_id = fields.Many2one('crfp.container.type', string='Container Type')
+    total_boxes = fields.Integer(string='Total Boxes in Container', default=1386)
 
     # Shipment info
     etd = fields.Date(string='ETD')
@@ -52,70 +47,74 @@ class CrfpQuotation(models.Model):
     vessel_name = fields.Char(string='Vessel / Voyage')
     shipping_company = fields.Char(string='Shipping Company')
 
-    # Fixed cost snapshot (copied from crfp.fixed.cost at creation time)
-    fc_transport = fields.Float(string='Transport (USD)', default=600.0)
-    fc_thc_origin = fields.Float(string='THC Origin (USD)', default=380.0)
-    fc_fumigation = fields.Float(string='Fumigation (USD)', default=180.0)
-    fc_broker = fields.Float(string='Broker (USD)', default=150.0)
-    fc_thc_dest = fields.Float(string='THC Dest (USD)', default=0.0)
-    fc_fumig_dest = fields.Float(string='Fumig. Dest (USD)', default=0.0)
-    fc_inland_dest = fields.Float(string='Inland Dest (USD)', default=0.0)
-    fc_insurance_pct = fields.Float(string='Insurance %', default=0.30)
-    fc_duties_pct = fields.Float(string='Duties %', default=0.0)
+    # Fixed cost snapshot
+    fc_transport = fields.Float(default=600.0)
+    fc_thc_origin = fields.Float(default=380.0)
+    fc_fumigation = fields.Float(default=180.0)
+    fc_broker = fields.Float(default=150.0)
+    fc_thc_dest = fields.Float(default=0.0)
+    fc_fumig_dest = fields.Float(default=0.0)
+    fc_inland_dest = fields.Float(default=0.0)
+    fc_insurance_pct = fields.Float(default=0.30)
+    fc_duties_pct = fields.Float(default=0.0)
 
     # Lines
-    line_ids = fields.One2many('crfp.quotation.line', 'quotation_id',
-                               string='Product Lines')
+    line_ids = fields.One2many('crfp.quotation.line', 'quotation_id', string='Product Lines')
 
     # Sale order link
-    sale_order_id = fields.Many2one('sale.order', string='Sale Order',
-                                     readonly=True, copy=False)
+    sale_order_id = fields.Many2one('sale.order', string='Sale Order', readonly=True, copy=False)
 
     # Computed
     line_count = fields.Integer(compute='_compute_line_count')
-    total_amount = fields.Float(compute='_compute_totals', string='Total Amount')
+    total_amount = fields.Float(compute='_compute_totals', string='Total $/box')
+    total_pallets = fields.Integer(compute='_compute_totals', string='Total Pallets')
+    total_boxes_sum = fields.Integer(compute='_compute_totals', string='Total Boxes')
+    total_order_amount = fields.Float(compute='_compute_totals', string='Total Order Amount')
 
     @api.depends('line_ids')
     def _compute_line_count(self):
         for rec in self:
             rec.line_count = len(rec.line_ids)
 
-    @api.depends('line_ids.final_price', 'line_ids.include_in_pdf')
+    @api.depends('line_ids.final_price', 'line_ids.include_in_pdf',
+                 'line_ids.pallets', 'line_ids.boxes_per_pallet', 'line_ids.line_total')
     def _compute_totals(self):
         for rec in self:
-            rec.total_amount = sum(
-                l.final_price for l in rec.line_ids if l.include_in_pdf
-            )
+            included = rec.line_ids.filtered('include_in_pdf')
+            rec.total_amount = sum(l.final_price for l in included)
+            rec.total_pallets = sum(l.pallets for l in included)
+            rec.total_boxes_sum = sum(l.total_boxes for l in included)
+            rec.total_order_amount = sum(l.line_total for l in included)
+
+    # ── Actions ──
 
     def action_create_sale_order(self):
-        """Create a sale.order from this quotation using Odoo standard API."""
+        """Create a sale.order from this quotation."""
         self.ensure_one()
         if not self.partner_id:
             raise UserError('Please select a client before creating a Sale Order.')
-        if not self.line_ids:
-            raise UserError('No product lines in this quotation.')
 
         order_lines = []
-        for line in self.line_ids:
-            if not line.include_in_pdf:
+        for line in self.line_ids.filtered('include_in_pdf'):
+            if line.pallets <= 0:
                 continue
             product = line.crfp_product_id.product_id
             if not product:
                 raise UserError(
                     f'Product "{line.crfp_product_id.name}" has no Odoo product '
-                    f'linked. Please configure it in Export Products.'
+                    f'linked. Go to Configuration > Export Products and link it.'
                 )
+            qty = line.pallets * line.boxes_per_pallet
             order_lines.append((0, 0, {
                 'product_id': product.id,
-                'product_uom_qty': line.pallets * line.boxes_per_pallet if line.pallets else 1,
+                'product_uom_qty': qty,
                 'price_unit': line.final_price,
-                'name': f"{line.crfp_product_id.name} - "
-                        f"{line.pallets or 0} pallets x "
-                        f"{line.boxes_per_pallet or 0} boxes/pallet",
+                'name': (f"{line.crfp_product_id.name} — "
+                         f"{line.pallets} pallets × {line.boxes_per_pallet} boxes/pallet"),
             }))
 
         if not order_lines:
-            raise UserError('No lines with "Include in PDF" checked.')
+            raise UserError('No product lines with pallets > 0. Enter pallet quantities first.')
 
         note_parts = [f"Incoterm: {self.incoterm}"]
         if self.port_id:
@@ -136,11 +135,7 @@ class CrfpQuotation(models.Model):
             so_vals['commitment_date'] = self.etd
 
         so = self.env['sale.order'].create(so_vals)
-        self.write({
-            'sale_order_id': so.id,
-            'state': 'won',
-        })
-
+        self.write({'sale_order_id': so.id, 'state': 'won'})
         return {
             'type': 'ir.actions.act_window',
             'res_model': 'sale.order',
@@ -148,3 +143,33 @@ class CrfpQuotation(models.Model):
             'view_mode': 'form',
             'target': 'current',
         }
+
+    def action_send_email(self):
+        """Open the email composer with PDF attached."""
+        self.ensure_one()
+        template = self.env.ref('crfp_pricing.email_template_crfp_quotation', raise_if_not_found=False)
+        compose_form = self.env.ref('mail.email_compose_message_wizard_form', raise_if_not_found=False)
+        ctx = {
+            'default_model': 'crfp.quotation',
+            'default_res_ids': self.ids,
+            'default_template_id': template.id if template else False,
+            'default_composition_mode': 'comment',
+            'force_email': True,
+        }
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'mail.compose.message',
+            'views': [[compose_form.id if compose_form else False, 'form']],
+            'view_mode': 'form',
+            'target': 'new',
+            'context': ctx,
+        }
+
+    def action_confirm(self):
+        self.write({'state': 'confirmed'})
+
+    def action_mark_sent(self):
+        self.write({'state': 'sent'})
+
+    def action_mark_lost(self):
+        self.write({'state': 'lost'})

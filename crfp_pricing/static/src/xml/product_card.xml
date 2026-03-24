@@ -7,63 +7,65 @@
                 <span class="crfp-ptag" t-esc="'$' + fmt(props.line.final_price)"/>
             </div>
             <div class="crfp-pform">
+                <!-- Raw Material Price — synced with sidebar Base Prices -->
                 <div class="crfp-fg">
-                    <label>Raw Price (CRC)</label>
+                    <label>Raw Mat. Price</label>
                     <input type="number" t-att-value="props.line.raw_price_crc"
                            t-on-change="(ev) => this.onFieldChange('raw_price_crc', ev)"/>
-                </div>
-                <div class="crfp-fg">
-                    <label>Net Kg</label>
-                    <input type="number" t-att-value="props.line.net_kg" step="0.01"
-                           t-on-change="(ev) => this.onFieldChange('net_kg', ev)"/>
-                </div>
-                <div class="crfp-fg">
-                    <label>Box Cost ($)</label>
-                    <select t-on-change="onBoxTypeChange">
-                        <option value="">-- Manual --</option>
-                        <t t-foreach="props.boxTypes" t-as="bt" t-key="bt.id">
-                            <option t-att-value="bt.cost"
-                                    t-att-selected="Math.abs(bt.cost - props.line.box_cost) &lt; 0.01"
-                                    t-esc="bt.name + ' ($' + bt.cost.toFixed(2) + ')'"/>
-                        </t>
-                    </select>
                 </div>
                 <div class="crfp-fg">
                     <label>Profit ($)</label>
                     <input type="number" t-att-value="props.line.profit" step="0.5"
                            t-on-change="(ev) => this.onFieldChange('profit', ev)"/>
                 </div>
+                <div class="crfp-fg">
+                    <label>Box Type / Cost ($)</label>
+                    <select t-on-change="onBoxTypeChange">
+                        <option value="">-- Manual --</option>
+                        <t t-foreach="props.boxTypes" t-as="bt" t-key="bt.id">
+                            <option t-att-value="bt.cost"
+                                    t-att-selected="Math.abs(bt.cost - props.line.box_cost) &lt; 0.01"
+                                    t-esc="bt.name + ' (' + bt.brand + ') — $' + bt.cost.toFixed(2)"/>
+                        </t>
+                    </select>
+                </div>
+                <div class="crfp-fg">
+                    <label>Cost ($)</label>
+                    <input type="number" t-att-value="props.line.box_cost" step="0.01"
+                           t-on-change="(ev) => this.onFieldChange('box_cost', ev)"/>
+                </div>
+                <div class="crfp-fg">
+                    <label>Net Kilos</label>
+                    <input type="number" t-att-value="props.line.net_kg" step="0.01"
+                           t-on-change="(ev) => this.onFieldChange('net_kg', ev)"/>
+                </div>
 
+                <!-- Cost Breakdown toggle -->
                 <div class="crfp-dtoggle" t-on-click="toggleDetail">
-                    <span>Cost Details</span>
+                    <span>Cost Breakdown</span>
                     <i t-att-class="state.showDetail ? 'fa fa-chevron-up' : 'fa fa-chevron-down'"/>
                 </div>
-                <div class="crfp-dcont" t-if="state.showDetail">
-                    <div class="crfp-fg">
-                        <label>Labor/kg</label>
-                        <input type="number" t-att-value="props.line.labor_per_kg" step="0.001"
-                               t-on-change="(ev) => this.onFieldChange('labor_per_kg', ev)"/>
+                <t t-if="state.showDetail">
+                    <div class="crfp-dcont">
+                        <div class="crfp-ri"><span>Gross Pounds:</span><span t-esc="fmt(props.line.gross_lbs, 2) + ' lb'"/></div>
+                        <div class="crfp-ri"><span>Packing:</span><span t-esc="'$' + fmt(props.line.packing_cost, 4)"/></div>
+                        <div class="crfp-ri crfp-ri-log"><span>Logistics/box:</span><span t-esc="'$' + fmt(props.line.logistics_per_box, 4)"/></div>
+                        <div class="crfp-ri"><span>EXW Price:</span><span t-esc="'$' + fmt(props.line.exw_price)"/></div>
+                        <div class="crfp-fg"><label>Labor/kg</label>
+                            <input type="number" t-att-value="props.line.labor_per_kg" step="0.001"
+                                   t-on-change="(ev) => this.onFieldChange('labor_per_kg', ev)"/></div>
+                        <div class="crfp-fg"><label>Materials/kg</label>
+                            <input type="number" t-att-value="props.line.materials_per_kg" step="0.001"
+                                   t-on-change="(ev) => this.onFieldChange('materials_per_kg', ev)"/></div>
+                        <div class="crfp-fg"><label>Indirect/kg</label>
+                            <input type="number" t-att-value="props.line.indirect_per_kg" step="0.001"
+                                   t-on-change="(ev) => this.onFieldChange('indirect_per_kg', ev)"/></div>
                     </div>
-                    <div class="crfp-fg">
-                        <label>Materials/kg</label>
-                        <input type="number" t-att-value="props.line.materials_per_kg" step="0.001"
-                               t-on-change="(ev) => this.onFieldChange('materials_per_kg', ev)"/>
-                    </div>
-                    <div class="crfp-fg">
-                        <label>Indirect/kg</label>
-                        <input type="number" t-att-value="props.line.indirect_per_kg" step="0.001"
-                               t-on-change="(ev) => this.onFieldChange('indirect_per_kg', ev)"/>
-                    </div>
-                </div>
+                </t>
             </div>
-            <div class="crfp-presults">
-                <div class="crfp-ri"><span>Purchase</span><span t-esc="'$' + fmt(props.line.purchase_cost, 4)"/></div>
-                <div class="crfp-ri"><span>Packing</span><span t-esc="'$' + fmt(props.line.packing_cost, 4)"/></div>
-                <div class="crfp-ri"><span>EXW Price</span><span t-esc="'$' + fmt(props.line.exw_price)"/></div>
-                <div class="crfp-ri crfp-ri-log"><span>Logistics/box</span><span t-esc="'$' + fmt(props.line.logistics_per_box, 4)"/></div>
-                <div class="crfp-ri"><span>Gross Lbs</span><span t-esc="fmt(props.line.gross_lbs, 1)"/></div>
-            </div>
+            <!-- Final price box -->
             <div class="crfp-fpbox" t-esc="'$' + fmt(props.line.final_price) + ' / box'"/>
+            <!-- Include checkbox -->
             <div class="crfp-pdfcb" t-on-click="onToggle">
                 <input type="checkbox" t-att-checked="props.line.include_in_pdf" readonly="1"/>
                 <span>Include in PDF / Order</span>

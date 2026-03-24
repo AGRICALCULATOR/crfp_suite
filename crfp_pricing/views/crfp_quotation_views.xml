@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- ═══ TREE VIEW ═══ -->
     <record id="crfp_quotation_tree" model="ir.ui.view">
         <field name="name">crfp.quotation.tree</field>
         <field name="model">crfp.quotation</field>
@@ -11,16 +12,17 @@
                 <field name="port_id"/>
                 <field name="exchange_rate"/>
                 <field name="line_count"/>
-                <field name="total_amount"/>
+                <field name="total_amount" string="Total $/box"/>
                 <field name="sale_order_id"/>
                 <field name="state" widget="badge"
                        decoration-success="state == 'won'"
-                       decoration-info="state == 'confirmed'"
+                       decoration-info="state in ('confirmed','sent')"
                        decoration-warning="state == 'draft'"/>
             </list>
         </field>
     </record>
 
+    <!-- ═══ FORM VIEW — Commercial quotation with pallets table ═══ -->
     <record id="crfp_quotation_form" model="ir.ui.view">
         <field name="name">crfp.quotation.form</field>
         <field name="model">crfp.quotation</field>
@@ -29,65 +31,75 @@
                 <header>
                     <button name="action_create_sale_order" type="object"
                             string="Create Sale Order" class="btn-primary"
-                            invisible="sale_order_id"/>
-                    <field name="state" widget="statusbar"/>
+                            invisible="sale_order_id or state == 'lost'"/>
+                    <button name="action_send_email" type="object"
+                            string="Send by Email" class="btn-secondary"
+                            invisible="state == 'lost'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,confirmed,sent,won"/>
                 </header>
                 <sheet>
                     <div class="oe_title">
-                        <h1><field name="name"/></h1>
+                        <h1><field name="name" placeholder="e.g. VANESSA VEGA FOB Rotterdam"/></h1>
                     </div>
                     <group>
-                        <group>
-                            <field name="partner_id"/>
+                        <group string="Commercial">
+                            <field name="partner_id" string="Client"
+                                   options="{'no_create': True}"/>
                             <field name="client_type"/>
-                            <field name="exchange_rate"/>
                             <field name="incoterm"/>
+                            <field name="exchange_rate"/>
                         </group>
-                        <group>
+                        <group string="Logistics">
                             <field name="port_id"/>
                             <field name="freight_quote_id"/>
                             <field name="total_boxes"/>
-                            <field name="sale_order_id"/>
+                            <field name="container_type_id"/>
+                            <field name="sale_order_id" readonly="1"/>
                         </group>
                     </group>
-                    <group string="Shipment Info" col="4">
-                        <field name="etd"/>
-                        <field name="eta"/>
-                        <field name="vessel_name"/>
-                        <field name="shipping_company"/>
+                    <group string="Shipment" col="4">
+                        <field name="etd"/><field name="eta"/>
+                        <field name="vessel_name"/><field name="shipping_company"/>
                     </group>
+
                     <notebook>
-                        <page string="Product Lines">
+                        <page string="Products &amp; Pallets" name="lines">
                             <field name="line_ids">
                                 <list editable="bottom">
-                                    <field name="crfp_product_id"/>
-                                    <field name="raw_price_crc"/>
-                                    <field name="net_kg"/>
-                                    <field name="box_cost"/>
-                                    <field name="profit"/>
-                                    <field name="exw_price"/>
-                                    <field name="logistics_per_box"/>
-                                    <field name="final_price"/>
-                                    <field name="gross_lbs"/>
-                                    <field name="pallets"/>
-                                    <field name="boxes_per_pallet"/>
-                                    <field name="include_in_pdf"/>
+                                    <field name="crfp_product_id" string="Product"/>
+                                    <field name="final_price" string="$/Box" readonly="1"/>
+                                    <field name="boxes_per_pallet" string="Boxes/Pallet"/>
+                                    <field name="pallets" string="Pallets"/>
+                                    <field name="total_boxes" string="Total Boxes" readonly="1"/>
+                                    <field name="pallet_price" string="$/Pallet" readonly="1"/>
+                                    <field name="line_total" string="Line Total" readonly="1"/>
+                                    <field name="net_kg" string="Kg" optional="show"/>
+                                    <field name="gross_lbs" string="Lbs" optional="show" readonly="1"/>
+                                    <field name="exw_price" string="EXW" optional="hide" readonly="1"/>
+                                    <field name="logistics_per_box" string="Log/Box" optional="hide" readonly="1"/>
+                                    <field name="include_in_pdf" string="Incl." widget="boolean"/>
+                                    <field name="raw_price_crc" optional="hide"/>
+                                    <field name="box_cost" optional="hide"/>
+                                    <field name="profit" optional="hide"/>
                                 </list>
                             </field>
+                            <group class="oe_subtotal_footer">
+                                <field name="total_pallets" string="Total Pallets"/>
+                                <field name="total_boxes_sum" string="Total Boxes"/>
+                                <field name="total_order_amount" string="Total Order Amount"
+                                       class="oe_subtotal_footer_separator"/>
+                            </group>
                         </page>
-                        <page string="Fixed Cost Snapshot">
+                        <page string="Fixed Cost Snapshot" name="costs">
                             <group>
                                 <group>
-                                    <field name="fc_transport"/>
-                                    <field name="fc_thc_origin"/>
-                                    <field name="fc_fumigation"/>
-                                    <field name="fc_broker"/>
+                                    <field name="fc_transport"/><field name="fc_thc_origin"/>
+                                    <field name="fc_fumigation"/><field name="fc_broker"/>
                                 </group>
                                 <group>
-                                    <field name="fc_thc_dest"/>
-                                    <field name="fc_fumig_dest"/>
-                                    <field name="fc_inland_dest"/>
-                                    <field name="fc_insurance_pct"/>
+                                    <field name="fc_thc_dest"/><field name="fc_fumig_dest"/>
+                                    <field name="fc_inland_dest"/><field name="fc_insurance_pct"/>
                                     <field name="fc_duties_pct"/>
                                 </group>
                             </group>

@@ -12,7 +12,7 @@ class CrfpQuotationLine(models.Model):
                                        required=True)
     sequence = fields.Integer(related='crfp_product_id.sequence', store=True)
 
-    # Editable per-line parameters (user can override defaults)
+    # Editable per-line parameters
     raw_price_crc = fields.Float(string='Raw Price (CRC)', digits=(12, 2))
     net_kg = fields.Float(string='Net Kg')
     box_cost = fields.Float(string='Box Cost (USD)', digits=(12, 2))
@@ -29,10 +29,22 @@ class CrfpQuotationLine(models.Model):
     final_price = fields.Float(string='Final Price (USD)', digits=(12, 2))
     gross_lbs = fields.Float(string='Gross Lbs', digits=(12, 1))
 
-    # Order config
+    # Order / pallet config
     pallets = fields.Integer(string='Pallets', default=0)
     boxes_per_pallet = fields.Integer(string='Boxes/Pallet', default=66)
     include_in_pdf = fields.Boolean(string='Include', default=True)
+
+    # Computed fields for quotation form
+    total_boxes = fields.Integer(string='Total Boxes', compute='_compute_totals', store=True)
+    pallet_price = fields.Float(string='Price/Pallet', compute='_compute_totals', store=True, digits=(12, 2))
+    line_total = fields.Float(string='Line Total', compute='_compute_totals', store=True, digits=(12, 2))
+
+    @api.depends('pallets', 'boxes_per_pallet', 'final_price')
+    def _compute_totals(self):
+        for rec in self:
+            rec.total_boxes = rec.pallets * rec.boxes_per_pallet
+            rec.pallet_price = rec.final_price * rec.boxes_per_pallet
+            rec.line_total = rec.final_price * rec.total_boxes
 
     @api.onchange('crfp_product_id')
     def _onchange_product(self):

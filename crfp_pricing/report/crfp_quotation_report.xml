@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Report action -->
+    <record id="action_report_crfp_quotation" model="ir.actions.report">
+        <field name="name">Export Price Quotation</field>
+        <field name="model">crfp.quotation</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">crfp_pricing.report_crfp_quotation</field>
+        <field name="report_file">crfp_pricing.report_crfp_quotation</field>
+        <field name="binding_model_id" ref="model_crfp_quotation"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- QWeb template -->
+    <template id="report_crfp_quotation">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page" style="font-family: 'Segoe UI', Arial, sans-serif;">
+
+                        <!-- Header -->
+                        <div style="border-bottom: 3px solid #1a4d2e; padding-bottom: 12px; margin-bottom: 16px;">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                <div>
+                                    <h2 style="color: #1a4d2e; margin: 0; font-size: 22px;">EXPORT PRICE QUOTATION</h2>
+                                    <p style="color: #3d8b5c; margin: 4px 0 0; font-size: 13px; font-weight: 600;">
+                                        CR FARM PRODUCTS VYM S.A
+                                    </p>
+                                </div>
+                                <div style="text-align: right;">
+                                    <p style="margin: 0; font-size: 12px; color: #666;">
+                                        Date: <strong t-field="o.create_date" t-options='{"widget": "date"}'/>
+                                    </p>
+                                    <p style="margin: 2px 0 0; font-size: 12px; color: #666;">
+                                        Ref: <strong t-esc="o.name"/>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Client and terms -->
+                        <div style="display: flex; gap: 30px; margin-bottom: 16px;">
+                            <div style="flex: 1;">
+                                <p style="font-size: 10px; color: #888; text-transform: uppercase; margin: 0;">Client</p>
+                                <p style="font-size: 14px; font-weight: 700; margin: 2px 0;" t-esc="o.partner_id.name or '—'"/>
+                                <p style="font-size: 11px; color: #666; margin: 0;" t-if="o.partner_id.email" t-esc="o.partner_id.email"/>
+                            </div>
+                            <div style="flex: 1;">
+                                <table style="font-size: 11px; width: 100%;">
+                                    <tr><td style="color: #888; padding: 2px 8px 2px 0;">Incoterm</td><td style="font-weight: 700;" t-esc="o.incoterm"/></tr>
+                                    <tr><td style="color: #888; padding: 2px 8px 2px 0;">Destination</td><td style="font-weight: 700;" t-esc="o.port_id.name or '—'"/></tr>
+                                    <tr><td style="color: #888; padding: 2px 8px 2px 0;">Exchange Rate</td><td style="font-weight: 700;">₡<t t-esc="'%.2f' % o.exchange_rate"/> / USD</td></tr>
+                                    <tr t-if="o.vessel_name"><td style="color: #888; padding: 2px 8px 2px 0;">Vessel</td><td t-esc="o.vessel_name"/></tr>
+                                    <tr t-if="o.etd"><td style="color: #888; padding: 2px 8px 2px 0;">ETD</td><td t-field="o.etd"/></tr>
+                                    <tr t-if="o.eta"><td style="color: #888; padding: 2px 8px 2px 0;">ETA</td><td t-field="o.eta"/></tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Products table -->
+                        <table style="width: 100%; border-collapse: collapse; font-size: 11px; margin-bottom: 16px;">
+                            <thead>
+                                <tr style="background: #1a4d2e; color: white;">
+                                    <th style="padding: 8px; text-align: left;">Product</th>
+                                    <th style="padding: 8px; text-align: center;">Net Kg</th>
+                                    <th style="padding: 8px; text-align: center;">Gross Lb</th>
+                                    <th style="padding: 8px; text-align: right;">EXW Price</th>
+                                    <th style="padding: 8px; text-align: right;">Logistics</th>
+                                    <th style="padding: 8px; text-align: right;">Price/Box</th>
+                                    <th style="padding: 8px; text-align: center;">Boxes/Plt</th>
+                                    <th style="padding: 8px; text-align: right;">Price/Pallet</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="o.line_ids.filtered(lambda l: l.include_in_pdf)" t-as="line">
+                                    <tr style="border-bottom: 1px solid #e0e0e0;">
+                                        <td style="padding: 6px 8px; font-weight: 600;" t-esc="line.crfp_product_id.name"/>
+                                        <td style="padding: 6px 8px; text-align: center; font-family: monospace;" t-esc="'%.1f' % line.net_kg"/>
+                                        <td style="padding: 6px 8px; text-align: center; font-family: monospace;" t-esc="'%.1f' % line.gross_lbs"/>
+                                        <td style="padding: 6px 8px; text-align: right; font-family: monospace;" t-esc="'$%.2f' % line.exw_price"/>
+                                        <td style="padding: 6px 8px; text-align: right; font-family: monospace; color: #3d8b5c;" t-esc="'$%.4f' % line.logistics_per_box"/>
+                                        <td style="padding: 6px 8px; text-align: right; font-family: monospace; font-weight: 700; color: #1a4d2e;" t-esc="'$%.2f' % line.final_price"/>
+                                        <td style="padding: 6px 8px; text-align: center; font-family: monospace;" t-esc="line.boxes_per_pallet"/>
+                                        <td style="padding: 6px 8px; text-align: right; font-family: monospace; font-weight: 700;" t-esc="'$%.2f' % line.pallet_price"/>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+
+                        <!-- Footer note -->
+                        <div style="background: #eef6f1; border-radius: 6px; padding: 10px 14px; font-size: 11px; color: #1a4d2e;">
+                            <p style="margin: 0;"><strong>Terms:</strong> Prices in USD. <t t-esc="o.incoterm"/> terms apply.
+                            Prices valid for 7 days from quotation date. Subject to product availability.</p>
+                        </div>
+
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>
