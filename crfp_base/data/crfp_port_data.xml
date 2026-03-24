@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="port_rtm" model="crfp.port"><field name="code">RTM</field><field name="name">Rotterdam</field><field name="country">Netherlands</field><field name="region">europe</field></record>
+        <record id="port_anr" model="crfp.port"><field name="code">ANR</field><field name="name">Antwerp</field><field name="country">Belgium</field><field name="region">europe</field></record>
+        <record id="port_vls" model="crfp.port"><field name="code">VLS</field><field name="name">Vlissingen</field><field name="country">Netherlands</field><field name="region">europe</field></record>
+        <record id="port_dkk" model="crfp.port"><field name="code">DKK</field><field name="name">Dunkerque</field><field name="country">France</field><field name="region">europe</field></record>
+        <record id="port_liv" model="crfp.port"><field name="code">LIV</field><field name="name">Livorno</field><field name="country">Italy</field><field name="region">europe</field></record>
+        <record id="port_alc" model="crfp.port"><field name="code">ALC</field><field name="name">Algeciras</field><field name="country">Spain</field><field name="region">europe</field></record>
+        <record id="port_ham" model="crfp.port"><field name="code">HAM</field><field name="name">Hamburg</field><field name="country">Germany</field><field name="region">europe</field></record>
+        <record id="port_mia" model="crfp.port"><field name="code">MIA</field><field name="name">Miami</field><field name="country">USA</field><field name="region">north_america</field></record>
+        <record id="port_nyc" model="crfp.port"><field name="code">NYC</field><field name="name">New York</field><field name="country">USA</field><field name="region">north_america</field></record>
+        <record id="port_lax" model="crfp.port"><field name="code">LAX</field><field name="name">Los Angeles</field><field name="country">USA</field><field name="region">north_america</field></record>
+        <record id="port_nwk" model="crfp.port"><field name="code">NWK</field><field name="name">Rockleigh NJ</field><field name="country">USA</field><field name="region">north_america</field></record>
+        <record id="port_yto" model="crfp.port"><field name="code">YTO</field><field name="name">Toronto</field><field name="country">Canada</field><field name="region">north_america</field></record>
+        <record id="port_lhr" model="crfp.port"><field name="code">LHR</field><field name="name">Tilbury London</field><field name="country">UK</field><field name="region">europe</field></record>
+        <record id="port_ptp" model="crfp.port"><field name="code">PTP</field><field name="name">Pointe-a-Pitre</field><field name="country">Guadalupe</field><field name="region">caribbean</field></record>
+    </data>
+</odoo>

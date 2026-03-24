@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="crfp_box_type_tree" model="ir.ui.view">
+        <field name="name">crfp.box.type.tree</field>
+        <field name="model">crfp.box.type</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="brand"/>
+                <field name="cost"/>
+                <field name="notes"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_crfp_box_type" model="ir.actions.act_window">
+        <field name="name">Box Types</field>
+        <field name="res_model">crfp.box.type</field>
+        <field name="view_mode">list</field>
+    </record>
+</odoo>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="crfp_pricing.PriceCalculator">
+        <div class="crfp-calc-main">
+            <t t-foreach="props.categories" t-as="cat" t-key="cat">
+                <t t-set="catLines" t-value="getLinesByCategory(cat)"/>
+                <t t-if="catLines.length">
+                    <div class="crfp-cat-hdr">
+                        <i t-att-class="'fa ' + getCategoryIcon(cat)"/>
+                        <span t-esc="getCategoryLabel(cat)"/>
+                        <span class="crfp-cat-count" t-esc="'(' + catLines.length + ')'"/>
+                    </div>
+                    <div class="crfp-pgrid">
+                        <t t-foreach="catLines" t-as="line" t-key="line.crfp_product_id">
+                            <ProductCard line="line"
+                                         boxTypes="props.boxTypes"
+                                         onUpdate="props.onUpdateLine"
+                                         onToggleInclude="props.onToggleInclude"/>
+                        </t>
+                    </div>
+                </t>
+            </t>
+        </div>
+    </t>
+</templates>

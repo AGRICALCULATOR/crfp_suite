@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="crfp_pricing.BoxCostManager">
+        <div class="crfp-box-tab">
+            <div class="crfp-tab-header">
+                <div>
+                    <h2><i class="fa fa-box"/> Box Cost Manager</h2>
+                    <p class="crfp-subtitle">Box types and costs. Edit via Configuration > Box Types.</p>
+                </div>
+            </div>
+            <table class="crfp-rtbl">
+                <thead><tr>
+                    <th>Description</th>
+                    <th>Brand / Client</th>
+                    <th>Cost / Box (USD)</th>
+                    <th>Notes</th>
+                </tr></thead>
+                <tbody>
+                    <t t-foreach="props.boxTypes" t-as="bt" t-key="bt.id">
+                        <tr>
+                            <td t-esc="bt.name"/>
+                            <td t-esc="bt.brand"/>
+                            <td class="crfp-mono" t-esc="'$' + fmt(bt.cost)"/>
+                            <td t-esc="bt.notes"/>
+                        </tr>
+                    </t>
+                </tbody>
+            </table>
+            <div class="crfp-box-help">
+                <strong>How it works:</strong> In the Price Calculator, each product card shows a dropdown for Box Cost — select the type and the cost fills automatically. To add or edit box types, go to Configuration > Box Types.
+            </div>
+        </div>
+    </t>
+</templates>

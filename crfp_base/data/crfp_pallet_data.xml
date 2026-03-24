@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="pallet_yuca_18" model="crfp.pallet.config"><field name="product_keyword">YUCA</field><field name="weight_kg">18</field><field name="boxes_per_pallet">66</field></record>
+        <record id="pallet_malanga_16" model="crfp.pallet.config"><field name="product_keyword">MALANGA</field><field name="weight_kg">16</field><field name="boxes_per_pallet">60</field></record>
+        <record id="pallet_islena_16" model="crfp.pallet.config"><field name="product_keyword">ISLENA</field><field name="weight_kg">16</field><field name="boxes_per_pallet">60</field></record>
+        <record id="pallet_bigtaro_16" model="crfp.pallet.config"><field name="product_keyword">BIG TARO</field><field name="weight_kg">16</field><field name="boxes_per_pallet">60</field></record>
+        <record id="pallet_eddoes_10" model="crfp.pallet.config"><field name="product_keyword">EDDOES</field><field name="weight_kg">10</field><field name="boxes_per_pallet">100</field></record>
+        <record id="pallet_sweetpotato_10" model="crfp.pallet.config"><field name="product_keyword">SWEET POTATO</field><field name="weight_kg">10</field><field name="boxes_per_pallet">100</field></record>
+        <record id="pallet_ginger_10" model="crfp.pallet.config"><field name="product_keyword">GINGER</field><field name="weight_kg">10</field><field name="boxes_per_pallet">80</field></record>
+        <record id="pallet_ginger_12" model="crfp.pallet.config"><field name="product_keyword">GINGER</field><field name="weight_kg">12</field><field name="boxes_per_pallet">80</field></record>
+        <record id="pallet_whiteyam_14" model="crfp.pallet.config"><field name="product_keyword">WHITE YAM</field><field name="weight_kg">13.65</field><field name="boxes_per_pallet">72</field></record>
+        <record id="pallet_yampee_16" model="crfp.pallet.config"><field name="product_keyword">YAMPEE</field><field name="weight_kg">16</field><field name="boxes_per_pallet">60</field></record>
+        <record id="pallet_drycoconut_40" model="crfp.pallet.config"><field name="product_keyword">DRY COCONUT</field><field name="weight_kg">40</field><field name="boxes_per_pallet">30</field></record>
+        <record id="pallet_greencoconut_10" model="crfp.pallet.config"><field name="product_keyword">GREEN COCONUT</field><field name="weight_kg">10</field><field name="boxes_per_pallet">100</field></record>
+        <record id="pallet_sugarcane_bundle_18" model="crfp.pallet.config"><field name="product_keyword">SUGAR CANE</field><field name="weight_kg">18</field><field name="boxes_per_pallet">44</field></record>
+        <record id="pallet_pumpkin_13" model="crfp.pallet.config"><field name="product_keyword">PUMPKIN</field><field name="weight_kg">13</field><field name="boxes_per_pallet">70</field></record>
+    </data>
+</odoo>

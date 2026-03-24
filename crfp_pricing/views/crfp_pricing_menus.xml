@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Client Action: the Owl Calculator -->
+    <record id="action_crfp_calculator" model="ir.actions.client">
+        <field name="name">Price Calculator</field>
+        <field name="tag">crfp_pricing.calculator</field>
+    </record>
+
+    <!-- ROOT APP MENU (shows in Odoo dashboard) -->
+    <menuitem id="menu_crfp_pricing_root"
+              name="CR Farm Export"
+              action="action_crfp_calculator"
+              web_icon="crfp_pricing,static/description/icon.png"
+              sequence="5"/>
+
+    <!-- Sub-menus -->
+    <menuitem id="menu_crfp_calculator"
+              name="Calculator"
+              parent="menu_crfp_pricing_root"
+              action="action_crfp_calculator"
+              sequence="10"/>
+
+    <menuitem id="menu_crfp_quotations"
+              name="Quotations"
+              parent="menu_crfp_pricing_root"
+              action="action_crfp_quotation"
+              sequence="20"/>
+
+    <menuitem id="menu_crfp_freight_quotes"
+              name="Freight Quotes"
+              parent="menu_crfp_pricing_root"
+              action="action_crfp_freight_quote"
+              sequence="30"/>
+
+    <!-- Configuration sub-menu (from crfp_base) -->
+    <menuitem id="menu_crfp_pricing_config"
+              name="Configuration"
+              parent="menu_crfp_pricing_root"
+              sequence="90"/>
+
+    <menuitem id="menu_crfp_pc_ports"
+              name="Ports"
+              parent="menu_crfp_pricing_config"
+              action="crfp_base.action_crfp_port"
+              sequence="10"/>
+
+    <menuitem id="menu_crfp_pc_carriers"
+              name="Carriers &amp; Forwarders"
+              parent="menu_crfp_pricing_config"
+              action="crfp_base.action_crfp_carrier"
+              sequence="20"/>
+
+    <menuitem id="menu_crfp_pc_containers"
+              name="Container Types"
+              parent="menu_crfp_pricing_config"
+              action="crfp_base.action_crfp_container_type"
+              sequence="30"/>
+
+    <menuitem id="menu_crfp_pc_products"
+              name="Export Products"
+              parent="menu_crfp_pricing_config"
+              action="crfp_base.action_crfp_product"
+              sequence="40"/>
+
+    <menuitem id="menu_crfp_pc_boxes"
+              name="Box Types"
+              parent="menu_crfp_pricing_config"
+              action="crfp_base.action_crfp_box_type"
+              sequence="50"/>
+
+    <menuitem id="menu_crfp_pc_pallets"
+              name="Pallet Configuration"
+              parent="menu_crfp_pricing_config"
+              action="crfp_base.action_crfp_pallet_config"
+              sequence="60"/>
+
+    <menuitem id="menu_crfp_pc_incoterms"
+              name="Incoterm Matrix"
+              parent="menu_crfp_pricing_config"
+              action="crfp_base.action_crfp_incoterm_matrix"
+              sequence="70"/>
+
+    <menuitem id="menu_crfp_pc_fixed"
+              name="Fixed Costs"
+              parent="menu_crfp_pricing_config"
+              action="crfp_base.action_crfp_fixed_cost"
+              sequence="80"/>
+</odoo>

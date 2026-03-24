@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Tubers & Root Vegetables -->
+        <record id="prod_yuca_valencia" model="crfp.product">
+            <field name="name">YUCA VALENCIA</field><field name="category">tubers</field><field name="sequence">1</field>
+            <field name="raw_price_crc">29000</field><field name="net_kg">18</field><field name="default_box_cost">1.65</field>
+            <field name="labor_per_kg">0.0481</field><field name="materials_per_kg">0.0829</field><field name="indirect_per_kg">0.032</field>
+            <field name="default_profit">3</field><field name="calc_type">standard</field><field name="purchase_formula">quintal</field><field name="gross_weight_type">standard</field>
+        </record>
+        <record id="prod_yuca_senorita" model="crfp.product">
+            <field name="name">YUCA SENORITA</field><field name="category">tubers</field><field name="sequence">2</field>
+            <field name="raw_price_crc">22000</field><field name="net_kg">18</field><field name="default_box_cost">1.65</field>
+            <field name="labor_per_kg">0.0481</field><field name="materials_per_kg">0.0829</field><field name="indirect_per_kg">0.032</field>
+            <field name="default_profit">3</field><field name="calc_type">standard</field><field name="purchase_formula">quintal</field><field name="gross_weight_type">standard</field>
+        </record>
+        <record id="prod_eddoes" model="crfp.product">
+            <field name="name">EDDOES</field><field name="category">tubers</field><field name="sequence">3</field>
+            <field name="raw_price_crc">26000</field><field name="net_kg">10</field><field name="default_box_cost">1.4</field>
+            <field name="labor_per_kg">0.0933</field><field name="materials_per_kg">0.0233</field><field name="indirect_per_kg">0.032</field>
+            <field name="default_profit">5</field><field name="calc_type">standard</field><field name="purchase_formula">quintal</field><field name="gross_weight_type">standard</field>
+        </record>
+        <record id="prod_islena" model="crfp.product">
+            <field name="name">ISLENA (taro head)</field><field name="category">tubers</field><field name="sequence">4</field>
+            <field name="raw_price_crc">11000</field><field name="net_kg">16</field><field name="default_box_cost">1.45</field>
+            <field name="labor_per_kg">0.0933</field><field name="materials_per_kg">0.0233</field><field name="indirect_per_kg">0.032</field>
+            <field name="default_profit">4</field><field name="calc_type">standard</field><field name="purchase_formula">quintal</field><field name="gross_weight_type">standard</field>
+        </record>
+        <record id="prod_malanga_lila" model="crfp.product">
+            <field name="name">Malanga LILA</field><field name="category">tubers</field><field name="sequence">5</field>
+            <field name="raw_price_crc">27000</field><field name="net_kg">16</field><field name="default_box_cost">1.45</field>
+            <field name="labor_per_kg">0.0933</field><field name="materials_per_kg">0.0233</field><field name="indirect_per_kg">0.032</field>
+            <field name="default_profit">5</field><field name="calc_type">standard</field><field name="purchase_formula">quintal</field><field name="gross_weight_type">standard</field>
+        </record>
+        <record id="prod_big_taro" model="crfp.product">
+            <field name="name">BIG TARO LILA</field><field name="category">tubers</field><field name="sequence">6</field>
+            <field name="raw_price_crc">31000</field><field name="net_kg">16</field><field name="default_box_cost">1.65</field>
+            <field name="labor_per_kg">0.0933</field><field name="materials_per_kg">0.0233</field><field name="indirect_per_kg">0.032</field>
+            <field name="default_profit">4</field><field name="calc_type">standard</field><field name="purchase_formula">quintal</field><field name="gross_weight_type">standard</field>
+        </record>
+        <record id="prod_white_yam" model="crfp.product">
+            <field name="name">WHITE YAM</field><field name="category">tubers</field><field name="sequence">8</field>
+            <field name="raw_price_crc">740</field><field name="net_kg">13.65</field><field name="default_box_cost">1.45</field>
+            <field name="labor_per_kg">0.0824</field><field name="materials_per_kg">0.0439</field><field name="indirect_per_kg">0.032</field>
+            <field name="default_profit">3</field><field name="calc_type">standard</field><field name="purchase_formula">standard</field><field name="gross_weight_type">standard</field>
+        </record>
+        <record id="prod_yampee" model="crfp.product">
+            <field name="name">YAMPEE</field><field name="category">tubers</field><field name="sequence">9</field>
+            <field name="raw_price_crc">1600</field><field name="net_kg">16</field><field name="default_box_cost">1.45</field>
+            <field name="labor_per_kg">0.076</field><field name="materials_per_kg">0.079</field><field name="indirect_per_kg">0.032</field>
+            <field name="default_profit">5</field><field name="calc_type">standard</field><field name="purchase_formula">standard</field><field name="gross_weight_type">standard</field>
+        </record>
+        <record id="prod_sweet_potato" model="crfp.product">
+            <field name="name">SWEET POTATOES LILAC</field><field name="category">tubers</field><field name="sequence">18</field>
+            <field name="raw_price_crc">633</field><field name="net_kg">10</field><field name="default_box_cost">1.65</field>
+            <field name="labor_per_kg">0.0961</field><field name="materials_per_kg">0.0187</field><field name="indirect_per_kg">0.032</field>
+            <field name="default_profit">3</field><field name="calc_type">standard</field><field name="purchase_formula">standard</field><field name="gross_weight_type">standard</field>
+        </record>
+        <record id="prod_ginger" model="crfp.product">
+            <field name="name">GINGER</field><field name="category">tubers</field><field name="sequence">7</field>
+            <field name="raw_price_crc">800</field><field name="net_kg">10</field><field name="default_box_cost">1.4</field>
+            <field name="labor_per_kg">0.082</field><field name="materials_per_kg">0.022</field><field name="indirect_per_kg">0.032</field>
+            <field name="default_profit">4</field><field name="calc_type">standard</field><field name="purchase_formula">standard</field><field name="gross_weight_type">standard</field>
+        </record>
+
+        <!-- Coconut -->
+        <record id="prod_dry_coconut" model="crfp.product">
+            <field name="name">DRY COCONUT</field><field name="category">coconut</field><field name="sequence">12</field>
+            <field name="raw_price_crc">300</field><field name="net_kg">40</field><field name="default_box_cost">0</field>
+            <field name="labor_per_kg">0.824</field><field name="materials_per_kg">1.09</field><field name="indirect_per_kg">0.42</field>
+            <field name="default_profit">5</field><field name="calc_type">flat_no_box</field><field name="purchase_formula">standard</field><field name="gross_weight_type">zero</field>
+        </record>
+        <record id="prod_green_coconut" model="crfp.product">
+            <field name="name">GREEN COCONUT BOX</field><field name="category">coconut</field><field name="sequence">13</field>
+            <field name="raw_price_crc">240</field><field name="net_kg">10</field><field name="default_box_cost">1.8</field>
+            <field name="labor_per_kg">1.133</field><field name="materials_per_kg">0.66</field><field name="indirect_per_kg">0.42</field>
+            <field name="default_profit">3</field><field name="calc_type">flat_plus_box</field><field name="purchase_formula">standard</field><field name="gross_weight_type">zero</field>
+        </record>
+
+        <!-- Sugar Cane -->
+        <record id="prod_sugar_cane_green_bundles" model="crfp.product">
+            <field name="name">SUGAR CANE GREEN BUNDLES</field><field name="category">sugar_cane</field><field name="sequence">14</field>
+            <field name="raw_price_crc">225</field><field name="net_kg">18</field><field name="default_box_cost">0</field>
+            <field name="labor_per_kg">0.4944</field><field name="materials_per_kg">0.21</field><field name="indirect_per_kg">0.42</field>
+            <field name="default_profit">3</field><field name="calc_type">flat_no_box</field><field name="purchase_formula">standard</field><field name="gross_weight_type">no_tare</field>
+        </record>
+        <record id="prod_sugar_cane_green_box" model="crfp.product">
+            <field name="name">SUGAR CANE GREEN BOX</field><field name="category">sugar_cane</field><field name="sequence">15</field>
+            <field name="raw_price_crc">225</field><field name="net_kg">18</field><field name="default_box_cost">1.65</field>
+            <field name="labor_per_kg">0.5974</field><field name="materials_per_kg">0.27</field><field name="indirect_per_kg">0.42</field>
+            <field name="default_profit">3</field><field name="calc_type">flat_plus_box</field><field name="purchase_formula">standard</field><field name="gross_weight_type">no_tare</field>
+        </record>
+        <record id="prod_sugar_cane_lilac_bundles" model="crfp.product">
+            <field name="name">SUGAR CANE LILAC BUNDLES</field><field name="category">sugar_cane</field><field name="sequence">16</field>
+            <field name="raw_price_crc">253</field><field name="net_kg">18</field><field name="default_box_cost">0</field>
+            <field name="labor_per_kg">0.4944</field><field name="materials_per_kg">0.21</field><field name="indirect_per_kg">0.42</field>
+            <field name="default_profit">3</field><field name="calc_type">flat_no_box</field><field name="purchase_formula">standard</field><field name="gross_weight_type">no_tare</field>
+        </record>
+        <record id="prod_sugar_cane_lilac_box" model="crfp.product">
+            <field name="name">SUGAR CANE LILAC BOX</field><field name="category">sugar_cane</field><field name="sequence">17</field>
+            <field name="raw_price_crc">253</field><field name="net_kg">18</field><field name="default_box_cost">1.65</field>
+            <field name="labor_per_kg">0.5974</field><field name="materials_per_kg">0.27</field><field name="indirect_per_kg">0.42</field>
+            <field name="default_profit">3</field><field name="calc_type">flat_plus_box</field><field name="purchase_formula">standard</field><field name="gross_weight_type">no_tare</field>
+        </record>
+
+        <!-- Vegetables & Others -->
+        <record id="prod_pumpkins_box" model="crfp.product">
+            <field name="name">PUMPKINS BOX</field><field name="category">vegetables</field><field name="sequence">10</field>
+            <field name="raw_price_crc">200</field><field name="net_kg">13</field><field name="default_box_cost">1.65</field>
+            <field name="labor_per_kg">0.077</field><field name="materials_per_kg">0.023</field><field name="indirect_per_kg">0.0369</field>
+            <field name="default_profit">2.5</field><field name="calc_type">standard</field><field name="purchase_formula">standard</field><field name="gross_weight_type">standard</field>
+        </record>
+        <record id="prod_pumpkins_bag" model="crfp.product">
+            <field name="name">PUMPKINS BAG</field><field name="category">vegetables</field><field name="sequence">11</field>
+            <field name="raw_price_crc">200</field><field name="net_kg">13</field><field name="default_box_cost">0</field>
+            <field name="labor_per_kg">0.05</field><field name="materials_per_kg">0.058</field><field name="indirect_per_kg">0.0369</field>
+            <field name="default_profit">2.5</field><field name="calc_type">kg_no_box</field><field name="purchase_formula">standard</field><field name="gross_weight_type">standard</field>
+        </record>
+    </data>
+</odoo>

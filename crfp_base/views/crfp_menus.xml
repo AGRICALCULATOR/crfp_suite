@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Configuration menu (sub-menu inside the pricing app) -->
+    <menuitem id="menu_crfp_config_root"
+              name="Configuration"
+              sequence="90"/>
+
+    <menuitem id="menu_crfp_config_ports"
+              name="Ports"
+              parent="menu_crfp_config_root"
+              action="action_crfp_port"
+              sequence="10"/>
+
+    <menuitem id="menu_crfp_config_carriers"
+              name="Carriers &amp; Forwarders"
+              parent="menu_crfp_config_root"
+              action="action_crfp_carrier"
+              sequence="20"/>
+
+    <menuitem id="menu_crfp_config_containers"
+              name="Container Types"
+              parent="menu_crfp_config_root"
+              action="action_crfp_container_type"
+              sequence="30"/>
+
+    <menuitem id="menu_crfp_config_products"
+              name="Export Products"
+              parent="menu_crfp_config_root"
+              action="action_crfp_product"
+              sequence="40"/>
+
+    <menuitem id="menu_crfp_config_boxes"
+              name="Box Types"
+              parent="menu_crfp_config_root"
+              action="action_crfp_box_type"
+              sequence="50"/>
+
+    <menuitem id="menu_crfp_config_pallets"
+              name="Pallet Configuration"
+              parent="menu_crfp_config_root"
+              action="action_crfp_pallet_config"
+              sequence="60"/>
+
+    <menuitem id="menu_crfp_config_incoterms"
+              name="Incoterm Matrix"
+              parent="menu_crfp_config_root"
+              action="action_crfp_incoterm_matrix"
+              sequence="70"/>
+
+    <menuitem id="menu_crfp_config_fixed_costs"
+              name="Fixed Costs"
+              parent="menu_crfp_config_root"
+              action="action_crfp_fixed_cost"
+              sequence="80"/>
+</odoo>

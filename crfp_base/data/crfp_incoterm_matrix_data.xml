@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="inco_exw" model="crfp.incoterm.matrix"><field name="code">EXW</field><field name="sequence">1</field>
+            <field name="inc_transport" eval="False"/><field name="inc_fumigation" eval="False"/><field name="inc_thc_origin" eval="False"/>
+            <field name="inc_broker" eval="False"/><field name="inc_freight" eval="False"/><field name="inc_insurance" eval="False"/>
+            <field name="inc_thc_dest" eval="False"/><field name="inc_fumig_dest" eval="False"/><field name="inc_broker_dest" eval="False"/>
+            <field name="inc_inland_dest" eval="False"/><field name="inc_duties" eval="False"/>
+        </record>
+        <record id="inco_fca" model="crfp.incoterm.matrix"><field name="code">FCA</field><field name="sequence">2</field>
+            <field name="inc_transport" eval="True"/><field name="inc_fumigation" eval="False"/><field name="inc_thc_origin" eval="False"/>
+            <field name="inc_broker" eval="False"/><field name="inc_freight" eval="False"/><field name="inc_insurance" eval="False"/>
+            <field name="inc_thc_dest" eval="False"/><field name="inc_fumig_dest" eval="False"/><field name="inc_broker_dest" eval="False"/>
+            <field name="inc_inland_dest" eval="False"/><field name="inc_duties" eval="False"/>
+        </record>
+        <record id="inco_fob" model="crfp.incoterm.matrix"><field name="code">FOB</field><field name="sequence">3</field>
+            <field name="inc_transport" eval="True"/><field name="inc_fumigation" eval="True"/><field name="inc_thc_origin" eval="True"/>
+            <field name="inc_broker" eval="True"/><field name="inc_freight" eval="False"/><field name="inc_insurance" eval="False"/>
+            <field name="inc_thc_dest" eval="False"/><field name="inc_fumig_dest" eval="False"/><field name="inc_broker_dest" eval="False"/>
+            <field name="inc_inland_dest" eval="False"/><field name="inc_duties" eval="False"/>
+        </record>
+        <record id="inco_cfr" model="crfp.incoterm.matrix"><field name="code">CFR</field><field name="sequence">4</field>
+            <field name="inc_transport" eval="True"/><field name="inc_fumigation" eval="True"/><field name="inc_thc_origin" eval="True"/>
+            <field name="inc_broker" eval="True"/><field name="inc_freight" eval="True"/><field name="inc_insurance" eval="False"/>
+            <field name="inc_thc_dest" eval="False"/><field name="inc_fumig_dest" eval="False"/><field name="inc_broker_dest" eval="False"/>
+            <field name="inc_inland_dest" eval="False"/><field name="inc_duties" eval="False"/>
+        </record>
+        <record id="inco_cif" model="crfp.incoterm.matrix"><field name="code">CIF</field><field name="sequence">5</field>
+            <field name="inc_transport" eval="True"/><field name="inc_fumigation" eval="True"/><field name="inc_thc_origin" eval="True"/>
+            <field name="inc_broker" eval="True"/><field name="inc_freight" eval="True"/><field name="inc_insurance" eval="True"/>
+            <field name="inc_thc_dest" eval="False"/><field name="inc_fumig_dest" eval="False"/><field name="inc_broker_dest" eval="False"/>
+            <field name="inc_inland_dest" eval="False"/><field name="inc_duties" eval="False"/>
+        </record>
+        <record id="inco_cpt" model="crfp.incoterm.matrix"><field name="code">CPT</field><field name="sequence">6</field>
+            <field name="inc_transport" eval="True"/><field name="inc_fumigation" eval="True"/><field name="inc_thc_origin" eval="True"/>
+            <field name="inc_broker" eval="True"/><field name="inc_freight" eval="True"/><field name="inc_insurance" eval="False"/>
+            <field name="inc_thc_dest" eval="True"/><field name="inc_fumig_dest" eval="False"/><field name="inc_broker_dest" eval="False"/>
+            <field name="inc_inland_dest" eval="False"/><field name="inc_duties" eval="False"/>
+        </record>
+        <record id="inco_cip" model="crfp.incoterm.matrix"><field name="code">CIP</field><field name="sequence">7</field>
+            <field name="inc_transport" eval="True"/><field name="inc_fumigation" eval="True"/><field name="inc_thc_origin" eval="True"/>
+            <field name="inc_broker" eval="True"/><field name="inc_freight" eval="True"/><field name="inc_insurance" eval="True"/>
+            <field name="inc_thc_dest" eval="True"/><field name="inc_fumig_dest" eval="False"/><field name="inc_broker_dest" eval="False"/>
+            <field name="inc_inland_dest" eval="False"/><field name="inc_duties" eval="False"/>
+        </record>
+        <record id="inco_dap" model="crfp.incoterm.matrix"><field name="code">DAP</field><field name="sequence">8</field>
+            <field name="inc_transport" eval="True"/><field name="inc_fumigation" eval="True"/><field name="inc_thc_origin" eval="True"/>
+            <field name="inc_broker" eval="True"/><field name="inc_freight" eval="True"/><field name="inc_insurance" eval="True"/>
+            <field name="inc_thc_dest" eval="True"/><field name="inc_fumig_dest" eval="True"/><field name="inc_broker_dest" eval="False"/>
+            <field name="inc_inland_dest" eval="True"/><field name="inc_duties" eval="False"/>
+        </record>
+        <record id="inco_ddp" model="crfp.incoterm.matrix"><field name="code">DDP</field><field name="sequence">9</field>
+            <field name="inc_transport" eval="True"/><field name="inc_fumigation" eval="True"/><field name="inc_thc_origin" eval="True"/>
+            <field name="inc_broker" eval="True"/><field name="inc_freight" eval="True"/><field name="inc_insurance" eval="True"/>
+            <field name="inc_thc_dest" eval="True"/><field name="inc_fumig_dest" eval="True"/><field name="inc_broker_dest" eval="True"/>
+            <field name="inc_inland_dest" eval="True"/><field name="inc_duties" eval="True"/>
+        </record>
+    </data>
+</odoo>

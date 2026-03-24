@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="crfp_pricing.LogisticsSetup">
+        <div class="crfp-logistics-tab">
+            <div class="crfp-tab-header">
+                <div>
+                    <h2><i class="fa fa-route"/> Logistics Setup</h2>
+                    <p class="crfp-subtitle">Manage freight quotes, fixed costs and rate comparator</p>
+                </div>
+                <div class="crfp-tab-actions">
+                    <button class="btn btn-primary btn-sm" t-on-click="openAdd">
+                        <i class="fa fa-plus"/> Add Quote
+                    </button>
+                </div>
+            </div>
+
+            <!-- Add/Edit form -->
+            <div class="crfp-quote-form" t-if="state.showAddForm">
+                <h4 t-esc="state.editQuoteId ? 'Edit Freight Quote' : 'Add Freight Quote'"/>
+                <div class="crfp-form-grid-3">
+                    <div class="crfp-mfg">
+                        <label>Carrier / Forwarder</label>
+                        <select t-model="state.form.carrier_id">
+                            <option value="">-- Select --</option>
+                            <t t-foreach="props.carriers" t-as="c" t-key="c.id">
+                                <option t-att-value="c.id" t-esc="c.name"/>
+                            </t>
+                        </select>
+                    </div>
+                    <div class="crfp-mfg">
+                        <label>Destination Port</label>
+                        <select t-model="state.form.port_id">
+                            <option value="">-- Select --</option>
+                            <t t-foreach="props.ports" t-as="p" t-key="p.id">
+                                <option t-att-value="p.id" t-esc="p.code + ' - ' + p.name"/>
+                            </t>
+                        </select>
+                    </div>
+                    <div class="crfp-mfg">
+                        <label>All-in Freight (USD)</label>
+                        <input type="number" t-model.number="state.form.all_in_freight" class="crfp-mono"/>
+                    </div>
+                    <div class="crfp-mfg">
+                        <label>Container Type</label>
+                        <select t-model="state.form.container_type_id">
+                            <option value="">-- Select --</option>
+                            <t t-foreach="props.containerTypes" t-as="ct" t-key="ct.id">
+                                <option t-att-value="ct.id" t-esc="ct.name"/>
+                            </t>
+                        </select>
+                    </div>
+                    <div class="crfp-mfg">
+                        <label>Transit Days</label>
+                        <input type="number" t-model.number="state.form.transit_days"/>
+                    </div>
+                    <div class="crfp-mfg">
+                        <label>Valid Until</label>
+                        <input type="date" t-model="state.form.valid_until"/>
+                    </div>
+                    <div class="crfp-mfg">
+                        <label>Reference</label>
+                        <input type="text" t-model="state.form.name" placeholder="Q2026-184"/>
+                    </div>
+                    <div class="crfp-mfg">
+                        <label>Source</label>
+                        <input type="text" t-model="state.form.source" placeholder="Email, agent..."/>
+                    </div>
+                    <div class="crfp-mfg">
+                        <label>Notes</label>
+                        <input type="text" t-model="state.form.notes"/>
+                    </div>
+                </div>
+                <div class="crfp-includes-row">
+                    <span class="crfp-includes-label">What's INCLUDED in this freight quote:</span>
+                    <label class="crfp-inc-cb"><input type="checkbox" t-model="state.form.inc_transport"/> Internal Transport</label>
+                    <label class="crfp-inc-cb"><input type="checkbox" t-model="state.form.inc_thc_origin"/> THC Origin</label>
+                    <label class="crfp-inc-cb"><input type="checkbox" t-model="state.form.inc_broker"/> Customs Broker</label>
+                    <label class="crfp-inc-cb crfp-inc-dest"><input type="checkbox" t-model="state.form.inc_thc_dest"/> THC Dest.</label>
+                    <label class="crfp-inc-cb crfp-inc-dest"><input type="checkbox" t-model="state.form.inc_inland_dest"/> Inland Dest.</label>
+                    <label class="crfp-inc-cb crfp-inc-warn"><input type="checkbox" t-model="state.form.inc_fumig_dest"/> Fumig. Dest.</label>
+                </div>
+                <div class="crfp-form-actions">
+                    <button class="btn btn-primary btn-sm" t-on-click="saveForm"><i class="fa fa-save"/> Save</button>
+                    <button class="btn btn-secondary btn-sm" t-on-click="cancelForm">Cancel</button>
+                </div>
+            </div>
+
+            <div class="crfp-logistics-grid">
+                <!-- LEFT: Quotes list -->
+                <div class="crfp-panel">
+                    <div class="crfp-panel-hdr"><i class="fa fa-ship"/> Freight Quotes</div>
+                    <div class="crfp-panel-body">
+                        <t t-if="!props.freightQuotes.length">
+                            <div class="crfp-empty">No quotes yet. Add one above.</div>
+                        </t>
+                        <t t-foreach="filteredQuotes" t-as="q" t-key="q.id">
+                            <div class="crfp-quote-card"
+                                 t-att-class="{'crfp-quote-active': q.id === props.activeQuoteId}">
+                                <div class="crfp-quote-top">
+                                    <strong t-esc="q.carrier_name || 'Unknown'"/>
+                                    <span class="crfp-quote-price" t-esc="'$' + fmt(q.all_in_freight)"/>
+                                </div>
+                                <div class="crfp-quote-detail">
+                                    <span t-if="q.port_id" t-esc="q.port_id[1]"/>
+                                    <span t-if="q.transit_days" t-esc="q.transit_days + ' days'"/>
+                                </div>
+                                <div class="crfp-quote-actions">
+                                    <button class="crfp-use-btn"
+                                            t-att-class="{'crfp-used': q.id === props.activeQuoteId}"
+                                            t-on-click="() => props.onSelectQuote(q.id)">
+                                        <t t-if="q.id === props.activeQuoteId">Active</t>
+                                        <t t-else="">Use</t>
+                                    </button>
+                                    <button class="crfp-edit-btn" t-on-click="() => this.openEdit(q)">
+                                        <i class="fa fa-edit"/>
+                                    </button>
+                                    <button class="crfp-del-btn" t-on-click="() => props.onDeleteQuote(q.id)">
+                                        <i class="fa fa-trash"/>
+                                    </button>
+                                </div>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+
+                <!-- RIGHT: Fixed costs -->
+                <div class="crfp-panel">
+                    <div class="crfp-panel-hdr"><i class="fa fa-dollar-sign"/> Fixed Costs (USD per container)</div>
+                    <div class="crfp-panel-body">
+                        <div class="crfp-alert-info">
+                            These are YOUR operation costs in Costa Rica, not the carrier's.
+                            They apply globally. If a cost is included in a freight quote, mark it with the checkbox in that quote.
+                        </div>
+                        <div class="crfp-fixed-grid">
+                            <div class="crfp-fg">
+                                <label>Transport Internal ($)</label>
+                                <input type="number" t-att-value="props.fixedCosts.fc_transport"
+                                       t-on-change="(ev) => this.onFixedField('fc_transport', ev)"/>
+                            </div>
+                            <div class="crfp-fg">
+                                <label>THC Origin ($)</label>
+                                <input type="number" t-att-value="props.fixedCosts.fc_thc_origin"
+                                       t-on-change="(ev) => this.onFixedField('fc_thc_origin', ev)"/>
+                            </div>
+                            <div class="crfp-fg">
+                                <label>Fumigation ($)</label>
+                                <input type="number" t-att-value="props.fixedCosts.fc_fumigation"
+                                       t-on-change="(ev) => this.onFixedField('fc_fumigation', ev)"/>
+                            </div>
+                            <div class="crfp-fg">
+                                <label>Customs Broker ($)</label>
+                                <input type="number" t-att-value="props.fixedCosts.fc_broker"
+                                       t-on-change="(ev) => this.onFixedField('fc_broker', ev)"/>
+                            </div>
+                            <div class="crfp-fg">
+                                <label>THC Destination ($)</label>
+                                <input type="number" t-att-value="props.fixedCosts.fc_thc_dest"
+                                       t-on-change="(ev) => this.onFixedField('fc_thc_dest', ev)"/>
+                            </div>
+                            <div class="crfp-fg">
+                                <label>Fumig. Destination ($)</label>
+                                <input type="number" t-att-value="props.fixedCosts.fc_fumig_dest"
+                                       t-on-change="(ev) => this.onFixedField('fc_fumig_dest', ev)"/>
+                            </div>
+                            <div class="crfp-fg">
+                                <label>Inland Dest. ($)</label>
+                                <input type="number" t-att-value="props.fixedCosts.fc_inland_dest"
+                                       t-on-change="(ev) => this.onFixedField('fc_inland_dest', ev)"/>
+                            </div>
+                            <div class="crfp-fg">
+                                <label>Insurance (% EXW)</label>
+                                <input type="number" step="0.01" t-att-value="props.fixedCosts.fc_insurance_pct"
+                                       t-on-change="(ev) => this.onFixedField('fc_insurance_pct', ev)"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="crfp_product_tree" model="ir.ui.view">
+        <field name="name">crfp.product.tree</field>
+        <field name="model">crfp.product</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="category"/>
+                <field name="raw_price_crc"/>
+                <field name="net_kg"/>
+                <field name="default_box_cost"/>
+                <field name="total_cost_per_kg"/>
+                <field name="default_profit"/>
+                <field name="product_id" optional="show"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="crfp_product_form" model="ir.ui.view">
+        <field name="name">crfp.product.form</field>
+        <field name="model">crfp.product</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group string="Product Info">
+                            <field name="name"/>
+                            <field name="category"/>
+                            <field name="sequence"/>
+                            <field name="active"/>
+                        </group>
+                        <group string="Pricing">
+                            <field name="raw_price_crc"/>
+                            <field name="net_kg"/>
+                            <field name="default_box_cost"/>
+                            <field name="default_profit"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Processing Costs (USD/kg)">
+                            <field name="labor_per_kg"/>
+                            <field name="materials_per_kg"/>
+                            <field name="indirect_per_kg"/>
+                            <field name="total_cost_per_kg"/>
+                        </group>
+                        <group string="Calculation Config">
+                            <field name="calc_type"/>
+                            <field name="purchase_formula"/>
+                            <field name="gross_weight_type"/>
+                            <field name="product_id"/>
+                        </group>
+                    </group>
+                    <field name="notes" placeholder="Notes about this product..."/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_crfp_product" model="ir.actions.act_window">
+        <field name="name">Products</field>
+        <field name="res_model">crfp.product</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

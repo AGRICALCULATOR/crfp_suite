@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="box_generic_18" model="crfp.box.type"><field name="name">Caja Generica 18kg</field><field name="brand">Generic</field><field name="cost">1.65</field><field name="sequence">1</field><field name="notes">Tuberculos 18kg</field></record>
+        <record id="box_generic_16" model="crfp.box.type"><field name="name">Caja Generica 16kg</field><field name="brand">Generic</field><field name="cost">1.55</field><field name="sequence">2</field><field name="notes">MALANGA LILA, ISLENA 16kg</field></record>
+        <record id="box_generic_10" model="crfp.box.type"><field name="name">Caja Generica 10kg</field><field name="brand">Generic</field><field name="cost">1.40</field><field name="sequence">3</field><field name="notes">EDDOES, SWEET POTATO 10kg</field></record>
+        <record id="box_generic_13" model="crfp.box.type"><field name="name">Caja Generica 12-13kg</field><field name="brand">Generic</field><field name="cost">1.45</field><field name="sequence">4</field><field name="notes">GINGER, WHITE YAM, YAMPI</field></record>
+        <record id="box_mitrofresh" model="crfp.box.type"><field name="name">Caja Marca Mitrofresh</field><field name="brand">Mitrofresh</field><field name="cost">1.80</field><field name="sequence">10</field><field name="notes">Logo printed</field></record>
+        <record id="box_sandy_tropic" model="crfp.box.type"><field name="name">Caja Marca Sandy Tropic</field><field name="brand">Sandy Tropic</field><field name="cost">1.75</field><field name="sequence">11</field><field name="notes">Logo printed</field></record>
+        <record id="box_transfood" model="crfp.box.type"><field name="name">Caja Marca Transfood</field><field name="brand">Transfood</field><field name="cost">1.78</field><field name="sequence">12</field><field name="notes">Logo printed</field></record>
+        <record id="box_exotic_roots" model="crfp.box.type"><field name="name">Caja Marca EXOTIC ROOTS</field><field name="brand">EXOTIC ROOTS</field><field name="cost">1.72</field><field name="sequence">13</field><field name="notes">Logo printed</field></record>
+        <record id="box_coco_seco" model="crfp.box.type"><field name="name">Saco Coco Seco 40u</field><field name="brand">Generic</field><field name="cost">0.45</field><field name="sequence">20</field><field name="notes">DRY COCONUT, no box</field></record>
+        <record id="box_cane_bundle" model="crfp.box.type"><field name="name">Amarre Cana Bundles</field><field name="brand">Generic</field><field name="cost">0.21</field><field name="sequence">21</field><field name="notes">SUGAR CANE bundles, no box</field></record>
+        <record id="box_green_coconut" model="crfp.box.type"><field name="name">Caja Green Coconut 10u</field><field name="brand">Generic</field><field name="cost">1.80</field><field name="sequence">22</field><field name="notes">GREEN COCONUT BOX 10 units</field></record>
+    </data>
+</odoo>

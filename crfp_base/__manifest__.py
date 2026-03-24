@@ -1,0 +1,37 @@
+{
+    'name': 'CR Farm Products - Export Suite Base',
+    'version': '19.0.1.0.0',
+    'category': 'Sales/Export',
+    'summary': 'Master data for CR Farm Products export suite',
+    'description': """
+        Base module for the CR Farm Products Export Suite.
+        Contains shared master data: ports, carriers, container types,
+        products, box types, pallet configs, incoterm matrix, and fixed costs.
+    """,
+    'author': 'CR Farm Products VYM S.A.',
+    'website': 'https://crfarm.erpcr.net',
+    'license': 'LGPL-3',
+    'depends': ['base', 'mail', 'product', 'sale'],
+    'data': [
+        'security/crfp_security.xml',
+        'security/ir.model.access.csv',
+        'views/crfp_port_views.xml',
+        'views/crfp_carrier_views.xml',
+        'views/crfp_container_type_views.xml',
+        'views/crfp_product_views.xml',
+        'views/crfp_box_type_views.xml',
+        'views/crfp_pallet_config_views.xml',
+        'views/crfp_incoterm_matrix_views.xml',
+        'views/crfp_fixed_cost_views.xml',
+        'views/crfp_menus.xml',
+        'data/crfp_port_data.xml',
+        'data/crfp_container_type_data.xml',
+        'data/crfp_product_data.xml',
+        'data/crfp_box_type_data.xml',
+        'data/crfp_pallet_data.xml',
+        'data/crfp_incoterm_matrix_data.xml',
+    ],
+    'installable': True,
+    'application': False,
+    'auto_install': False,
+}

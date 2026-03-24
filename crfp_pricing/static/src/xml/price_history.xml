@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="crfp_pricing.PriceHistory">
+        <div class="crfp-history-tab">
+            <div class="crfp-tab-header">
+                <div>
+                    <h2><i class="fa fa-chart-line"/> Price History</h2>
+                    <p class="crfp-subtitle">Track raw material prices over time. Recorded automatically when you save a quotation.</p>
+                </div>
+            </div>
+            <div class="crfp-history-grid">
+                <t t-foreach="productSummaries" t-as="ps" t-key="ps.id">
+                    <div class="crfp-history-card"
+                         t-att-class="{'crfp-history-selected': ps.id === state.selectedProductId}"
+                         t-on-click="() => this.selectProduct(ps.id)">
+                        <div class="crfp-hc-name" t-esc="ps.name"/>
+                        <div class="crfp-hc-price">
+                            <span class="crfp-mono" t-esc="'₡' + fmt(ps.lastPrice)"/>
+                            <span t-if="ps.change !== 0"
+                                  t-att-class="{'crfp-hc-up': ps.change > 0, 'crfp-hc-down': ps.change &lt; 0}"
+                                  t-esc="(ps.change > 0 ? '+' : '') + fmt(ps.change, 1) + '%'"/>
+                        </div>
+                        <div class="crfp-hc-records" t-esc="ps.recordCount + ' records'"/>
+                    </div>
+                </t>
+            </div>
+
+            <t t-if="state.selectedProductId &amp;&amp; productHistory.length">
+                <div class="crfp-history-detail">
+                    <h4>Price Records</h4>
+                    <table class="crfp-rtbl">
+                        <thead><tr><th>Date</th><th>Price (CRC)</th><th>Rate</th><th>Price (USD)</th></tr></thead>
+                        <tbody>
+                            <t t-foreach="productHistory" t-as="h" t-key="h.id">
+                                <tr>
+                                    <td class="crfp-mono" t-esc="h.date"/>
+                                    <td class="crfp-mono" t-esc="'₡' + fmt(h.price_crc)"/>
+                                    <td class="crfp-mono" t-esc="fmt(h.exchange_rate)"/>
+                                    <td class="crfp-mono" t-esc="'$' + fmt(h.price_usd, 4)"/>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+            </t>
+        </div>
+    </t>
+</templates>

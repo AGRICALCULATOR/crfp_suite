@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="crfp_fixed_cost_form" model="ir.ui.view">
+        <field name="name">crfp.fixed.cost.form</field>
+        <field name="model">crfp.fixed.cost</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <h2><field name="name"/></h2>
+                    <group string="Origin Costs (USD per container)">
+                        <group>
+                            <field name="transport"/>
+                            <field name="thc_origin"/>
+                            <field name="fumigation"/>
+                            <field name="broker"/>
+                        </group>
+                        <group>
+                            <field name="thc_dest"/>
+                            <field name="fumig_dest"/>
+                            <field name="inland_dest"/>
+                        </group>
+                    </group>
+                    <group string="Percentages &amp; Defaults">
+                        <group>
+                            <field name="insurance_pct"/>
+                            <field name="duties_pct"/>
+                        </group>
+                        <group>
+                            <field name="default_total_boxes"/>
+                            <field name="default_exchange_rate"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_crfp_fixed_cost" model="ir.actions.act_window">
+        <field name="name">Fixed Costs</field>
+        <field name="res_model">crfp.fixed.cost</field>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+    </record>
+</odoo>

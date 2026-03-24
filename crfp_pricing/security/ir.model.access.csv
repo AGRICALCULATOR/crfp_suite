@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_crfp_freight_quote_user,crfp.freight.quote.user,model_crfp_freight_quote,crfp_base.group_crfp_user,1,1,1,1
+access_crfp_quotation_user,crfp.quotation.user,model_crfp_quotation,crfp_base.group_crfp_user,1,1,1,1
+access_crfp_quotation_line_user,crfp.quotation.line.user,model_crfp_quotation_line,crfp_base.group_crfp_user,1,1,1,1
+access_crfp_price_history_user,crfp.price.history.user,model_crfp_price_history,crfp_base.group_crfp_user,1,1,1,0
+access_crfp_price_history_manager,crfp.price.history.manager,model_crfp_price_history,crfp_base.group_crfp_manager,1,1,1,1

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="crfp_carrier_tree" model="ir.ui.view">
+        <field name="name">crfp.carrier.tree</field>
+        <field name="model">crfp.carrier</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="carrier_type"/>
+                <field name="scac_code" optional="show"/>
+                <field name="contact_email" optional="show"/>
+                <field name="contact_phone" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="crfp_carrier_form" model="ir.ui.view">
+        <field name="name">crfp.carrier.form</field>
+        <field name="model">crfp.carrier</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="carrier_type"/>
+                            <field name="scac_code"/>
+                            <field name="partner_id"/>
+                        </group>
+                        <group>
+                            <field name="contact_name"/>
+                            <field name="contact_email"/>
+                            <field name="contact_phone"/>
+                            <field name="tracking_url"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <field name="notes" placeholder="Notes..."/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_crfp_carrier" model="ir.actions.act_window">
+        <field name="name">Carriers &amp; Forwarders</field>
+        <field name="res_model">crfp.carrier</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

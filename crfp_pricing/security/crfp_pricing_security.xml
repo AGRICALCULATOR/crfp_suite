@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Pricing users inherit from base CRFP user -->
+    <record id="group_crfp_pricing_user" model="res.groups">
+        <field name="name">Pricing User</field>
+        <field name="category_id" ref="crfp_base.module_category_crfp"/>
+        <field name="implied_ids" eval="[(4, ref('crfp_base.group_crfp_user'))]"/>
+    </record>
+</odoo>

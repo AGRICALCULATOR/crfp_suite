@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="crfp_quotation_tree" model="ir.ui.view">
+        <field name="name">crfp.quotation.tree</field>
+        <field name="model">crfp.quotation</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="incoterm"/>
+                <field name="port_id"/>
+                <field name="exchange_rate"/>
+                <field name="line_count"/>
+                <field name="total_amount"/>
+                <field name="sale_order_id"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'won'"
+                       decoration-info="state == 'confirmed'"
+                       decoration-warning="state == 'draft'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="crfp_quotation_form" model="ir.ui.view">
+        <field name="name">crfp.quotation.form</field>
+        <field name="model">crfp.quotation</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_create_sale_order" type="object"
+                            string="Create Sale Order" class="btn-primary"
+                            invisible="sale_order_id"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="partner_id"/>
+                            <field name="client_type"/>
+                            <field name="exchange_rate"/>
+                            <field name="incoterm"/>
+                        </group>
+                        <group>
+                            <field name="port_id"/>
+                            <field name="freight_quote_id"/>
+                            <field name="total_boxes"/>
+                            <field name="sale_order_id"/>
+                        </group>
+                    </group>
+                    <group string="Shipment Info" col="4">
+                        <field name="etd"/>
+                        <field name="eta"/>
+                        <field name="vessel_name"/>
+                        <field name="shipping_company"/>
+                    </group>
+                    <notebook>
+                        <page string="Product Lines">
+                            <field name="line_ids">
+                                <list editable="bottom">
+                                    <field name="crfp_product_id"/>
+                                    <field name="raw_price_crc"/>
+                                    <field name="net_kg"/>
+                                    <field name="box_cost"/>
+                                    <field name="profit"/>
+                                    <field name="exw_price"/>
+                                    <field name="logistics_per_box"/>
+                                    <field name="final_price"/>
+                                    <field name="gross_lbs"/>
+                                    <field name="pallets"/>
+                                    <field name="boxes_per_pallet"/>
+                                    <field name="include_in_pdf"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Fixed Cost Snapshot">
+                            <group>
+                                <group>
+                                    <field name="fc_transport"/>
+                                    <field name="fc_thc_origin"/>
+                                    <field name="fc_fumigation"/>
+                                    <field name="fc_broker"/>
+                                </group>
+                                <group>
+                                    <field name="fc_thc_dest"/>
+                                    <field name="fc_fumig_dest"/>
+                                    <field name="fc_inland_dest"/>
+                                    <field name="fc_insurance_pct"/>
+                                    <field name="fc_duties_pct"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_crfp_quotation" model="ir.actions.act_window">
+        <field name="name">Quotations</field>
+        <field name="res_model">crfp.quotation</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>
