@@ -2,6 +2,7 @@
 import { Component, useState, onWillStart } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
+import { rpc } from "@web/core/network/rpc";
 
 import { CalculatorService } from "./calculator_service";
 import { PriceCalculator } from "./price_calculator";
@@ -17,7 +18,6 @@ export class CrfpCalculator extends Component {
     };
 
     setup() {
-        this.rpc = useService("rpc");
         this.notification = useService("notification");
         this.action = useService("action");
 
@@ -98,7 +98,7 @@ export class CrfpCalculator extends Component {
     // ─── DATA LOADING ──────────────────────────────────────────
 
     async loadMasterData() {
-        const data = await this.rpc('/crfp/api/master-data', {});
+        const data = await rpc('/crfp/api/master-data', {});
         this.state.products = data.products;
         this.state.ports = data.ports;
         this.state.carriers = data.carriers;
@@ -125,19 +125,19 @@ export class CrfpCalculator extends Component {
     }
 
     async loadFreightQuotes() {
-        this.state.freightQuotes = await this.rpc('/crfp/api/freight-quotes', {});
+        this.state.freightQuotes = await rpc('/crfp/api/freight-quotes', {});
     }
 
     async loadQuotations() {
-        this.state.quotations = await this.rpc('/crfp/api/quotations', {});
+        this.state.quotations = await rpc('/crfp/api/quotations', {});
     }
 
     async loadPartners() {
-        this.state.partners = await this.rpc('/crfp/api/partners', {});
+        this.state.partners = await rpc('/crfp/api/partners', {});
     }
 
     async loadPriceHistory() {
-        this.state.historyData = await this.rpc('/crfp/api/price-history', {});
+        this.state.historyData = await rpc('/crfp/api/price-history', {});
     }
 
     // ─── INITIALIZATION ────────────────────────────────────────
@@ -258,13 +258,13 @@ export class CrfpCalculator extends Component {
     }
 
     async saveFreightQuote(vals) {
-        await this.rpc('/crfp/api/freight-quote/save', { vals });
+        await rpc('/crfp/api/freight-quote/save', { vals });
         await this.loadFreightQuotes();
         this.notification.add("Freight quote saved", { type: "success" });
     }
 
     async deleteFreightQuote(quoteId) {
-        await this.rpc('/crfp/api/freight-quote/delete', { quote_id: quoteId });
+        await rpc('/crfp/api/freight-quote/delete', { quote_id: quoteId });
         if (this.state.freightQuoteId === quoteId) {
             this.state.freightQuoteId = null;
         }
@@ -319,7 +319,7 @@ export class CrfpCalculator extends Component {
             })),
         };
 
-        const result = await this.rpc('/crfp/api/quotation/save', { data });
+        const result = await rpc('/crfp/api/quotation/save', { data });
         this.state.quotationId = result.id;
         this.state.modified = false;
         await this.loadQuotations();
@@ -328,7 +328,7 @@ export class CrfpCalculator extends Component {
     }
 
     async loadQuotation(quotationId) {
-        const data = await this.rpc('/crfp/api/quotation/load', { quotation_id: quotationId });
+        const data = await rpc('/crfp/api/quotation/load', { quotation_id: quotationId });
         if (data.error) {
             this.notification.add(data.error, { type: "danger" });
             return;
@@ -400,7 +400,7 @@ export class CrfpCalculator extends Component {
             return;
         }
         // Update partner on quotation
-        await this.rpc('/crfp/api/quotation/save', {
+        await rpc('/crfp/api/quotation/save', {
             data: {
                 id: this.state.quotationId,
                 partner_id: partnerId,
@@ -426,7 +426,7 @@ export class CrfpCalculator extends Component {
             }
         });
 
-        const result = await this.rpc('/crfp/api/quotation/create-so', {
+        const result = await rpc('/crfp/api/quotation/create-so', {
             quotation_id: this.state.quotationId,
         });
         if (result.error) {
