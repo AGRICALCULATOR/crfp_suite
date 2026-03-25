@@ -1,3 +1,4 @@
+import base64
 from odoo import models, fields, api
 from odoo.exceptions import UserError
 
@@ -151,24 +152,55 @@ class CrfpQuotation(models.Model):
         return self.env.ref('crfp_pricing.action_report_crfp_quotation').report_action(self)
 
     def action_send_email(self):
-        """Open the email composer with PDF attached."""
+        """Generate PDF, attach it, and open email composer."""
         self.ensure_one()
-        template = self.env.ref('crfp_pricing.email_template_crfp_quotation', raise_if_not_found=False)
-        compose_form = self.env.ref('mail.email_compose_message_wizard_form', raise_if_not_found=False)
-        ctx = {
-            'default_model': 'crfp.quotation',
-            'default_res_ids': self.ids,
-            'default_template_id': template.id if template else False,
-            'default_composition_mode': 'comment',
-            'force_email': True,
-        }
+        if not self.partner_id:
+            raise UserError('Please select a client before sending an email.')
+
+        # Generate the PDF
+        report = self.env.ref('crfp_pricing.action_report_crfp_quotation')
+        pdf_content, _ = report._render_qweb_pdf(report.report_name, self.ids)
+
+        # Create attachment
+        attachment = self.env['ir.attachment'].create({
+            'name': f'CRFP-Quotation-{self.name}.pdf',
+            'type': 'binary',
+            'datas': base64.b64encode(pdf_content),
+            'res_model': 'crfp.quotation',
+            'res_id': self.id,
+            'mimetype': 'application/pdf',
+        })
+
+        # Build email body
+        port_name = self.port_id.name if self.port_id else '—'
+        body = (
+            f'<p>Dear {self.partner_id.name or "Customer"},</p>'
+            f'<p>Please find attached our export price quotation '
+            f'<strong>{self.name}</strong>.</p>'
+            f'<p>Incoterm: {self.incoterm}<br/>'
+            f'Destination: {port_name}</p>'
+            f'<p>Prices are valid for 7 days. Please let us know if you '
+            f'have any questions or would like to confirm an order.</p>'
+            f'<p>Best regards,<br/>'
+            f'<strong>CR Farm Products VYM S.A</strong></p>'
+        )
+
         return {
             'type': 'ir.actions.act_window',
             'res_model': 'mail.compose.message',
-            'views': [[compose_form.id if compose_form else False, 'form']],
+            'views': [[False, 'form']],
             'view_mode': 'form',
             'target': 'new',
-            'context': ctx,
+            'context': {
+                'default_model': 'crfp.quotation',
+                'default_res_ids': self.ids,
+                'default_partner_ids': [self.partner_id.id],
+                'default_subject': f'Export Price Quotation — {self.name}',
+                'default_body': body,
+                'default_attachment_ids': [attachment.id],
+                'default_composition_mode': 'comment',
+                'force_email': True,
+            },
         }
 
     def action_confirm(self):
