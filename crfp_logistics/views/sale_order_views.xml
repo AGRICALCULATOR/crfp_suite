@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Add Shipment smart button to Sale Order form -->
+    <record id="sale_order_form_inherit_crfp_logistics" model="ir.ui.view">
+        <field name="name">sale.order.form.crfp.logistics</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_create_shipment" type="object"
+                        class="oe_stat_button" icon="fa-ship"
+                        invisible="crfp_shipment_id"
+                        string="Create Shipment"/>
+                <button name="action_view_shipment" type="object"
+                        class="oe_stat_button" icon="fa-ship"
+                        invisible="not crfp_shipment_id">
+                    <field name="crfp_shipment_id" widget="statinfo" string="Shipment"/>
+                </button>
+            </xpath>
+        </field>
+    </record>
+</odoo>

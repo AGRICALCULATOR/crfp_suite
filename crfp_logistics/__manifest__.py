@@ -24,6 +24,7 @@
         'views/crfp_document_views.xml',
         'views/crfp_checklist_template_views.xml',
         'views/crfp_tracking_views.xml',
+        'views/sale_order_views.xml',
         'views/crfp_logistics_menus.xml',
     ],
     'installable': True,

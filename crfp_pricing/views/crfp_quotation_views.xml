@@ -49,6 +49,11 @@
                                 invisible="not sale_order_id">
                             <field name="sale_order_id" widget="statinfo" string="Sale Order"/>
                         </button>
+                        <button name="action_view_shipment" type="object"
+                                class="oe_stat_button" icon="fa-ship"
+                                invisible="not shipment_id">
+                            <field name="shipment_id" widget="statinfo" string="Shipment"/>
+                        </button>
                     </div>
                     <div class="oe_title">
                         <h1><field name="name" placeholder="e.g. VANESSA VEGA FOB Rotterdam"/></h1>
