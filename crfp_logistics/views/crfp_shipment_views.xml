@@ -1,21 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- ═══ SEARCH ═══ -->
-    <record id="crfp_shipment_search" model="ir.ui.view">
-        <field name="name">crfp.shipment.search</field>
-        <field name="model">crfp.shipment</field>
-        <field name="arch" type="xml">
-            <search>
-                <field name="name"/>
-                <field name="partner_id"/>
-                <field name="state"/>
-                <group expand="0" string="Group By">
-                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
-                    <filter name="group_responsible" string="Responsible" context="{'group_by': 'responsible_id'}"/>
-                </group>
-            </search>
-        </field>
-    </record>
+    <!-- search view removed for now -->
 
     <!-- ═══ LIST ═══ -->
     <record id="crfp_shipment_tree" model="ir.ui.view">
@@ -326,7 +311,6 @@
         <field name="name">Shipments</field>
         <field name="res_model">crfp.shipment</field>
         <field name="view_mode">kanban,list,form</field>
-        <field name="search_view_id" ref="crfp_shipment_search"/>
-        <field name="context">{'search_default_active': 1}</field>
+        <field name="context">{}</field>
     </record>
 </odoo>
