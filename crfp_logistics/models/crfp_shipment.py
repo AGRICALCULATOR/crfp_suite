@@ -150,6 +150,40 @@ class CrfpShipment(models.Model):
 
     # ── Actions ──
 
+    @api.onchange('sale_order_id')
+    def _onchange_sale_order_id(self):
+        """Auto-fill ALL fields from the Sale Order and its linked Quotation."""
+        if not self.sale_order_id:
+            return
+        so = self.sale_order_id
+
+        # Always copy client from SO
+        self.partner_id = so.partner_id
+
+        # Find the CRFP quotation linked to this SO
+        quotation = self.env['crfp.quotation'].search([
+            ('sale_order_id', '=', so.id)
+        ], limit=1)
+
+        if quotation:
+            # Auto-fill from quotation (the richest source of data)
+            self.incoterm = quotation.incoterm
+            self.port_destination_id = quotation.port_id
+            self.container_type_id = quotation.container_type_id
+            self.etd = quotation.etd
+            self.eta = quotation.eta
+            self.vessel_name = quotation.vessel_name
+            # Get carrier from freight quote
+            if quotation.freight_quote_id and quotation.freight_quote_id.carrier_partner_id:
+                self.carrier_partner_id = quotation.freight_quote_id.carrier_partner_id
+            if quotation.shipping_company:
+                # Try to find forwarder by name in contacts
+                forwarder = self.env['res.partner'].search([
+                    ('name', 'ilike', quotation.shipping_company)
+                ], limit=1)
+                if forwarder:
+                    self.forwarder_partner_id = forwarder
+
     def action_load_from_sale_order(self):
         """Copy lines from sale.order into shipment lines as planned quantities."""
         self.ensure_one()
@@ -159,16 +193,43 @@ class CrfpShipment(models.Model):
             raise UserError('Shipment already has lines. Clear them first or create a new shipment.')
 
         so = self.sale_order_id
-        # Set header fields from SO
-        if not self.partner_id:
-            self.partner_id = so.partner_id
-        if not self.port_destination_id and hasattr(so, 'note') and so.note:
-            # Try to find port from SO notes (set by crfp_pricing)
-            pass
+        self.partner_id = so.partner_id
+
+        # Find linked quotation for richer data
+        quotation = self.env['crfp.quotation'].search([
+            ('sale_order_id', '=', so.id)
+        ], limit=1)
+
+        if quotation:
+            # Fill header from quotation
+            if not self.incoterm:
+                self.incoterm = quotation.incoterm
+            if not self.port_destination_id:
+                self.port_destination_id = quotation.port_id
+            if not self.container_type_id:
+                self.container_type_id = quotation.container_type_id
+            if not self.etd:
+                self.etd = quotation.etd
+            if not self.eta:
+                self.eta = quotation.eta
+            if not self.vessel_name:
+                self.vessel_name = quotation.vessel_name
+            if not self.carrier_partner_id and quotation.freight_quote_id:
+                self.carrier_partner_id = quotation.freight_quote_id.carrier_partner_id
+
+        # Build a lookup from quotation lines for extra data (boxes_per_pallet, net_kg)
+        quot_line_map = {}
+        if quotation:
+            for ql in quotation.line_ids:
+                if ql.product_id:
+                    quot_line_map[ql.product_id.id] = ql
+                elif ql.crfp_product_id and ql.crfp_product_id.product_id:
+                    quot_line_map[ql.crfp_product_id.product_id.id] = ql
 
         for sol in so.order_line:
             if not sol.product_id:
                 continue
+
             # Find matching crfp.product
             crfp_prod = self.env['crfp.product'].search([
                 ('product_id', '=', sol.product_id.id)
@@ -176,9 +237,13 @@ class CrfpShipment(models.Model):
 
             qty = int(sol.product_uom_qty)
             net_kg = crfp_prod.net_kg if crfp_prod else 0
-            bpp = 66  # default
-            if crfp_prod:
-                # Get boxes per pallet from pallet config
+
+            # Get boxes_per_pallet from quotation line first, then config
+            bpp = 66
+            quot_line = quot_line_map.get(sol.product_id.id)
+            if quot_line and quot_line.boxes_per_pallet:
+                bpp = quot_line.boxes_per_pallet
+            elif crfp_prod:
                 pallet_cfg = self.env['crfp.pallet.config'].search([
                     ('product_keyword', 'ilike', crfp_prod.name.split()[0]),
                 ], limit=1)
@@ -196,7 +261,7 @@ class CrfpShipment(models.Model):
                 'pallets_planned': pallets,
                 'boxes_per_pallet_planned': bpp,
                 'net_weight_planned': qty * net_kg,
-                'gross_weight_planned': qty * net_kg * 1.05,  # ~5% tare estimate
+                'gross_weight_planned': qty * net_kg * 1.05,
                 'price_unit_planned': sol.price_unit,
             })
 
