@@ -153,9 +153,12 @@ class CrfpShipment(models.Model):
             return
         so = self.sale_order_id
         self.partner_id = so.partner_id
+        # Find quotation: first try via SO link, then via crfp_quotation_id on SO
         quotation = self.env['crfp.quotation'].search([
             ('sale_order_id', '=', so.id)
         ], limit=1)
+        if not quotation and hasattr(so, 'crfp_quotation_id') and so.crfp_quotation_id:
+            quotation = so.crfp_quotation_id
         if quotation:
             self.crfp_quotation_id = quotation
             self.incoterm = quotation.incoterm
@@ -261,21 +264,21 @@ class CrfpShipment(models.Model):
     # ── State transitions ──
 
     def action_request_space(self):
-        for rec in self:
-            if not rec.carrier_partner_id:
-                raise UserError('Set a Carrier before requesting space.')
-            if not rec.port_destination_id:
-                raise UserError('Set a Destination Port before requesting space.')
-            if rec.sale_order_id and not rec.line_ids:
-                rec._create_lines_from_so()
-            rec._auto_load_documents()
-            rec._auto_load_checklist()
-            rec._generate_commodity_description()
-            rec.write({'state': 'space_requested'})
-            rec.message_post(
-                body='Space requested. Pre-reserva sent to %s.' % (rec.carrier_partner_id.name or ''),
-                message_type='notification',
-            )
+        self.ensure_one()
+        if not self.carrier_partner_id:
+            raise UserError('Set a Carrier before requesting space.')
+        if not self.port_destination_id:
+            raise UserError('Set a Destination Port before requesting space.')
+        # Auto-create lines from SO if not yet created
+        if self.sale_order_id and not self.line_ids:
+            self._create_lines_from_so()
+        # Auto-load documents and checklist
+        self._auto_load_documents()
+        self._auto_load_checklist()
+        self._generate_commodity_description()
+        self.write({'state': 'space_requested'})
+        # Open email composer for pre-reserva
+        return self.action_send_booking_crfarm()
 
     def action_request_booking(self):
         for rec in self:
