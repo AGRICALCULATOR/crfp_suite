@@ -20,6 +20,7 @@
         'views/crfp_pricing_menus.xml',
         'report/crfp_quotation_report.xml',
         'data/mail_template_data.xml',
+        'data/cron_data.xml',
     ],
     'assets': {
         'web.assets_backend': [

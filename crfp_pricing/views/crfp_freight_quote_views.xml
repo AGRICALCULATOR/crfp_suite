@@ -4,13 +4,14 @@
         <field name="name">crfp.freight.quote.tree</field>
         <field name="model">crfp.freight.quote</field>
         <field name="arch" type="xml">
-            <list>
+            <list decoration-danger="is_expired" decoration-muted="state == 'expired'">
                 <field name="name"/>
                 <field name="carrier_partner_id" string="Carrier"/>
                 <field name="port_id"/>
                 <field name="all_in_freight"/>
                 <field name="transit_days"/>
-                <field name="valid_until"/>
+                <field name="valid_until" decoration-danger="is_expired"/>
+                <field name="is_expired" column_invisible="1"/>
                 <field name="state" widget="badge"
                        decoration-success="state == 'active'"
                        decoration-warning="state == 'draft'"
@@ -31,12 +32,18 @@
                             invisible="state != 'active'"/>
                     <button name="action_request_update" type="object"
                             string="Request Updated Quote"
-                            class="btn-secondary"
+                            class="btn-primary"
                             invisible="state != 'expired'"
                             icon="fa-envelope"/>
                     <field name="state" widget="statusbar"/>
                 </header>
                 <sheet>
+                    <field name="is_expired" invisible="1"/>
+                    <div class="alert alert-danger" role="alert"
+                         invisible="not is_expired">
+                        <strong>This freight quote has EXPIRED!</strong>
+                        Click "Request Updated Quote" to email the carrier for a new rate.
+                    </div>
                     <group>
                         <group string="Quote Info">
                             <field name="name"/>

@@ -73,6 +73,17 @@ class CrfpFreightQuote(models.Model):
     def action_expire(self):
         self.write({'state': 'expired'})
 
+    @api.model
+    def _cron_auto_expire(self):
+        """Scheduled action: mark expired quotes."""
+        today = fields.Date.context_today(self)
+        expired = self.search([
+            ('state', '=', 'active'),
+            ('valid_until', '<', today),
+        ])
+        if expired:
+            expired.write({'state': 'expired'})
+
     def action_request_update(self):
         """Open email composer to request updated quote from carrier."""
         self.ensure_one()

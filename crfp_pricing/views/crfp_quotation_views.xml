@@ -32,9 +32,13 @@
                     <button name="action_create_sale_order" type="object"
                             string="Create Sale Order" class="btn-primary"
                             invisible="sale_order_id or state == 'lost'"/>
+                    <button name="%(crfp_pricing.action_report_crfp_quotation)d"
+                            type="action" string="Download PDF" class="btn-secondary"
+                            icon="fa-file-pdf-o"/>
                     <button name="action_send_email" type="object"
                             string="Send by Email" class="btn-secondary"
-                            invisible="state == 'lost'"/>
+                            invisible="state == 'lost'"
+                            icon="fa-envelope"/>
                     <field name="state" widget="statusbar"
                            statusbar_visible="draft,confirmed,sent,won"/>
                 </header>
@@ -68,6 +72,9 @@
                             <field name="line_ids">
                                 <list editable="bottom">
                                     <field name="crfp_product_id" string="Product"/>
+                                    <field name="product_id" string="Odoo SKU"
+                                           options="{'no_create': True}"
+                                           optional="show"/>
                                     <field name="final_price" string="$/Box" readonly="1"/>
                                     <field name="boxes_per_pallet" string="Boxes/Pallet"/>
                                     <field name="pallets" string="Pallets"/>

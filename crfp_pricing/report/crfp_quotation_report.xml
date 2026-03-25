@@ -72,7 +72,8 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <t t-foreach="o.line_ids.filtered(lambda l: l.include_in_pdf)" t-as="line">
+                                <t t-foreach="o.line_ids" t-as="line">
+                                  <t t-if="line.include_in_pdf">
                                     <tr style="border-bottom: 1px solid #e0e0e0;">
                                         <td style="padding: 6px 8px; font-weight: 600;" t-esc="line.crfp_product_id.name"/>
                                         <td style="padding: 6px 8px; text-align: center; font-family: monospace;" t-esc="'%.1f' % line.net_kg"/>
@@ -83,6 +84,7 @@
                                         <td style="padding: 6px 8px; text-align: center; font-family: monospace;" t-esc="line.boxes_per_pallet"/>
                                         <td style="padding: 6px 8px; text-align: right; font-family: monospace; font-weight: 700;" t-esc="'$%.2f' % line.pallet_price"/>
                                     </tr>
+                                  </t>
                                 </t>
                             </tbody>
                         </table>

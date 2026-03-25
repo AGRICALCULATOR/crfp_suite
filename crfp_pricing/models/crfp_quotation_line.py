@@ -12,6 +12,12 @@ class CrfpQuotationLine(models.Model):
                                        required=True)
     sequence = fields.Integer(related='crfp_product_id.sequence', store=True)
 
+    # ★ SKU link — per line, not per product (one base product has many SKUs)
+    product_id = fields.Many2one(
+        'product.product', string='Odoo SKU',
+        help='Select the specific Odoo product/variant for this line. '
+             'Required to create a Sale Order.')
+
     # Editable per-line parameters
     raw_price_crc = fields.Float(string='Raw Price (CRC)', digits=(12, 2))
     net_kg = fields.Float(string='Net Kg')
@@ -57,3 +63,6 @@ class CrfpQuotationLine(models.Model):
             self.materials_per_kg = p.materials_per_kg
             self.indirect_per_kg = p.indirect_per_kg
             self.profit = p.default_profit
+            # Pre-fill SKU from base product if set
+            if p.product_id:
+                self.product_id = p.product_id.id

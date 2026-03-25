@@ -80,7 +80,7 @@ class CrfpQuotation(models.Model):
                  'line_ids.pallets', 'line_ids.boxes_per_pallet', 'line_ids.line_total')
     def _compute_totals(self):
         for rec in self:
-            included = rec.line_ids.filtered('include_in_pdf')
+            included = rec.line_ids.filtered(lambda l: l.include_in_pdf)
             rec.total_amount = sum(l.final_price for l in included)
             rec.total_pallets = sum(l.pallets for l in included)
             rec.total_boxes_sum = sum(l.total_boxes for l in included)
@@ -98,11 +98,12 @@ class CrfpQuotation(models.Model):
         for line in self.line_ids.filtered('include_in_pdf'):
             if line.pallets <= 0:
                 continue
-            product = line.crfp_product_id.product_id
+            # Use line-level SKU first, fallback to base product link
+            product = line.product_id or line.crfp_product_id.product_id
             if not product:
                 raise UserError(
-                    f'Product "{line.crfp_product_id.name}" has no Odoo product '
-                    f'linked. Go to Configuration > Export Products and link it.'
+                    f'Product "{line.crfp_product_id.name}" has no Odoo SKU linked. '
+                    f'Open the quotation, click on the line, and select the Odoo SKU.'
                 )
             qty = line.pallets * line.boxes_per_pallet
             order_lines.append((0, 0, {
