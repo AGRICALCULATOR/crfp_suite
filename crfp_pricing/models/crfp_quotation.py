@@ -65,10 +65,6 @@ class CrfpQuotation(models.Model):
     # Sale order link
     sale_order_id = fields.Many2one('sale.order', string='Sale Order', readonly=True, copy=False)
 
-    # Shipment link (computed — lives in crfp_logistics)
-    shipment_id = fields.Many2one('crfp.shipment', string='Shipment',
-                                   compute='_compute_shipment_id', store=False)
-
     # Computed
     line_count = fields.Integer(compute='_compute_line_count')
     total_amount = fields.Float(compute='_compute_totals', string='Total $/box')
@@ -155,30 +151,25 @@ class CrfpQuotation(models.Model):
             'target': 'current',
         }
 
-    def _compute_shipment_id(self):
-        for rec in self:
-            shipment = False
-            if rec.sale_order_id:
-                try:
-                    shipment = self.env['crfp.shipment'].search([
-                        ('sale_order_id', '=', rec.sale_order_id.id)
-                    ], limit=1)
-                except Exception:
-                    pass  # crfp_logistics may not be installed
-            rec.shipment_id = shipment
-
     def action_view_shipment(self):
-        """Open the linked Shipment."""
+        """Open the linked Shipment (if crfp_logistics is installed)."""
         self.ensure_one()
-        if not self.shipment_id:
+        if not self.sale_order_id:
             return
-        return {
-            'type': 'ir.actions.act_window',
-            'res_model': 'crfp.shipment',
-            'res_id': self.shipment_id.id,
-            'view_mode': 'form',
-            'target': 'current',
-        }
+        try:
+            shipment = self.env['crfp.shipment'].search([
+                ('sale_order_id', '=', self.sale_order_id.id)
+            ], limit=1)
+            if shipment:
+                return {
+                    'type': 'ir.actions.act_window',
+                    'res_model': 'crfp.shipment',
+                    'res_id': shipment.id,
+                    'view_mode': 'form',
+                    'target': 'current',
+                }
+        except Exception:
+            pass  # crfp_logistics not installed
 
     def action_view_sale_order(self):
         """Open the linked Sale Order."""
