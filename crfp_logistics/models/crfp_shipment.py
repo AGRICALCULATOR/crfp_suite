@@ -145,6 +145,28 @@ class CrfpShipment(models.Model):
         for vals in vals_list:
             if vals.get('name', 'New') == 'New':
                 vals['name'] = self.env['ir.sequence'].next_by_code('crfp.shipment') or 'New'
+            # Auto-fill from SO + Quotation on create
+            if vals.get('sale_order_id') and not vals.get('partner_id'):
+                so = self.env['sale.order'].browse(vals['sale_order_id'])
+                quotation = self.env['crfp.quotation'].search([
+                    ('sale_order_id', '=', so.id)
+                ], limit=1)
+                if not quotation and hasattr(so, 'crfp_quotation_id') and so.crfp_quotation_id:
+                    quotation = so.crfp_quotation_id
+                vals['partner_id'] = so.partner_id.id
+                if quotation:
+                    vals.setdefault('crfp_quotation_id', quotation.id)
+                    vals.setdefault('incoterm', quotation.incoterm)
+                    if quotation.port_id:
+                        vals.setdefault('port_destination_id', quotation.port_id.id)
+                    if quotation.container_type_id:
+                        vals.setdefault('container_type_id', quotation.container_type_id.id)
+                    vals.setdefault('etd', quotation.etd)
+                    vals.setdefault('eta', quotation.eta)
+                    if quotation.vessel_name:
+                        vals.setdefault('vessel_name', quotation.vessel_name)
+                    if quotation.freight_quote_id and quotation.freight_quote_id.carrier_partner_id:
+                        vals.setdefault('carrier_partner_id', quotation.freight_quote_id.carrier_partner_id.id)
         return super().create(vals_list)
 
     @api.onchange('sale_order_id')
