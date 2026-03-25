@@ -25,6 +25,8 @@ class CrfpShipmentDocument(models.Model):
         ('delivery_note', 'Delivery Note'),
         ('customer_copy', 'Customer Document Package'),
         ('vgm_verification', 'VGM Verification'),
+        ('eur1', 'EUR.1 Movement Certificate'),
+        ('bl_correction', 'BL Correction Request'),
         ('other', 'Other'),
     ], string='Document Type', required=True)
 
@@ -74,3 +76,37 @@ class CrfpShipmentDocument(models.Model):
                 and rec.date_required < today
                 and rec.state not in ('approved', 'na', 'received')
             )
+
+    def action_send_document(self):
+        """Open email composer with document attachments pre-loaded."""
+        self.ensure_one()
+        ship = self.shipment_id
+        partner_ids = []
+        if self.doc_source in ('generated', 'odoo_ref'):
+            # Sending to client or broker
+            if ship.partner_id:
+                partner_ids.append(ship.partner_id.id)
+        else:
+            # Sending to carrier/forwarder
+            if ship.carrier_partner_id:
+                partner_ids.append(ship.carrier_partner_id.id)
+
+        attachment_ids = self.attachment_ids.ids if self.attachment_ids else []
+
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'mail.compose.message',
+            'views': [[False, 'form']],
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_model': 'crfp.shipment',
+                'default_res_ids': [ship.id],
+                'default_partner_ids': partner_ids,
+                'default_subject': '%s - %s - %s' % (
+                    dict(self._fields['doc_type'].selection).get(self.doc_type, ''),
+                    ship.name, self.reference or ''),
+                'default_attachment_ids': attachment_ids,
+                'default_composition_mode': 'comment',
+            },
+        }

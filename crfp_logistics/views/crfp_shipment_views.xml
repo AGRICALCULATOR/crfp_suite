@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- search view removed for now -->
-
     <!-- ═══ LIST ═══ -->
     <record id="crfp_shipment_tree" model="ir.ui.view">
         <field name="name">crfp.shipment.list</field>
@@ -12,18 +10,18 @@
                 <field name="partner_id"/>
                 <field name="sale_order_id" optional="show"/>
                 <field name="port_destination_id"/>
-                <field name="carrier_partner_id" optional="show"/>
+                <field name="carrier_partner_id" optional="show" string="Carrier"/>
                 <field name="vessel_name" optional="show"/>
                 <field name="etd"/>
-                <field name="total_boxes_actual" string="Boxes"/>
-                <field name="total_pallets_actual" string="Pallets"/>
+                <field name="total_boxes_planned" string="Boxes Plan"/>
+                <field name="total_boxes_actual" string="Boxes Actual"/>
                 <field name="has_shortages" column_invisible="1"/>
                 <field name="checklist_progress" string="Progress" widget="progressbar"/>
                 <field name="state" widget="badge"
                        decoration-success="state in ('delivered','closed')"
                        decoration-info="state in ('shipped','in_transit','arrived')"
-                       decoration-warning="state in ('in_preparation','docs_pending')"
-                       decoration-danger="state == 'confirmed'"/>
+                       decoration-warning="state in ('loading','docs_final','bl_draft_received')"
+                       decoration-danger="state in ('space_requested','booking_requested')"/>
             </list>
         </field>
     </record>
@@ -43,13 +41,10 @@
                             <span class="text-muted"><field name="etd"/></span>
                         </div>
                         <div class="d-flex justify-content-between mt-1">
-                            <span>Boxes: <field name="total_boxes_actual"/></span>
-                            <span>Pallets: <field name="total_pallets_actual"/></span>
+                            <span>Boxes: <field name="total_boxes_planned"/></span>
+                            <span>Pallets: <field name="total_pallets_planned"/></span>
                         </div>
                         <field name="checklist_progress" widget="progressbar"/>
-                        <div t-if="record.alert_count.raw_value > 0" class="text-danger fw-bold mt-1">
-                            <i class="fa fa-exclamation-triangle"/> <field name="alert_count"/> alerts
-                        </div>
                     </t>
                 </templates>
             </kanban>
@@ -63,34 +58,71 @@
         <field name="arch" type="xml">
             <form>
                 <header>
-                    <button name="action_confirm" type="object" string="Confirm"
+                    <!-- State transition buttons -->
+                    <button name="action_request_space" type="object"
+                            string="Confirm &amp; Request Space"
                             class="btn-primary" invisible="state != 'draft'"/>
-                    <button name="action_start_preparation" type="object" string="Start Preparation"
-                            invisible="state != 'confirmed'"/>
-                    <button name="action_docs_pending" type="object" string="Docs Pending"
-                            invisible="state != 'in_preparation'"/>
-                    <button name="action_ship" type="object" string="Mark Shipped"
-                            class="btn-primary" invisible="state != 'docs_pending'"/>
-                    <button name="action_in_transit" type="object" string="In Transit"
-                            invisible="state != 'shipped'"/>
-                    <button name="action_arrived" type="object" string="Arrived"
+                    <button name="action_request_booking" type="object"
+                            string="Send Booking Request"
+                            class="btn-primary" invisible="state != 'space_requested'"/>
+                    <button name="action_confirm_booking" type="object"
+                            string="Booking Confirmed"
+                            class="btn-primary" invisible="state != 'booking_requested'"/>
+                    <button name="action_send_si" type="object"
+                            string="SI Sent"
+                            class="btn-primary" invisible="state != 'booking_confirmed'"/>
+                    <button name="action_bl_draft_received" type="object"
+                            string="BL Draft Received"
+                            invisible="state != 'si_sent'"/>
+                    <button name="action_start_loading" type="object"
+                            string="Start Loading"
+                            class="btn-primary" invisible="state != 'bl_draft_received'"/>
+                    <button name="action_docs_final" type="object"
+                            string="Documents Final"
+                            invisible="state != 'loading'"/>
+                    <button name="action_ship" type="object"
+                            string="Mark Shipped"
+                            class="btn-primary" invisible="state != 'docs_final'"/>
+                    <button name="action_in_transit" type="object"
+                            string="In Transit" invisible="state != 'shipped'"/>
+                    <button name="action_arrive" type="object"
+                            string="Arrived"
                             class="btn-primary" invisible="state != 'in_transit'"/>
-                    <button name="action_delivered" type="object" string="Delivered"
-                            class="btn-primary" invisible="state != 'arrived'"/>
-                    <button name="action_close" type="object" string="Close"
-                            invisible="state != 'delivered'"/>
+                    <button name="action_deliver" type="object"
+                            string="Delivered" invisible="state != 'arrived'"/>
+                    <button name="action_close" type="object"
+                            string="Close" invisible="state != 'delivered'"/>
+
+                    <!-- Document action buttons -->
+                    <button name="action_send_booking_crfarm" type="object"
+                            string="Send CR Farm Booking" icon="fa-envelope"
+                            class="btn-secondary"
+                            invisible="state not in ('space_requested','booking_requested')"/>
+                    <button name="action_send_si_crfarm" type="object"
+                            string="Send CR Farm SI" icon="fa-envelope"
+                            class="btn-secondary"
+                            invisible="state not in ('booking_confirmed','si_sent')"/>
+                    <button name="action_send_carrier_doc" type="object"
+                            string="Send Carrier Template" icon="fa-paperclip"
+                            class="btn-secondary"
+                            invisible="state not in ('space_requested','booking_requested','booking_confirmed','si_sent')"/>
                     <button name="action_generate_packing_list" type="object"
                             string="Packing List PDF" icon="fa-file-pdf-o"
-                            invisible="state == 'draft'"/>
+                            invisible="state not in ('loading','docs_final','shipped','in_transit','arrived','delivered','closed')"/>
+                    <button name="action_send_export_package" type="object"
+                            string="Send Export Package" icon="fa-paper-plane"
+                            class="btn-primary"
+                            invisible="state != 'docs_final'"/>
+
                     <field name="state" widget="statusbar"
-                           statusbar_visible="draft,confirmed,in_preparation,shipped,in_transit,delivered,closed"/>
+                           statusbar_visible="draft,booking_confirmed,si_sent,loading,docs_final,shipped,in_transit,delivered,closed"/>
                 </header>
                 <sheet>
-                    <!-- Alerts banner -->
+                    <!-- Alerts -->
                     <field name="has_shortages" invisible="1"/>
                     <div class="alert alert-warning" role="alert" invisible="not has_shortages">
                         <i class="fa fa-exclamation-triangle"/>
-                        <strong> This shipment has SHORTAGES.</strong> Some products have fewer actual boxes than planned.
+                        <strong> SHORTAGES detected.</strong> Some products have fewer actual boxes than planned.
                     </div>
 
                     <div class="oe_title">
@@ -100,9 +132,7 @@
                     <group>
                         <group string="Commercial">
                             <field name="sale_order_id" options="{'no_create': True}"/>
-                            <button name="action_load_from_sale_order" type="object"
-                                    string="Load Lines from SO" class="btn-link"
-                                    invisible="line_ids or not sale_order_id"/>
+                            <field name="crfp_quotation_id" options="{'no_create': True}" optional="show"/>
                             <field name="partner_id" options="{'no_create': True}"/>
                             <field name="incoterm"/>
                             <field name="responsible_id"/>
@@ -127,19 +157,23 @@
                             <field name="cutoff_date"/>
                         </group>
                     </group>
-                    <group string="Invoices (Odoo references only)" col="4">
+                    <group string="Reefer Settings" col="4"
+                           invisible="state in ('draft','space_requested','booking_requested')">
+                        <field name="temperature_set" string="Temperature (°C)"/>
+                        <field name="ventilation" string="Ventilation"/>
+                        <field name="gps_device_id" string="GPS/Thermometer ID"/>
+                        <field name="commodity_description"/>
+                    </group>
+                    <group string="Invoices (Odoo references)" col="4">
                         <field name="proforma_invoice_id" options="{'no_create': True}"/>
                         <field name="commercial_invoice_id" options="{'no_create': True}"/>
-                        <field name="consignee_id" options="{'no_create': True}" optional="hide"/>
-                        <field name="notify_party_id" options="{'no_create': True}" optional="hide"/>
+                        <field name="consignee_id" options="{'no_create': True}"/>
+                        <field name="notify_party_id" options="{'no_create': True}"/>
                     </group>
 
                     <notebook>
-                        <!-- TAB 1: Shipment Lines (planned vs actual) -->
+                        <!-- TAB 1: Shipment Lines -->
                         <page string="Shipment Lines" name="lines">
-                            <div class="alert alert-info" role="alert" invisible="line_ids">
-                                Select a Sale Order above and click "Load Lines from SO" to populate planned quantities.
-                            </div>
                             <field name="line_ids">
                                 <list editable="bottom">
                                     <field name="crfp_product_id" string="Product"/>
@@ -209,7 +243,9 @@
                                     <field name="responsible_id"/>
                                     <field name="is_overdue" column_invisible="1"/>
                                     <field name="attachment_ids" widget="many2many_binary"/>
-                                    <field name="notes" optional="hide"/>
+                                    <button name="action_send_document" type="object"
+                                            string="Send" icon="fa-envelope"
+                                            class="btn-link"/>
                                 </list>
                             </field>
                         </page>
@@ -219,8 +255,7 @@
                             <div class="d-flex justify-content-between mb-2">
                                 <field name="checklist_progress" widget="progressbar" style="width: 200px;"/>
                                 <button name="action_load_checklist_template" type="object"
-                                        string="Load Template" class="btn-link"
-                                        icon="fa-magic"/>
+                                        string="Load Template" class="btn-link" icon="fa-magic"/>
                             </div>
                             <field name="checklist_ids">
                                 <list editable="bottom"

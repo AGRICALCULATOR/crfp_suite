@@ -137,6 +137,11 @@ class CrfpQuotation(models.Model):
             so_vals['commitment_date'] = self.etd
 
         so = self.env['sale.order'].create(so_vals)
+        # Store the quotation reference on the SO (for logistics auto-fill)
+        try:
+            so.write({'crfp_quotation_id': self.id})
+        except Exception:
+            pass  # Field may not exist if crfp_logistics not installed
         self.write({'sale_order_id': so.id, 'state': 'won'})
         return {
             'type': 'ir.actions.act_window',
