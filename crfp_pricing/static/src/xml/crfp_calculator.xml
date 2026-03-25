@@ -17,12 +17,32 @@
                             <span t-esc="state.incoterm"/> · <span t-esc="portDisplay"/>
                         </div>
                         <div class="crfp-hdr-client">
-                            <select t-on-change="onPartnerChange" class="crfp-client-select">
-                                <option value="">-- Client --</option>
-                                <t t-foreach="state.partners" t-as="p" t-key="p.id">
-                                    <option t-att-value="p.id" t-att-selected="p.id === state.partnerId" t-esc="p.name"/>
+                            <div class="crfp-client-search-wrap">
+                                <input type="text"
+                                       class="crfp-client-input"
+                                       t-att-value="state.partnerSearchText"
+                                       t-on-input="onPartnerSearch"
+                                       t-on-focus="onPartnerFocus"
+                                       t-on-blur="onPartnerBlur"
+                                       placeholder="Search client..."/>
+                                <t t-if="state.partnerId">
+                                    <button class="crfp-client-clear" t-on-mousedown.prevent="clearPartner">✕</button>
                                 </t>
-                            </select>
+                                <div class="crfp-client-dropdown" t-if="state.showPartnerDropdown">
+                                    <t t-if="filteredPartners.length === 0">
+                                        <div class="crfp-client-empty">No contacts found</div>
+                                    </t>
+                                    <t t-foreach="filteredPartners" t-as="p" t-key="p.id">
+                                        <div class="crfp-client-option"
+                                             t-att-class="{'crfp-client-selected': p.id === state.partnerId}"
+                                             t-on-mousedown.prevent="() => this.selectPartner(p)">
+                                            <span class="crfp-client-name" t-esc="p.name"/>
+                                            <span class="crfp-client-email" t-if="p.email" t-esc="p.email"/>
+                                            <span class="crfp-client-badge" t-if="p.is_company">Company</span>
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
                         </div>
                         <div class="crfp-list-mgr">
                             <input type="text" t-att-value="state.quotationName" placeholder="Quotation Name" t-on-change="onQuotationNameChange"/>

@@ -19,6 +19,7 @@ export class CrfpCalculator extends Component {
             products: [], ports: [], carriers: [], containerTypes: [],
             boxTypes: [], palletConfigs: [], incotermMatrix: {}, fixedCosts: {},
             quotationId: null, quotationName: '', partnerId: false,
+            partnerSearchText: '', showPartnerDropdown: false,
             exchangeRate: 503, incoterm: 'FOB', totalBoxes: 1386,
             portId: false, containerTypeId: false, freightQuoteId: false,
             clientType: 'distribuidor',
@@ -95,13 +96,40 @@ export class CrfpCalculator extends Component {
 
     // ── Header ──
     onQuotationNameChange(ev) { this.state.quotationName = ev.target.value; this.state.modified = true; }
-    onPartnerChange(ev) {
-        this.state.partnerId = parseInt(ev.target.value) || false;
-        if (this.state.partnerId && !this.state.quotationName) {
-            const p = this.state.partners.find(p => p.id === this.state.partnerId);
-            if (p) this.state.quotationName = `${p.name} ${this.state.incoterm}`;
+    // ── Client search ──
+    onPartnerSearch(ev) {
+        this.state.partnerSearchText = ev.target.value;
+        this.state.showPartnerDropdown = true;
+    }
+    onPartnerFocus() {
+        this.state.showPartnerDropdown = true;
+    }
+    onPartnerBlur() {
+        // Delay to allow mousedown on dropdown option
+        setTimeout(() => { this.state.showPartnerDropdown = false; }, 200);
+    }
+    selectPartner(partner) {
+        this.state.partnerId = partner.id;
+        this.state.partnerSearchText = partner.name;
+        this.state.showPartnerDropdown = false;
+        if (!this.state.quotationName) {
+            this.state.quotationName = `${partner.name} ${this.state.incoterm}`;
         }
         this.state.modified = true;
+    }
+    clearPartner() {
+        this.state.partnerId = false;
+        this.state.partnerSearchText = '';
+        this.state.showPartnerDropdown = false;
+        this.state.modified = true;
+    }
+    get filteredPartners() {
+        const q = (this.state.partnerSearchText || '').toLowerCase().trim();
+        if (!q) return this.state.partners.slice(0, 20);
+        return this.state.partners.filter(p =>
+            (p.name || '').toLowerCase().includes(q) ||
+            (p.email || '').toLowerCase().includes(q)
+        ).slice(0, 20);
     }
 
     // ── Global params ──
@@ -154,8 +182,11 @@ export class CrfpCalculator extends Component {
     async loadQuotation(qId) {
         const d = await rpc('/crfp/api/quotation/load', { quotation_id: qId });
         if (d.error) { this.notification.add(d.error, { type: "danger" }); return; }
+        // Set partner search text from loaded partner name
+        const partnerName = d.partner_id ? (this.state.partners.find(p => p.id === d.partner_id) || {}).name || '' : '';
         Object.assign(this.state, {
             quotationId: d.id, quotationName: d.name, partnerId: d.partner_id,
+            partnerSearchText: partnerName,
             clientType: d.client_type, exchangeRate: d.exchange_rate, incoterm: d.incoterm,
             freightQuoteId: d.freight_quote_id, portId: d.port_id,
             containerTypeId: d.container_type_id, totalBoxes: d.total_boxes,
@@ -181,7 +212,7 @@ export class CrfpCalculator extends Component {
     }
 
     newQuotation() {
-        Object.assign(this.state, { quotationId: null, quotationName: '', partnerId: false });
+        Object.assign(this.state, { quotationId: null, quotationName: '', partnerId: false, partnerSearchText: '' });
         this.initLines(); this.recalcAll(); this.state.modified = false;
     }
 
