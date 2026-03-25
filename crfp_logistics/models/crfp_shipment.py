@@ -470,15 +470,44 @@ class CrfpShipment(models.Model):
         }
 
     def action_send_export_package(self):
+        """Send all export documents to client. Auto-attaches all document files."""
         self.ensure_one()
         partner_ids = [self.partner_id.id] if self.partner_id else []
+
+        # Collect ALL attachments from ALL shipment documents
+        all_attachment_ids = []
+        doc_list_html = []
+        for doc in self.document_ids:
+            doc_label = dict(doc._fields['doc_type'].selection).get(doc.doc_type, doc.doc_type)
+            if doc.attachment_ids:
+                all_attachment_ids.extend(doc.attachment_ids.ids)
+                doc_list_html.append('<li>%s (%d files)</li>' % (doc_label, len(doc.attachment_ids)))
+            else:
+                doc_list_html.append('<li style="color:#999;">%s — no file attached</li>' % doc_label)
+
         body = (
             "<h3>EXPORT DOCUMENT PACKAGE - %s</h3>"
-            "<p>Please find attached the complete export documentation.</p>"
+            "<p>Dear %s,</p>"
+            "<p>Please find attached the complete export documentation for shipment <b>%s</b>.</p>"
             "<p><b>Vessel:</b> %s<br/>"
+            "<b>Voyage:</b> %s<br/>"
             "<b>ETD:</b> %s<br/>"
-            "<b>Destination:</b> %s</p>"
-        ) % (self.name, self.vessel_name or '', self.etd or '', self.port_destination_id.name or '')
+            "<b>Destination:</b> %s<br/>"
+            "<b>Container:</b> %s</p>"
+            "<p><b>Documents included:</b></p><ul>%s</ul>"
+            "<p>Please confirm reception.</p>"
+            "<p>Best regards,<br/><b>CR Farm Products VYM S.A.</b></p>"
+        ) % (
+            self.name,
+            self.partner_id.name or 'Customer',
+            self.name,
+            self.vessel_name or '',
+            self.voyage_number or '',
+            self.etd or '',
+            self.port_destination_id.name or '',
+            self.container_number or '',
+            ''.join(doc_list_html),
+        )
         return {
             'type': 'ir.actions.act_window',
             'res_model': 'mail.compose.message',
@@ -491,6 +520,7 @@ class CrfpShipment(models.Model):
                 'default_partner_ids': partner_ids,
                 'default_subject': 'Export Documents - %s - %s' % (self.name, self.partner_id.name or ''),
                 'default_body': body,
+                'default_attachment_ids': all_attachment_ids,
                 'default_composition_mode': 'comment',
             },
         }
@@ -520,5 +550,31 @@ class CrfpShipment(models.Model):
             })
 
     def action_generate_packing_list(self):
+        """Generate packing list PDF and auto-attach to the packing_list document."""
         self.ensure_one()
-        return self.env.ref('crfp_logistics.action_report_packing_list').report_action(self)
+        report = self.env.ref('crfp_logistics.action_report_packing_list')
+
+        # Generate the PDF binary
+        pdf_content, content_type = report._render_qweb_pdf(report.report_name, [self.id])
+
+        # Create ir.attachment
+        filename = 'PackingList-%s.pdf' % self.name
+        attachment = self.env['ir.attachment'].create({
+            'name': filename,
+            'type': 'binary',
+            'datas': self.env['base'].sudo()._encode_base64(pdf_content) if hasattr(self.env['base'], '_encode_base64') else __import__('base64').b64encode(pdf_content).decode(),
+            'res_model': 'crfp.shipment',
+            'res_id': self.id,
+            'mimetype': 'application/pdf',
+        })
+
+        # Find the packing_list document and attach the PDF
+        pl_doc = self.document_ids.filtered(lambda d: d.doc_type == 'packing_list')
+        if pl_doc:
+            pl_doc[0].write({
+                'attachment_ids': [(4, attachment.id)],
+                'state': 'ready',
+            })
+
+        # Also return the report action so user can see/download
+        return report.report_action(self)
