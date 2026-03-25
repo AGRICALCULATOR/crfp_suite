@@ -98,9 +98,19 @@ export const CalculatorService = {
 
     /**
      * Calculate logistics cost per box for a given EXW price and incoterm.
+     *
+     * CORRECTED LOGIC (2026-03-25):
+     * The freight quote is the carrier's all-in price for the agreed incoterm.
+     * It ALWAYS gets added to the seller's cost (divided by total boxes).
+     * The checkboxes on the freight quote indicate what's INCLUDED in that price,
+     * so those fixed costs become $0 (to avoid double-counting).
+     *
+     * The incoterm matrix ONLY controls DESTINATION costs (THC dest, inland dest,
+     * insurance, duties) which the seller pays in CIF/DAP/DDP but not in FOB/CFR.
+     *
      * @param {number} exwPrice - EXW price per box
      * @param {Object} logCosts - output of calcLogisticsCosts()
-     * @param {Object} incotermFlags - from incoterm_matrix: inc_transport, inc_freight, etc.
+     * @param {Object} incotermFlags - from incoterm_matrix
      * @returns {number} total logistics cost per box
      */
     calcLogisticsPerBox(exwPrice, logCosts, incotermFlags) {
@@ -108,23 +118,33 @@ export const CalculatorService = {
         const c = logCosts || {};
 
         let total = 0;
-        if (m.inc_transport)   total += c.tPB  || 0;
-        if (m.inc_fumigation)  total += c.fuPB || 0;
-        if (m.inc_thc_origin)  total += c.poPB || 0;
-        if (m.inc_broker)      total += c.agPB || 0;
-        if (m.inc_freight)     total += c.frPB || 0;
 
-        // Insurance: % of EXW price
+        // ── SELLER ALWAYS PAYS (origin costs + freight quote) ──
+        // Freight quote is ALWAYS added — it's the carrier's price for this incoterm
+        total += c.frPB || 0;
+
+        // Fixed costs that are NOT included in the freight quote
+        // (if included, they're already $0 from calcLogisticsCosts)
+        total += c.tPB  || 0;  // Transport (if not in quote)
+        total += c.fuPB || 0;  // Fumigation (if not in quote)
+        total += c.poPB || 0;  // THC Origin (if not in quote)
+        total += c.agPB || 0;  // Broker (if not in quote)
+
+        // ── DESTINATION COSTS (controlled by incoterm) ──
+        // Insurance: only in CIF, CIP, DAP, DDP
         const insPB = m.inc_insurance ? (exwPrice * (c.sPct || 0) / 100) : 0;
         total += insPB;
 
+        // THC Destination: only in CPT, CIP, DAP, DDP
         if (m.inc_thc_dest)    total += c.tdPB || 0;
+        // Fumigation destination: only in DAP, DDP
         if (m.inc_fumig_dest)  total += c.fdPB || 0;
+        // Inland delivery destination: only in DAP, DDP
         if (m.inc_inland_dest) total += c.dePB || 0;
 
-        // Duties: % of CIF (EXW + freight + insurance)
+        // Duties: only in DDP — % of CIF value
         if (m.inc_duties && c.aPct) {
-            const cifBase = exwPrice + (m.inc_freight ? (c.frPB || 0) : 0) + insPB;
+            const cifBase = exwPrice + (c.frPB || 0) + insPB;
             total += cifBase * (c.aPct / 100);
         }
 
