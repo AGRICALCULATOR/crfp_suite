@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="crfp_tracking_event_tree" model="ir.ui.view">
+        <field name="name">crfp.tracking.event.list</field>
+        <field name="model">crfp.tracking.event</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="date_event"/>
+                <field name="shipment_id"/>
+                <field name="event_type" widget="badge"/>
+                <field name="location_text"/>
+                <field name="container_id" optional="show"/>
+                <field name="source" widget="badge"/>
+                <field name="user_id"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="crfp_tracking_search" model="ir.ui.view">
+        <field name="name">crfp.tracking.event.search</field>
+        <field name="model">crfp.tracking.event</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="shipment_id"/>
+                <field name="event_type"/>
+                <field name="location_text"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_shipment" string="Shipment" context="{'group_by': 'shipment_id'}"/>
+                    <filter name="group_event" string="Event Type" context="{'group_by': 'event_type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_crfp_tracking" model="ir.actions.act_window">
+        <field name="name">Tracking Events</field>
+        <field name="res_model">crfp.tracking.event</field>
+        <field name="view_mode">list</field>
+        <field name="search_view_id" ref="crfp_tracking_search"/>
+    </record>
+</odoo>

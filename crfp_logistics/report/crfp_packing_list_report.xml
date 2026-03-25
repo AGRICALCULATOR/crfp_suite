@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_packing_list" model="ir.actions.report">
+        <field name="name">Packing List</field>
+        <field name="model">crfp.shipment</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">crfp_logistics.report_packing_list</field>
+        <field name="report_file">crfp_logistics.report_packing_list</field>
+        <field name="print_report_name">'PackingList-%s' % object.name</field>
+        <field name="binding_model_id" ref="model_crfp_shipment"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_packing_list">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page" style="font-family: 'Segoe UI', Arial, sans-serif;">
+
+                        <!-- Header -->
+                        <div style="border-bottom: 3px solid #1a4d2e; padding-bottom: 12px; margin-bottom: 16px;">
+                            <h2 style="color: #1a4d2e; margin: 0; font-size: 22px;">PACKING LIST</h2>
+                            <p style="color: #3d8b5c; margin: 4px 0 0; font-size: 13px; font-weight: 600;">
+                                CR FARM PRODUCTS VYM S.A
+                            </p>
+                            <p style="text-align: right; font-size: 12px; color: #666; margin: -30px 0 0 0;">
+                                Ref: <strong t-esc="o.name"/><br/>
+                                Date: <strong t-esc="o.create_date.strftime('%Y-%m-%d') if o.create_date else ''"/>
+                            </p>
+                        </div>
+
+                        <!-- Shipment info -->
+                        <div style="display: flex; gap: 30px; margin-bottom: 14px; font-size: 11px;">
+                            <div style="flex: 1;">
+                                <table style="width: 100%;">
+                                    <tr><td style="color: #888; padding: 2px 8px 2px 0; width: 100px;">Client</td>
+                                        <td style="font-weight: 700;" t-esc="o.partner_id.name or '—'"/></tr>
+                                    <tr><td style="color: #888; padding: 2px 8px 2px 0;">Incoterm</td>
+                                        <td style="font-weight: 700;" t-esc="o.incoterm or '—'"/></tr>
+                                    <tr><td style="color: #888; padding: 2px 8px 2px 0;">Sale Order</td>
+                                        <td t-esc="o.sale_order_id.name or '—'"/></tr>
+                                    <tr t-if="o.commercial_invoice_id">
+                                        <td style="color: #888; padding: 2px 8px 2px 0;">Invoice</td>
+                                        <td t-esc="o.commercial_invoice_id.name or '—'"/></tr>
+                                </table>
+                            </div>
+                            <div style="flex: 1;">
+                                <table style="width: 100%;">
+                                    <tr><td style="color: #888; padding: 2px 8px 2px 0; width: 100px;">Origin</td>
+                                        <td t-esc="o.port_origin_id.name or '—'"/></tr>
+                                    <tr><td style="color: #888; padding: 2px 8px 2px 0;">Destination</td>
+                                        <td style="font-weight: 700;" t-esc="o.port_destination_id.name or '—'"/></tr>
+                                    <tr><td style="color: #888; padding: 2px 8px 2px 0;">Vessel</td>
+                                        <td t-esc="o.vessel_name or '—'"/></tr>
+                                    <tr><td style="color: #888; padding: 2px 8px 2px 0;">Carrier</td>
+                                        <td t-esc="o.carrier_partner_id.name or '—'"/></tr>
+                                    <tr t-if="o.etd"><td style="color: #888; padding: 2px 8px 2px 0;">ETD</td>
+                                        <td t-esc="o.etd"/></tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Containers summary -->
+                        <t t-if="o.container_ids">
+                            <div style="margin-bottom: 10px; font-size: 10px; color: #555;">
+                                <strong>Containers: </strong>
+                                <t t-foreach="o.container_ids" t-as="c">
+                                    <span t-esc="c.container_number or 'TBD'"/>
+                                    (<t t-esc="c.container_type_id.name or ''"/>)
+                                    <t t-if="not c_last">, </t>
+                                </t>
+                            </div>
+                        </t>
+
+                        <!-- Packing table — from ACTUAL quantities only -->
+                        <table style="width: 100%; border-collapse: collapse; font-size: 11px; margin-bottom: 16px;">
+                            <thead>
+                                <tr style="background: #1a4d2e; color: white;">
+                                    <th style="padding: 8px; text-align: left;">Product</th>
+                                    <th style="padding: 8px; text-align: center;">Container</th>
+                                    <th style="padding: 8px; text-align: center;">Boxes</th>
+                                    <th style="padding: 8px; text-align: center;">Pallets</th>
+                                    <th style="padding: 8px; text-align: right;">Net Wt (kg)</th>
+                                    <th style="padding: 8px; text-align: right;">Gross Wt (kg)</th>
+                                    <th style="padding: 8px; text-align: center;">Lot</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="o.line_ids" t-as="line">
+                                    <t t-if="line.boxes_actual > 0">
+                                        <tr style="border-bottom: 1px solid #e0e0e0;">
+                                            <td style="padding: 6px 8px; font-weight: 600;"
+                                                t-esc="line.crfp_product_id.name or line.product_id.name or '—'"/>
+                                            <td style="padding: 6px 8px; text-align: center; font-family: monospace;"
+                                                t-esc="line.container_id.container_number or '—'"/>
+                                            <td style="padding: 6px 8px; text-align: center; font-family: monospace; font-weight: 700;"
+                                                t-esc="line.boxes_actual"/>
+                                            <td style="padding: 6px 8px; text-align: center; font-family: monospace;"
+                                                t-esc="line.pallets_actual"/>
+                                            <td style="padding: 6px 8px; text-align: right; font-family: monospace;"
+                                                t-esc="'%.2f' % line.net_weight_actual"/>
+                                            <td style="padding: 6px 8px; text-align: right; font-family: monospace;"
+                                                t-esc="'%.2f' % line.gross_weight_actual"/>
+                                            <td style="padding: 6px 8px; text-align: center; font-size: 10px;"
+                                                t-esc="line.lot_number or ''"/>
+                                        </tr>
+                                    </t>
+                                </t>
+                            </tbody>
+                            <tfoot>
+                                <tr style="background: #eef6f1; font-weight: 700;">
+                                    <td style="padding: 8px;">TOTAL</td>
+                                    <td style="padding: 8px;"/>
+                                    <td style="padding: 8px; text-align: center; font-family: monospace;"
+                                        t-esc="o.total_boxes_actual"/>
+                                    <td style="padding: 8px; text-align: center; font-family: monospace;"
+                                        t-esc="o.total_pallets_actual"/>
+                                    <td style="padding: 8px; text-align: right; font-family: monospace;"
+                                        t-esc="'%.2f' % o.total_net_weight_actual"/>
+                                    <td style="padding: 8px; text-align: right; font-family: monospace;"
+                                        t-esc="'%.2f' % o.total_gross_weight_actual"/>
+                                    <td style="padding: 8px;"/>
+                                </tr>
+                            </tfoot>
+                        </table>
+
+                        <!-- Footer -->
+                        <div style="background: #eef6f1; border-radius: 6px; padding: 10px 14px; font-size: 10px; color: #1a4d2e;">
+                            <p style="margin: 0;">This packing list reflects actual quantities loaded.
+                            <t t-if="o.has_shortages">
+                                <strong style="color: #c0392b;"> Note: This shipment has shortages vs planned quantities.</strong>
+                            </t>
+                            </p>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

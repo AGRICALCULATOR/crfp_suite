@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ═══ ROOT APP MENU — separate app in dashboard ═══ -->
+    <menuitem id="menu_crfp_logistics_root"
+              name="CR Farm Logistics"
+              action="action_crfp_shipment"
+              web_icon="crfp_logistics,static/description/icon.png"
+              sequence="6"/>
+
+    <!-- Shipments -->
+    <menuitem id="menu_crfp_shipments"
+              name="Shipments"
+              parent="menu_crfp_logistics_root"
+              action="action_crfp_shipment"
+              sequence="10"/>
+
+    <!-- Bookings -->
+    <menuitem id="menu_crfp_bookings"
+              name="Bookings"
+              parent="menu_crfp_logistics_root"
+              action="action_crfp_booking"
+              sequence="20"/>
+
+    <!-- Documents (all across shipments) -->
+    <menuitem id="menu_crfp_documents"
+              name="Documents"
+              parent="menu_crfp_logistics_root"
+              action="action_crfp_document"
+              sequence="30"/>
+
+    <!-- Tracking -->
+    <menuitem id="menu_crfp_tracking"
+              name="Tracking"
+              parent="menu_crfp_logistics_root"
+              action="action_crfp_tracking"
+              sequence="40"/>
+
+    <!-- Configuration -->
+    <menuitem id="menu_crfp_logistics_config"
+              name="Configuration"
+              parent="menu_crfp_logistics_root"
+              sequence="90"/>
+
+    <menuitem id="menu_crfp_logistics_checklist_templates"
+              name="Checklist Templates"
+              parent="menu_crfp_logistics_config"
+              action="action_crfp_checklist_template"
+              sequence="10"/>
+</odoo>

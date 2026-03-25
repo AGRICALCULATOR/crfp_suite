@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ═══ SEARCH ═══ -->
+    <record id="crfp_shipment_search" model="ir.ui.view">
+        <field name="name">crfp.shipment.search</field>
+        <field name="model">crfp.shipment</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="sale_order_id"/>
+                <field name="vessel_name"/>
+                <field name="port_destination_id"/>
+                <filter name="my_shipments" string="My Shipments"
+                        domain="[('responsible_id', '=', uid)]"/>
+                <separator/>
+                <filter name="active" string="Active"
+                        domain="[('state', 'not in', ('closed', 'draft'))]"/>
+                <filter name="has_shortages" string="With Shortages"
+                        domain="[('has_shortages', '=', True)]"/>
+                <filter name="docs_pending" string="Docs Pending"
+                        domain="[('docs_complete', '=', False)]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="group_port" string="Destination" context="{'group_by': 'port_destination_id'}"/>
+                    <filter name="group_carrier" string="Carrier" context="{'group_by': 'carrier_partner_id'}"/>
+                    <filter name="group_responsible" string="Responsible" context="{'group_by': 'responsible_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ═══ LIST ═══ -->
+    <record id="crfp_shipment_tree" model="ir.ui.view">
+        <field name="name">crfp.shipment.list</field>
+        <field name="model">crfp.shipment</field>
+        <field name="arch" type="xml">
+            <list decoration-danger="has_shortages" decoration-muted="state == 'closed'">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="sale_order_id" optional="show"/>
+                <field name="port_destination_id"/>
+                <field name="carrier_partner_id" optional="show"/>
+                <field name="vessel_name" optional="show"/>
+                <field name="etd"/>
+                <field name="total_boxes_actual" string="Boxes"/>
+                <field name="total_pallets_actual" string="Pallets"/>
+                <field name="has_shortages" column_invisible="1"/>
+                <field name="checklist_progress" string="Progress" widget="progressbar"/>
+                <field name="state" widget="badge"
+                       decoration-success="state in ('delivered','closed')"
+                       decoration-info="state in ('shipped','in_transit','arrived')"
+                       decoration-warning="state in ('in_preparation','docs_pending')"
+                       decoration-danger="state == 'confirmed'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ═══ KANBAN ═══ -->
+    <record id="crfp_shipment_kanban" model="ir.ui.view">
+        <field name="name">crfp.shipment.kanban</field>
+        <field name="model">crfp.shipment</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state">
+                <templates>
+                    <t t-name="card">
+                        <field name="name" class="fw-bold"/>
+                        <field name="partner_id"/>
+                        <div class="d-flex justify-content-between mt-1">
+                            <span><field name="port_destination_id"/></span>
+                            <span class="text-muted"><field name="etd"/></span>
+                        </div>
+                        <div class="d-flex justify-content-between mt-1">
+                            <span>Boxes: <field name="total_boxes_actual"/></span>
+                            <span>Pallets: <field name="total_pallets_actual"/></span>
+                        </div>
+                        <field name="checklist_progress" widget="progressbar"/>
+                        <div t-if="record.alert_count.raw_value > 0" class="text-danger fw-bold mt-1">
+                            <i class="fa fa-exclamation-triangle"/> <field name="alert_count"/> alerts
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- ═══ FORM ═══ -->
+    <record id="crfp_shipment_form" model="ir.ui.view">
+        <field name="name">crfp.shipment.form</field>
+        <field name="model">crfp.shipment</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_confirm" type="object" string="Confirm"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_start_preparation" type="object" string="Start Preparation"
+                            invisible="state != 'confirmed'"/>
+                    <button name="action_docs_pending" type="object" string="Docs Pending"
+                            invisible="state != 'in_preparation'"/>
+                    <button name="action_ship" type="object" string="Mark Shipped"
+                            class="btn-primary" invisible="state != 'docs_pending'"/>
+                    <button name="action_in_transit" type="object" string="In Transit"
+                            invisible="state != 'shipped'"/>
+                    <button name="action_arrived" type="object" string="Arrived"
+                            class="btn-primary" invisible="state != 'in_transit'"/>
+                    <button name="action_delivered" type="object" string="Delivered"
+                            class="btn-primary" invisible="state != 'arrived'"/>
+                    <button name="action_close" type="object" string="Close"
+                            invisible="state != 'delivered'"/>
+                    <button name="action_generate_packing_list" type="object"
+                            string="Packing List PDF" icon="fa-file-pdf-o"
+                            invisible="state == 'draft'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,confirmed,in_preparation,shipped,in_transit,delivered,closed"/>
+                </header>
+                <sheet>
+                    <!-- Alerts banner -->
+                    <field name="has_shortages" invisible="1"/>
+                    <div class="alert alert-warning" role="alert" invisible="not has_shortages">
+                        <i class="fa fa-exclamation-triangle"/>
+                        <strong> This shipment has SHORTAGES.</strong> Some products have fewer actual boxes than planned.
+                    </div>
+
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+
+                    <group>
+                        <group string="Commercial">
+                            <field name="sale_order_id" options="{'no_create': True}"/>
+                            <button name="action_load_from_sale_order" type="object"
+                                    string="Load Lines from SO" class="btn-link"
+                                    invisible="line_ids or not sale_order_id"/>
+                            <field name="partner_id" options="{'no_create': True}"/>
+                            <field name="incoterm"/>
+                            <field name="responsible_id"/>
+                        </group>
+                        <group string="Logistics">
+                            <field name="port_origin_id"/>
+                            <field name="port_destination_id"/>
+                            <field name="carrier_partner_id" string="Carrier" options="{'no_create': True}"/>
+                            <field name="forwarder_partner_id" string="Forwarder" options="{'no_create': True}"/>
+                            <field name="container_type_id"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Transport">
+                            <field name="vessel_name"/>
+                            <field name="voyage_number"/>
+                            <field name="booking_id"/>
+                        </group>
+                        <group string="Dates">
+                            <field name="etd"/><field name="eta"/>
+                            <field name="atd"/><field name="ata"/>
+                            <field name="cutoff_date"/>
+                        </group>
+                    </group>
+                    <group string="Invoices (Odoo references only)" col="4">
+                        <field name="proforma_invoice_id" options="{'no_create': True}"/>
+                        <field name="commercial_invoice_id" options="{'no_create': True}"/>
+                        <field name="consignee_id" options="{'no_create': True}" optional="hide"/>
+                        <field name="notify_party_id" options="{'no_create': True}" optional="hide"/>
+                    </group>
+
+                    <notebook>
+                        <!-- TAB 1: Shipment Lines (planned vs actual) -->
+                        <page string="Shipment Lines" name="lines">
+                            <div class="alert alert-info" role="alert" invisible="line_ids">
+                                Select a Sale Order above and click "Load Lines from SO" to populate planned quantities.
+                            </div>
+                            <field name="line_ids">
+                                <list editable="bottom">
+                                    <field name="crfp_product_id" string="Product"/>
+                                    <field name="product_id" string="Odoo SKU" optional="show" options="{'no_create': True}"/>
+                                    <field name="container_id" string="Container" optional="show"/>
+                                    <field name="boxes_planned" string="Boxes Plan"/>
+                                    <field name="pallets_planned" string="Plts Plan"/>
+                                    <field name="boxes_actual" string="Boxes Actual"/>
+                                    <field name="pallets_actual" string="Plts Actual"/>
+                                    <field name="net_weight_actual" string="Net Kg" optional="show"/>
+                                    <field name="gross_weight_actual" string="Gross Kg" optional="show"/>
+                                    <field name="boxes_diff" string="Diff"
+                                           decoration-danger="boxes_diff &lt; 0"
+                                           decoration-success="boxes_diff >= 0"/>
+                                    <field name="has_shortage" column_invisible="1"/>
+                                    <field name="shortage_reason" string="Reason" optional="show"/>
+                                    <field name="lot_number" string="Lot" optional="hide"/>
+                                    <field name="box_type_id" optional="hide"/>
+                                </list>
+                            </field>
+                            <group class="oe_subtotal_footer">
+                                <field name="total_boxes_planned" string="Total Boxes Planned"/>
+                                <field name="total_boxes_actual" string="Total Boxes Actual"/>
+                                <field name="total_pallets_planned" string="Total Pallets Planned"/>
+                                <field name="total_pallets_actual" string="Total Pallets Actual"/>
+                                <field name="total_net_weight_actual" string="Total Net Weight (kg)"/>
+                                <field name="total_gross_weight_actual" string="Total Gross Weight (kg)"/>
+                            </group>
+                        </page>
+
+                        <!-- TAB 2: Containers -->
+                        <page string="Containers" name="containers">
+                            <field name="container_ids">
+                                <list editable="bottom">
+                                    <field name="container_type_id"/>
+                                    <field name="container_number"/>
+                                    <field name="seal_number"/>
+                                    <field name="temperature_set"/>
+                                    <field name="gate_in_date"/>
+                                    <field name="loading_date"/>
+                                    <field name="vgm_weight"/>
+                                    <field name="total_boxes" string="Boxes"/>
+                                    <field name="total_pallets" string="Pallets"/>
+                                    <field name="total_net_weight" string="Net Kg"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <!-- TAB 3: Documents -->
+                        <page string="Documents" name="documents"
+                              badge="docs_pending_count"
+                              badge_decoration="decoration-danger">
+                            <field name="document_ids">
+                                <list editable="bottom"
+                                      decoration-danger="is_overdue"
+                                      decoration-muted="state in ('na','approved')">
+                                    <field name="doc_type"/>
+                                    <field name="doc_source"/>
+                                    <field name="reference"/>
+                                    <field name="state" widget="badge"
+                                           decoration-success="state in ('approved','received')"
+                                           decoration-warning="state in ('in_progress','ready')"
+                                           decoration-danger="state in ('rejected')"
+                                           decoration-muted="state == 'na'"/>
+                                    <field name="is_required"/>
+                                    <field name="date_required"/>
+                                    <field name="date_sent" optional="show"/>
+                                    <field name="date_received" optional="show"/>
+                                    <field name="responsible_id"/>
+                                    <field name="is_overdue" column_invisible="1"/>
+                                    <field name="attachment_ids" widget="many2many_binary"/>
+                                    <field name="notes" optional="hide"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <!-- TAB 4: Checklist -->
+                        <page string="Checklist" name="checklist">
+                            <div class="d-flex justify-content-between mb-2">
+                                <field name="checklist_progress" widget="progressbar" style="width: 200px;"/>
+                                <button name="action_load_checklist_template" type="object"
+                                        string="Load Template" class="btn-link"
+                                        icon="fa-magic"/>
+                            </div>
+                            <field name="checklist_ids">
+                                <list editable="bottom"
+                                      decoration-success="state == 'done'"
+                                      decoration-muted="state == 'na'"
+                                      decoration-danger="is_blocking and state == 'pending'">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="category" widget="badge"/>
+                                    <field name="responsible_id"/>
+                                    <field name="date_due"/>
+                                    <field name="state" widget="badge"
+                                           decoration-success="state == 'done'"
+                                           decoration-muted="state == 'na'"/>
+                                    <field name="is_blocking"/>
+                                    <field name="date_done" optional="show"/>
+                                    <button name="action_done" type="object" string="Done"
+                                            icon="fa-check" invisible="state != 'pending'"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <!-- TAB 5: Tracking -->
+                        <page string="Tracking" name="tracking">
+                            <field name="tracking_event_ids">
+                                <list editable="bottom">
+                                    <field name="date_event"/>
+                                    <field name="event_type" widget="badge"/>
+                                    <field name="location_text"/>
+                                    <field name="port_id" optional="show"/>
+                                    <field name="container_id" optional="show"/>
+                                    <field name="source" widget="badge"/>
+                                    <field name="source_reference" optional="show"/>
+                                    <field name="user_id"/>
+                                    <field name="notes" optional="hide"/>
+                                    <field name="attachment_ids" widget="many2many_binary" optional="hide"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <!-- TAB 6: Alerts -->
+                        <page string="Alerts" name="alerts" badge="alert_count"
+                              badge_decoration="decoration-danger">
+                            <field name="alert_ids">
+                                <list decoration-danger="severity == 'critical' and not is_resolved"
+                                      decoration-warning="severity == 'warning' and not is_resolved"
+                                      decoration-muted="is_resolved">
+                                    <field name="date_triggered"/>
+                                    <field name="alert_type" widget="badge"/>
+                                    <field name="severity" widget="badge"
+                                           decoration-danger="severity == 'critical'"
+                                           decoration-warning="severity == 'warning'"/>
+                                    <field name="message"/>
+                                    <field name="is_resolved"/>
+                                    <field name="resolved_by" optional="show"/>
+                                    <button name="action_resolve" type="object" string="Resolve"
+                                            icon="fa-check-circle" invisible="is_resolved"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <!-- TAB 7: Communication Log -->
+                        <page string="Log" name="log">
+                            <field name="log_ids">
+                                <list editable="bottom">
+                                    <field name="date"/>
+                                    <field name="log_type" widget="badge"/>
+                                    <field name="subject"/>
+                                    <field name="partner_id"/>
+                                    <field name="user_id"/>
+                                    <field name="attachment_ids" widget="many2many_binary" optional="show"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <!-- TAB 8: Notes -->
+                        <page string="Notes" name="notes">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- ═══ ACTION ═══ -->
+    <record id="action_crfp_shipment" model="ir.actions.act_window">
+        <field name="name">Shipments</field>
+        <field name="res_model">crfp.shipment</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="crfp_shipment_search"/>
+        <field name="context">{'search_default_active': 1}</field>
+    </record>
+</odoo>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="crfp_checklist_template_tree" model="ir.ui.view">
+        <field name="name">crfp.checklist.template.list</field>
+        <field name="model">crfp.checklist.template</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="incoterm_filter"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="crfp_checklist_template_form" model="ir.ui.view">
+        <field name="name">crfp.checklist.template.form</field>
+        <field name="model">crfp.checklist.template</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="incoterm_filter"/>
+                        </group>
+                        <group>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <field name="line_ids">
+                        <list editable="bottom">
+                            <field name="sequence" widget="handle"/>
+                            <field name="name"/>
+                            <field name="category" widget="badge"/>
+                            <field name="is_blocking"/>
+                        </list>
+                    </field>
+                    <field name="notes" placeholder="Template notes..."/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_crfp_checklist_template" model="ir.actions.act_window">
+        <field name="name">Checklist Templates</field>
+        <field name="res_model">crfp.checklist.template</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

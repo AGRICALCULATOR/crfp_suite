@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="crfp_document_tree" model="ir.ui.view">
+        <field name="name">crfp.shipment.document.list</field>
+        <field name="model">crfp.shipment.document</field>
+        <field name="arch" type="xml">
+            <list decoration-danger="is_overdue" decoration-muted="state in ('na','approved')">
+                <field name="shipment_id"/>
+                <field name="doc_type"/>
+                <field name="doc_source" widget="badge"/>
+                <field name="reference"/>
+                <field name="date_required"/>
+                <field name="responsible_id"/>
+                <field name="is_overdue" column_invisible="1"/>
+                <field name="state" widget="badge"
+                       decoration-success="state in ('approved','received')"
+                       decoration-warning="state in ('in_progress','ready','sent')"
+                       decoration-danger="state == 'rejected'"
+                       decoration-muted="state == 'na'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="crfp_document_search" model="ir.ui.view">
+        <field name="name">crfp.shipment.document.search</field>
+        <field name="model">crfp.shipment.document</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="shipment_id"/>
+                <field name="doc_type"/>
+                <filter name="overdue" string="Overdue" domain="[('is_overdue', '=', True)]"/>
+                <filter name="pending" string="Pending" domain="[('state', '=', 'pending')]"/>
+                <filter name="my_docs" string="My Docs" domain="[('responsible_id', '=', uid)]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_shipment" string="Shipment" context="{'group_by': 'shipment_id'}"/>
+                    <filter name="group_type" string="Doc Type" context="{'group_by': 'doc_type'}"/>
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_crfp_document" model="ir.actions.act_window">
+        <field name="name">Documents</field>
+        <field name="res_model">crfp.shipment.document</field>
+        <field name="view_mode">list</field>
+        <field name="search_view_id" ref="crfp_document_search"/>
+    </record>
+</odoo>
