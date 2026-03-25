@@ -19,7 +19,7 @@
                 <filter name="has_shortages" string="With Shortages"
                         domain="[('has_shortages', '=', True)]"/>
                 <filter name="docs_pending" string="Docs Pending"
-                        domain="[('docs_complete', '=', False)]"/>
+                        domain="[('state', '=', 'docs_pending')]"/>
                 <group expand="0" string="Group By">
                     <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
                     <filter name="group_port" string="Destination" context="{'group_by': 'port_destination_id'}"/>
