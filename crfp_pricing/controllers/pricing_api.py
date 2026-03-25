@@ -287,12 +287,12 @@ class CrfpPricingAPI(http.Controller):
 
     @http.route('/crfp/api/partners', type='json', auth='user')
     def get_partners(self):
-        """Get customers for the client selector."""
+        """Get all contacts for the client selector."""
         return request.env['res.partner'].search_read(
-            [('customer_rank', '>', 0), ('active', '=', True)],
-            ['id', 'name', 'email', 'country_id'],
+            [('active', '=', True), ('type', '!=', 'private')],
+            ['id', 'name', 'email', 'country_id', 'is_company', 'customer_rank'],
             order='name',
-            limit=200,
+            limit=500,
         )
 
     # ─── PRICE HISTORY ───────────────────────────────────────────

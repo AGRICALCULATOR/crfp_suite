@@ -28,8 +28,12 @@
 .crfp-inc-badge { background:rgba(255,255,255,.2); border:1px solid rgba(255,255,255,.4);
     padding:4px 11px; border-radius:20px; font-size:12px; font-weight:700;
     font-family:var(--crfp-mono); letter-spacing:1px; }
-.crfp-hdr-client { }
-.crfp-client-select { padding:5px 8px; border-radius:5px; border:none; font-size:13px; min-width:180px; }
+.crfp-hdr-client { position:relative; }
+.crfp-client-select {
+    padding:6px 10px; border-radius:5px; border:1px solid rgba(255,255,255,.3);
+    font-size:13px; min-width:220px; background:rgba(255,255,255,.9); color:#2a2a2a;
+    cursor:pointer;
+}
 .crfp-list-mgr { background:rgba(255,255,255,.15); padding:7px 11px; border-radius:8px;
     display:flex; gap:7px; align-items:center; backdrop-filter:blur(4px); }
 .crfp-list-mgr input { padding:5px 8px; border-radius:5px; border:none; min-width:155px; font-size:13px; }
