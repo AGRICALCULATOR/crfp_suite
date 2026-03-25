@@ -15,9 +15,7 @@
                         domain="[('responsible_id', '=', uid)]"/>
                 <separator/>
                 <filter name="active" string="Active"
-                        domain="[('state', 'not in', ('closed', 'draft'))]"/>
-                <filter name="has_shortages" string="With Shortages"
-                        domain="[('has_shortages', '=', True)]"/>
+                        domain="[('state', 'not in', ['closed', 'draft'])]"/>
                 <filter name="docs_pending" string="Docs Pending"
                         domain="[('state', '=', 'docs_pending')]"/>
                 <group expand="0" string="Group By">
@@ -217,9 +215,7 @@
                         </page>
 
                         <!-- TAB 3: Documents -->
-                        <page string="Documents" name="documents"
-                              badge="docs_pending_count"
-                              badge_decoration="decoration-danger">
+                        <page string="Documents" name="documents">
                             <field name="document_ids">
                                 <list editable="bottom"
                                       decoration-danger="is_overdue"
@@ -292,8 +288,7 @@
                         </page>
 
                         <!-- TAB 6: Alerts -->
-                        <page string="Alerts" name="alerts" badge="alert_count"
-                              badge_decoration="decoration-danger">
+                        <page string="Alerts" name="alerts">
                             <field name="alert_ids">
                                 <list decoration-danger="severity == 'critical' and not is_resolved"
                                       decoration-warning="severity == 'warning' and not is_resolved"
