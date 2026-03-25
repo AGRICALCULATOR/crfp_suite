@@ -1,6 +1,10 @@
 import math
+import base64
+import logging
 from odoo import models, fields, api
 from odoo.exceptions import UserError
+
+_logger = logging.getLogger(__name__)
 
 
 class CrfpShipment(models.Model):
@@ -554,27 +558,35 @@ class CrfpShipment(models.Model):
         self.ensure_one()
         report = self.env.ref('crfp_logistics.action_report_packing_list')
 
-        # Generate the PDF binary
-        pdf_content, content_type = report._render_qweb_pdf(report.report_name, [self.id])
+        try:
+            # Generate the PDF binary
+            pdf_content, content_type = report._render_qweb_pdf(report.report_name, [self.id])
 
-        # Create ir.attachment
-        filename = 'PackingList-%s.pdf' % self.name
-        attachment = self.env['ir.attachment'].create({
-            'name': filename,
-            'type': 'binary',
-            'datas': self.env['base'].sudo()._encode_base64(pdf_content) if hasattr(self.env['base'], '_encode_base64') else __import__('base64').b64encode(pdf_content).decode(),
-            'res_model': 'crfp.shipment',
-            'res_id': self.id,
-            'mimetype': 'application/pdf',
-        })
-
-        # Find the packing_list document and attach the PDF
-        pl_doc = self.document_ids.filtered(lambda d: d.doc_type == 'packing_list')
-        if pl_doc:
-            pl_doc[0].write({
-                'attachment_ids': [(4, attachment.id)],
-                'state': 'ready',
+            # Create ir.attachment
+            filename = 'PackingList-%s.pdf' % self.name
+            attachment = self.env['ir.attachment'].create({
+                'name': filename,
+                'type': 'binary',
+                'datas': base64.b64encode(pdf_content),
+                'res_model': 'crfp.shipment',
+                'res_id': self.id,
+                'mimetype': 'application/pdf',
             })
 
-        # Also return the report action so user can see/download
+            # Find the packing_list document and attach the PDF
+            pl_doc = self.document_ids.filtered(lambda d: d.doc_type == 'packing_list')
+            if pl_doc:
+                pl_doc[0].write({
+                    'attachment_ids': [(4, attachment.id)],
+                    'state': 'ready',
+                })
+
+            self.message_post(
+                body='Packing List PDF generated and attached.',
+                attachment_ids=[attachment.id],
+            )
+        except Exception as e:
+            _logger.warning('Could not auto-attach packing list: %s', e)
+
+        # Return the report action so user can see/download
         return report.report_action(self)
