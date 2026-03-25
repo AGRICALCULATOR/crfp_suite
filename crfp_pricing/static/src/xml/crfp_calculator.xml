@@ -125,6 +125,97 @@
                             </div>
                         </div>
 
+                        <!-- ★ OPERATION COSTS (per container, editable per quotation) ★ -->
+                        <div class="crfp-sb-sec">
+                            <div class="crfp-sb-hdr" t-on-click="() => this.toggleSection('opCosts')">
+                                <span><i class="fa fa-dollar-sign"/> Operation Costs ($/container)</span>
+                                <i t-att-class="state.sections.opCosts ? 'fa fa-chevron-up' : 'fa fa-chevron-down'"/>
+                            </div>
+                            <div class="crfp-sb-body" t-if="state.sections.opCosts">
+                                <div class="crfp-opcost-note">
+                                    Your CR operation costs. Edit per quotation.
+                                    <span t-if="state.freightQuoteId" class="crfp-opcost-fq-note">
+                                        Costs marked <span class="crfp-fq-tag">FQ</span> are included in the freight quote.
+                                    </span>
+                                </div>
+                                <div class="crfp-opcost-grid">
+                                    <div class="crfp-opcost-row">
+                                        <label>Transport Internal</label>
+                                        <div class="crfp-opcost-input-wrap">
+                                            <input type="number" t-att-value="state.fc.fc_transport"
+                                                   t-on-change="(ev) => this.onFcChange('fc_transport', ev)" class="crfp-mono"/>
+                                            <span class="crfp-fq-tag" t-if="activeQuoteIncludes('inc_transport')">FQ</span>
+                                        </div>
+                                    </div>
+                                    <div class="crfp-opcost-row">
+                                        <label>THC Origin</label>
+                                        <div class="crfp-opcost-input-wrap">
+                                            <input type="number" t-att-value="state.fc.fc_thc_origin"
+                                                   t-on-change="(ev) => this.onFcChange('fc_thc_origin', ev)" class="crfp-mono"/>
+                                            <span class="crfp-fq-tag" t-if="activeQuoteIncludes('inc_thc_origin')">FQ</span>
+                                        </div>
+                                    </div>
+                                    <div class="crfp-opcost-row">
+                                        <label>Fumigation CR</label>
+                                        <div class="crfp-opcost-input-wrap">
+                                            <input type="number" t-att-value="state.fc.fc_fumigation"
+                                                   t-on-change="(ev) => this.onFcChange('fc_fumigation', ev)" class="crfp-mono"/>
+                                        </div>
+                                    </div>
+                                    <div class="crfp-opcost-row">
+                                        <label>Customs Broker</label>
+                                        <div class="crfp-opcost-input-wrap">
+                                            <input type="number" t-att-value="state.fc.fc_broker"
+                                                   t-on-change="(ev) => this.onFcChange('fc_broker', ev)" class="crfp-mono"/>
+                                            <span class="crfp-fq-tag" t-if="activeQuoteIncludes('inc_broker')">FQ</span>
+                                        </div>
+                                    </div>
+                                    <div class="crfp-opcost-row">
+                                        <label>THC Destination</label>
+                                        <div class="crfp-opcost-input-wrap">
+                                            <input type="number" t-att-value="state.fc.fc_thc_dest"
+                                                   t-on-change="(ev) => this.onFcChange('fc_thc_dest', ev)" class="crfp-mono"/>
+                                            <span class="crfp-fq-tag" t-if="activeQuoteIncludes('inc_thc_dest')">FQ</span>
+                                        </div>
+                                    </div>
+                                    <div class="crfp-opcost-row">
+                                        <label>Fumig. Destination</label>
+                                        <div class="crfp-opcost-input-wrap">
+                                            <input type="number" t-att-value="state.fc.fc_fumig_dest"
+                                                   t-on-change="(ev) => this.onFcChange('fc_fumig_dest', ev)" class="crfp-mono"/>
+                                            <span class="crfp-fq-tag" t-if="activeQuoteIncludes('inc_fumig_dest')">FQ</span>
+                                        </div>
+                                    </div>
+                                    <div class="crfp-opcost-row">
+                                        <label>Inland Delivery Dest.</label>
+                                        <div class="crfp-opcost-input-wrap">
+                                            <input type="number" t-att-value="state.fc.fc_inland_dest"
+                                                   t-on-change="(ev) => this.onFcChange('fc_inland_dest', ev)" class="crfp-mono"/>
+                                            <span class="crfp-fq-tag" t-if="activeQuoteIncludes('inc_inland_dest')">FQ</span>
+                                        </div>
+                                    </div>
+                                    <div class="crfp-opcost-row">
+                                        <label>Insurance (% EXW)</label>
+                                        <div class="crfp-opcost-input-wrap">
+                                            <input type="number" step="0.01" t-att-value="state.fc.fc_insurance_pct"
+                                                   t-on-change="(ev) => this.onFcChange('fc_insurance_pct', ev)" class="crfp-mono"/>
+                                        </div>
+                                    </div>
+                                    <div class="crfp-opcost-row">
+                                        <label>Duties (% CIF) — DDP</label>
+                                        <div class="crfp-opcost-input-wrap">
+                                            <input type="number" step="0.1" t-att-value="state.fc.fc_duties_pct"
+                                                   t-on-change="(ev) => this.onFcChange('fc_duties_pct', ev)" class="crfp-mono"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="crfp-opcost-total" t-if="logSummary">
+                                    <span>Total logistics/box:</span>
+                                    <span class="crfp-mono crfp-bold" t-esc="'$' + fmt(logSummary.frPB + logSummary.tPB + logSummary.poPB + logSummary.fuPB + logSummary.agPB + logSummary.tdPB + logSummary.fdPB + logSummary.dePB, 4)"/>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- ★ BASE PRICES — single source of truth ★ -->
                         <div class="crfp-sb-sec">
                             <div class="crfp-sb-hdr" t-on-click="() => this.toggleSection('basePrices')">

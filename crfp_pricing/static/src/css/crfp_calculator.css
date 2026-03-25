@@ -93,6 +93,22 @@
 .crfp-mono { font-family:var(--crfp-mono) !important; }
 .crfp-bold { font-weight:700 !important; }
 
+/* Operation costs section */
+.crfp-opcost-note { font-size:10px; color:#888; margin-bottom:6px; line-height:1.3; }
+.crfp-opcost-fq-note { display:block; margin-top:3px; }
+.crfp-opcost-grid { display:flex; flex-direction:column; gap:4px; }
+.crfp-opcost-row { display:flex; align-items:center; gap:4px; }
+.crfp-opcost-row label { font-size:10px; font-weight:600; color:#555; flex:1; min-width:0; }
+.crfp-opcost-input-wrap { display:flex; align-items:center; gap:3px; }
+.crfp-opcost-input-wrap input { width:70px; padding:3px 5px; border:1px solid var(--crfp-border);
+    border-radius:4px; font-size:11px; font-family:var(--crfp-mono); text-align:right; }
+.crfp-opcost-input-wrap input:focus { border-color:var(--crfp-secondary); outline:none; }
+.crfp-fq-tag { background:#e8f5e9; color:#1a4d2e; font-size:8px; font-weight:700;
+    padding:1px 4px; border-radius:3px; white-space:nowrap; }
+.crfp-opcost-total { display:flex; justify-content:space-between; align-items:center;
+    margin-top:6px; padding:5px 6px; background:#e8f5e9; border-radius:4px;
+    font-size:11px; font-weight:700; color:var(--crfp-primary); }
+
 /* Base prices */
 .crfp-bp-cat { font-size:9px; font-weight:700; color:var(--crfp-secondary); text-transform:uppercase;
     letter-spacing:.5px; margin:8px 0 3px; padding-top:4px; border-top:1px solid var(--crfp-border); }

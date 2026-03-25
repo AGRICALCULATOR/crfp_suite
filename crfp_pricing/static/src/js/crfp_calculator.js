@@ -26,7 +26,7 @@ export class CrfpCalculator extends Component {
             fc: {},
             lines: [], freightQuotes: [], quotations: [], partners: [],
             modified: false, compactView: false,
-            sections: { global: true, freight: true, basePrices: true, history: true },
+            sections: { global: true, freight: true, opCosts: false, basePrices: true, history: true },
         });
 
         onWillStart(async () => {
@@ -138,6 +138,19 @@ export class CrfpCalculator extends Component {
     onPortChange(ev) { this.state.portId = parseInt(ev.target.value) || false; this.state.modified = true; }
     onTotalBoxesChange(ev) { this.state.totalBoxes = parseInt(ev.target.value) || 1386; this.recalcAll(); this.state.modified = true; }
     onFreightQuoteChange(ev) { this.state.freightQuoteId = parseInt(ev.target.value) || false; this.recalcAll(); this.state.modified = true; }
+
+    // ── Operation Costs (per quotation) ──
+    onFcChange(field, ev) {
+        const v = parseFloat(ev.target.value) || 0;
+        this.state.fc[field] = v;
+        this.recalcAll();
+        this.state.modified = true;
+    }
+    activeQuoteIncludes(flag) {
+        if (!this.state.freightQuoteId) return false;
+        const fq = this.state.freightQuotes.find(q => q.id === this.state.freightQuoteId);
+        return fq ? fq[flag] : false;
+    }
 
     // ── Product card events ──
     updateLine(productId, field, value) {
