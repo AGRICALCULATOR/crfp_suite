@@ -43,6 +43,13 @@
                            statusbar_visible="draft,confirmed,sent,won"/>
                 </header>
                 <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_sale_order" type="object"
+                                class="oe_stat_button" icon="fa-shopping-cart"
+                                invisible="not sale_order_id">
+                            <field name="sale_order_id" widget="statinfo" string="Sale Order"/>
+                        </button>
+                    </div>
                     <div class="oe_title">
                         <h1><field name="name" placeholder="e.g. VANESSA VEGA FOB Rotterdam"/></h1>
                     </div>

@@ -151,6 +151,19 @@ class CrfpQuotation(models.Model):
             'target': 'current',
         }
 
+    def action_view_sale_order(self):
+        """Open the linked Sale Order."""
+        self.ensure_one()
+        if not self.sale_order_id:
+            return
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'sale.order',
+            'res_id': self.sale_order_id.id,
+            'view_mode': 'form',
+            'target': 'current',
+        }
+
     def action_download_pdf(self):
         """Download the quotation as PDF."""
         self.ensure_one()
