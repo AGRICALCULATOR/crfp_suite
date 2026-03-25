@@ -15,10 +15,10 @@
     'data': [
         'security/crfp_pricing_security.xml',
         'security/ir.model.access.csv',
+        'report/crfp_quotation_report.xml',
         'views/crfp_freight_quote_views.xml',
         'views/crfp_quotation_views.xml',
         'views/crfp_pricing_menus.xml',
-        'report/crfp_quotation_report.xml',
         'data/mail_template_data.xml',
         'data/cron_data.xml',
     ],

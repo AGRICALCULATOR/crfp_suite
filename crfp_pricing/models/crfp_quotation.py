@@ -145,6 +145,11 @@ class CrfpQuotation(models.Model):
             'target': 'current',
         }
 
+    def action_download_pdf(self):
+        """Download the quotation as PDF."""
+        self.ensure_one()
+        return self.env.ref('crfp_pricing.action_report_crfp_quotation').report_action(self)
+
     def action_send_email(self):
         """Open the email composer with PDF attached."""
         self.ensure_one()
