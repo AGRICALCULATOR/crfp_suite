@@ -529,6 +529,32 @@ class CrfpShipment(models.Model):
             },
         }
 
+    # ── Navigation actions ──
+
+    def action_view_sale_order(self):
+        self.ensure_one()
+        if not self.sale_order_id:
+            return
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'sale.order',
+            'res_id': self.sale_order_id.id,
+            'view_mode': 'form',
+            'target': 'current',
+        }
+
+    def action_view_quotation(self):
+        self.ensure_one()
+        if not self.crfp_quotation_id:
+            return
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'crfp.quotation',
+            'res_id': self.crfp_quotation_id.id,
+            'view_mode': 'form',
+            'target': 'current',
+        }
+
     # ── Legacy helpers ──
 
     def action_load_from_sale_order(self):
