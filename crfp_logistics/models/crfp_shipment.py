@@ -86,6 +86,9 @@ class CrfpShipment(models.Model):
     log_ids = fields.One2many('crfp.shipment.log', 'shipment_id', string='Communication Log')
     tracking_event_ids = fields.One2many('crfp.tracking.event', 'shipment_id', string='Tracking Events')
 
+    # Container number (from first container for easy list display)
+    container_number = fields.Char(compute='_compute_container_number', store=True, string='Container #')
+
     # Computed
     total_boxes_planned = fields.Integer(compute='_compute_totals', store=True)
     total_boxes_actual = fields.Integer(compute='_compute_totals', store=True)
@@ -99,6 +102,12 @@ class CrfpShipment(models.Model):
     docs_pending_count = fields.Integer(compute='_compute_docs_progress')
     checklist_progress = fields.Float(compute='_compute_checklist_progress')
     alert_count = fields.Integer(compute='_compute_alert_count')
+
+    @api.depends('container_ids.container_number')
+    def _compute_container_number(self):
+        for rec in self:
+            first = rec.container_ids[:1]
+            rec.container_number = first.container_number if first else ''
 
     @api.depends('line_ids.boxes_planned', 'line_ids.boxes_actual',
                  'line_ids.pallets_planned', 'line_ids.pallets_actual',

@@ -12,6 +12,7 @@
                 <field name="port_destination_id"/>
                 <field name="carrier_partner_id" optional="show" string="Carrier"/>
                 <field name="vessel_name" optional="show"/>
+                <field name="container_number" optional="show"/>
                 <field name="etd"/>
                 <field name="total_boxes_planned" string="Boxes Plan"/>
                 <field name="total_boxes_actual" string="Boxes Actual"/>
