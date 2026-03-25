@@ -99,7 +99,7 @@ class CrfpPricingAPI(http.Controller):
             domain.append(('port_id', '=', port_id))
         quotes = request.env['crfp.freight.quote'].search_read(
             domain,
-            ['id', 'name', 'carrier_id', 'carrier_name', 'port_id',
+            ['id', 'name', 'carrier_partner_id', 'carrier_name', 'port_id',
              'container_type_id', 'delivery_type', 'all_in_freight',
              'transit_days', 'routing', 'transship_port',
              'valid_from', 'valid_until', 'source', 'state',

@@ -62,7 +62,10 @@
 .crfp-mono { font-family:var(--crfp-mono) !important; }
 .crfp-bold { font-weight:700 !important; }
 
-/* Base prices rows */
+/* Base prices */
+.crfp-bp-cat { font-size:9px; font-weight:700; color:var(--crfp-secondary); text-transform:uppercase;
+    letter-spacing:.5px; margin:8px 0 3px; padding-top:4px; border-top:1px solid var(--crfp-border); }
+.crfp-bp-cat:first-child { border-top:none; margin-top:0; }
 .crfp-bp-row { display:flex; align-items:center; gap:6px; margin-bottom:4px; }
 .crfp-bp-row label { flex:1; font-size:11px; font-weight:600; color:var(--crfp-dark);
     white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }

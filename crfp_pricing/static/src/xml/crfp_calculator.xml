@@ -112,13 +112,16 @@
                                 <i t-att-class="state.sections.basePrices ? 'fa fa-chevron-up' : 'fa fa-chevron-down'"/>
                             </div>
                             <div class="crfp-sb-body" t-if="state.sections.basePrices">
-                                <t t-foreach="state.lines" t-as="line" t-key="line.crfp_product_id">
-                                    <div class="crfp-bp-row">
-                                        <label t-esc="line.product_name"/>
-                                        <input type="number" t-att-value="line.raw_price_crc"
-                                               t-on-change="(ev) => this.onBasePriceChange(line.crfp_product_id, ev)"
-                                               class="crfp-mono"/>
-                                    </div>
+                                <t t-foreach="categories" t-as="cat" t-key="cat">
+                                    <div class="crfp-bp-cat" t-esc="getCatLabel(cat)"/>
+                                    <t t-foreach="getLinesByCat(cat)" t-as="line" t-key="line.crfp_product_id">
+                                        <div class="crfp-bp-row">
+                                            <label t-esc="line.product_name"/>
+                                            <input type="number" t-att-value="line.raw_price_crc"
+                                                   t-on-change="(ev) => this.onBasePriceChange(line.crfp_product_id, ev)"
+                                                   class="crfp-mono"/>
+                                        </div>
+                                    </t>
                                 </t>
                             </div>
                         </div>

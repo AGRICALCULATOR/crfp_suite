@@ -6,7 +6,7 @@
         <field name="arch" type="xml">
             <list>
                 <field name="name"/>
-                <field name="carrier_id"/>
+                <field name="carrier_partner_id" string="Carrier"/>
                 <field name="port_id"/>
                 <field name="all_in_freight"/>
                 <field name="transit_days"/>
@@ -29,13 +29,20 @@
                             class="btn-primary" invisible="state != 'draft'"/>
                     <button name="action_expire" type="object" string="Mark Expired"
                             invisible="state != 'active'"/>
+                    <button name="action_request_update" type="object"
+                            string="Request Updated Quote"
+                            class="btn-secondary"
+                            invisible="state != 'expired'"
+                            icon="fa-envelope"/>
                     <field name="state" widget="statusbar"/>
                 </header>
                 <sheet>
                     <group>
                         <group string="Quote Info">
                             <field name="name"/>
-                            <field name="carrier_id"/>
+                            <field name="carrier_partner_id" string="Carrier / Forwarder"
+                                   options="{'no_create': True}"
+                                   help="Select the carrier from your Odoo contacts"/>
                             <field name="port_id"/>
                             <field name="container_type_id"/>
                             <field name="delivery_type"/>

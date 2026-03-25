@@ -8,13 +8,19 @@ class CrfpFreightQuote(models.Model):
     _inherit = ['mail.thread']
 
     name = fields.Char(string='Reference', help='Quote reference, e.g. Q2026-184')
-    carrier_id = fields.Many2one('crfp.carrier', string='Carrier / Forwarder',
-                                 required=True)
-    carrier_name = fields.Char(related='carrier_id.name', store=True)
-    port_id = fields.Many2one('crfp.port', string='Destination Port',
-                              required=True)
-    container_type_id = fields.Many2one('crfp.container.type',
-                                        string='Container Type')
+
+    # Carrier from Odoo contacts (res.partner), not from crfp.carrier
+    carrier_partner_id = fields.Many2one(
+        'res.partner', string='Carrier / Forwarder',
+        help='Select the carrier or forwarder from Odoo contacts')
+    carrier_name = fields.Char(
+        related='carrier_partner_id.name', store=True, string='Carrier Name')
+
+    # Keep old field for backward compatibility but make it optional
+    carrier_id = fields.Many2one('crfp.carrier', string='Legacy Carrier (old)')
+
+    port_id = fields.Many2one('crfp.port', string='Destination Port', required=True)
+    container_type_id = fields.Many2one('crfp.container.type', string='Container Type')
     delivery_type = fields.Selection([
         ('port-port', 'Port to Port'),
         ('door-port', 'Door to Port'),
@@ -34,8 +40,7 @@ class CrfpFreightQuote(models.Model):
 
     valid_from = fields.Date(string='Valid From')
     valid_until = fields.Date(string='Valid Until')
-    source = fields.Char(string='Source',
-                         help='Email reference, agent name, etc.')
+    source = fields.Char(string='Source', help='Email reference, agent name, etc.')
 
     # What is included in the quoted freight
     inc_transport = fields.Boolean(string='Includes Internal Transport')
@@ -67,3 +72,30 @@ class CrfpFreightQuote(models.Model):
 
     def action_expire(self):
         self.write({'state': 'expired'})
+
+    def action_request_update(self):
+        """Open email composer to request updated quote from carrier."""
+        self.ensure_one()
+        if not self.carrier_partner_id:
+            return
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'mail.compose.message',
+            'views': [[False, 'form']],
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_model': 'crfp.freight.quote',
+                'default_res_ids': self.ids,
+                'default_partner_ids': [self.carrier_partner_id.id],
+                'default_subject': f'Request Updated Freight Quote — {self.name or ""}',
+                'default_body': f'<p>Dear {self.carrier_partner_id.name},</p>'
+                    f'<p>We would like to request an updated freight quotation for:</p>'
+                    f'<ul><li>Destination: {self.port_id.name or ""}</li>'
+                    f'<li>Container: {self.container_type_id.name or "40ft HC Reefer"}</li>'
+                    f'<li>Previous rate: ${self.all_in_freight:.2f}</li></ul>'
+                    f'<p>Please send us your current rates.</p>'
+                    f'<p>Best regards,<br/>CR Farm Products</p>',
+                'default_composition_mode': 'comment',
+            },
+        }
