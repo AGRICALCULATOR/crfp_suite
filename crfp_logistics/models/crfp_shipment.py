@@ -57,6 +57,8 @@ class CrfpShipment(models.Model):
     # Transport
     vessel_name = fields.Char(string='Vessel', tracking=True)
     voyage_number = fields.Char(string='Voyage')
+    shipping_company = fields.Char(string='Shipping Company')
+    freight_cost = fields.Float(string='Freight Cost (USD)', digits=(12, 2))
 
     # Reefer / SI fields
     temperature_set = fields.Float(string='Temperature Set (C)')
@@ -206,36 +208,68 @@ class CrfpShipment(models.Model):
                 self.carrier_partner_id = quotation.freight_quote_id.carrier_partner_id
 
     def _create_lines_from_so(self):
+        """Legacy method — calls the improved version without quotation."""
+        self._create_lines_from_so_and_quotation(None)
+
+    def _create_lines_from_so_and_quotation(self, quotation=None):
+        """Create shipment lines from SO, using quotation data when available."""
         self.ensure_one()
         if not self.sale_order_id:
             return
+
+        # Build a map of quotation lines by crfp_product_id for fast lookup
+        q_lines_map = {}
+        if quotation:
+            for ql in quotation.line_ids:
+                if ql.crfp_product_id:
+                    q_lines_map[ql.crfp_product_id.id] = ql
+
+        # Get first container if exists
+        container = self.container_ids[:1]
+
         for sol in self.sale_order_id.order_line:
             if not sol.product_id:
                 continue
             boxes_planned = int(sol.product_uom_qty)
+
+            # Find crfp.product
             crfp_prod = self.env['crfp.product'].search([
                 ('product_id', '=', sol.product_id.id)
             ], limit=1)
-            net_kg = crfp_prod.net_kg if crfp_prod else 0
-            bpp = 66
-            if crfp_prod:
-                pallet_cfg = self.env['crfp.pallet.config'].search([
-                    ('product_keyword', 'ilike', crfp_prod.name)
-                ], limit=1)
-                if pallet_cfg:
-                    bpp = pallet_cfg.boxes_per_pallet
+
+            # Try to get data from quotation line (most accurate)
+            q_line = q_lines_map.get(crfp_prod.id) if crfp_prod else None
+
+            if q_line:
+                # Use quotation line data (preserves exact user input)
+                net_kg = q_line.net_kg or (crfp_prod.net_kg if crfp_prod else 0)
+                bpp = q_line.boxes_per_pallet or 66
+            else:
+                # Fallback: lookup from product and pallet config
+                net_kg = crfp_prod.net_kg if crfp_prod else 0
+                bpp = 66
+                if crfp_prod:
+                    pallet_cfg = self.env['crfp.pallet.config'].search([
+                        ('product_keyword', 'ilike', crfp_prod.name)
+                    ], limit=1)
+                    if pallet_cfg:
+                        bpp = pallet_cfg.boxes_per_pallet
+
             pallets_planned = math.ceil(boxes_planned / bpp) if bpp else 0
+
             self.env['crfp.shipment.line'].create({
                 'shipment_id': self.id,
                 'sale_order_line_id': sol.id,
                 'product_id': sol.product_id.id,
                 'crfp_product_id': crfp_prod.id if crfp_prod else False,
+                'container_id': container.id if container else False,
                 'boxes_planned': boxes_planned,
                 'pallets_planned': pallets_planned,
                 'boxes_per_pallet_planned': bpp,
                 'net_weight_planned': boxes_planned * net_kg,
                 'gross_weight_planned': boxes_planned * net_kg * 1.05,
                 'price_unit_planned': sol.price_unit,
+                'temperature_set': self.temperature_set or 0,
             })
 
     def _auto_load_documents(self):

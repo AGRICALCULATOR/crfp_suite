@@ -47,18 +47,36 @@ class SaleOrder(models.Model):
             if quotation.vessel_name:
                 vals['vessel_name'] = quotation.vessel_name
             if quotation.shipping_company:
-                vals['voyage_number'] = quotation.shipping_company
-            if quotation.freight_quote_id and quotation.freight_quote_id.carrier_partner_id:
-                vals['carrier_partner_id'] = quotation.freight_quote_id.carrier_partner_id.id
+                vals['shipping_company'] = quotation.shipping_company
+            # Carrier from freight quote
+            if quotation.freight_quote_id:
+                fq = quotation.freight_quote_id
+                if fq.carrier_partner_id:
+                    vals['carrier_partner_id'] = fq.carrier_partner_id.id
+                # Freight cost for reference
+                if fq.all_in_freight:
+                    vals['freight_cost'] = fq.all_in_freight
+            # Default consignee = client
+            vals['consignee_id'] = self.partner_id.id
 
         shipment = self.env['crfp.shipment'].create(vals)
 
-        # Create shipment lines from SO lines
-        shipment._create_lines_from_so()
+        # Create shipment lines from SO + quotation data
+        shipment._create_lines_from_so_and_quotation(quotation)
+
+        # Auto-create one container if container type is set
+        if shipment.container_type_id:
+            self.env['crfp.shipment.container'].create({
+                'shipment_id': shipment.id,
+                'container_type_id': shipment.container_type_id.id,
+            })
 
         # Auto-load documents and checklist
         shipment._auto_load_documents()
         shipment._auto_load_checklist()
+
+        # Generate commodity description
+        shipment._generate_commodity_description()
 
         return {
             'type': 'ir.actions.act_window',
