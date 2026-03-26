@@ -131,6 +131,15 @@
                         </group>
                     </group>
 
+                    <group string="Insurance" invisible="responsible_party != 'insurance'">
+                        <group>
+                            <field name="insurance_policy_number"/>
+                        </group>
+                        <group>
+                            <field name="insurance_policy_file" widget="many2many_binary"/>
+                        </group>
+                    </group>
+
                     <group string="Amounts" col="4">
                         <field name="claimed_amount"/>
                         <field name="currency_id"/>

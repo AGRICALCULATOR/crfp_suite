@@ -80,6 +80,10 @@ class CrfpClaim(models.Model):
     resolution_notes = fields.Text(string='Resolution Notes')
     credit_note_id = fields.Many2one('account.move', string='Credit Note')
 
+    # Insurance
+    insurance_policy_number = fields.Char(string='Insurance Policy Number')
+    insurance_policy_file = fields.Many2many('ir.attachment', string='Insurance Policy Document')
+
     # Management
     assigned_to = fields.Many2one('res.users', string='Assigned To',
                                    default=lambda self: self.env.user, tracking=True)
