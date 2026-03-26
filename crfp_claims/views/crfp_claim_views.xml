@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ═══ LIST ═══ -->
+    <record id="crfp_claim_tree" model="ir.ui.view">
+        <field name="name">crfp.claim.list</field>
+        <field name="model">crfp.claim</field>
+        <field name="arch" type="xml">
+            <list decoration-danger="priority == 'critical'"
+                  decoration-warning="priority == 'high'"
+                  decoration-muted="state in ('closed','cancelled')">
+                <field name="name"/>
+                <field name="claim_type" widget="badge"/>
+                <field name="origin" widget="badge"/>
+                <field name="partner_id"/>
+                <field name="shipment_id"/>
+                <field name="responsible_party"/>
+                <field name="claimed_amount"/>
+                <field name="approved_amount" optional="show"/>
+                <field name="recovered_amount" optional="show"/>
+                <field name="priority" widget="badge"
+                       decoration-danger="priority == 'critical'"
+                       decoration-warning="priority == 'high'"/>
+                <field name="assigned_to"/>
+                <field name="deadline" optional="show"/>
+                <field name="state" widget="badge"
+                       decoration-success="state in ('resolved','closed')"
+                       decoration-info="state in ('investigation','response_pending')"
+                       decoration-warning="state == 'open'"
+                       decoration-danger="state == 'draft'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ═══ KANBAN ═══ -->
+    <record id="crfp_claim_kanban" model="ir.ui.view">
+        <field name="name">crfp.claim.kanban</field>
+        <field name="model">crfp.claim</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state">
+                <templates>
+                    <t t-name="card">
+                        <field name="name" class="fw-bold"/>
+                        <field name="partner_id"/>
+                        <div class="d-flex justify-content-between mt-1">
+                            <field name="claim_type" widget="badge"/>
+                            <field name="priority" widget="badge"/>
+                        </div>
+                        <div class="mt-1">
+                            <span class="text-muted">Claimed: </span>
+                            <strong>$<field name="claimed_amount"/></strong>
+                        </div>
+                        <field name="assigned_to" widget="many2one_avatar_user"/>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- ═══ FORM ═══ -->
+    <record id="crfp_claim_form" model="ir.ui.view">
+        <field name="name">crfp.claim.form</field>
+        <field name="model">crfp.claim</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_open" type="object" string="Open"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_investigate" type="object" string="Investigate"
+                            invisible="state != 'open'"/>
+                    <button name="action_response_pending" type="object" string="Awaiting Response"
+                            invisible="state != 'investigation'"/>
+                    <button name="action_resolve" type="object" string="Resolve"
+                            class="btn-primary" invisible="state not in ('investigation','response_pending')"/>
+                    <button name="action_close" type="object" string="Close"
+                            class="btn-primary" invisible="state != 'resolved'"/>
+                    <button name="action_cancel" type="object" string="Cancel"
+                            invisible="state in ('closed','cancelled')"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,open,investigation,resolved,closed"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_shipment" type="object"
+                                class="oe_stat_button" icon="fa-ship"
+                                invisible="not shipment_id">
+                            <field name="shipment_id" widget="statinfo" string="Shipment"/>
+                        </button>
+                    </div>
+
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+
+                    <group>
+                        <group string="Claim Info">
+                            <field name="claim_type"/>
+                            <field name="origin"/>
+                            <field name="priority"/>
+                            <field name="date_filed"/>
+                            <field name="deadline"/>
+                            <field name="assigned_to"/>
+                        </group>
+                        <group string="Related To">
+                            <field name="shipment_id" options="{'no_create': True}" invisible="1"/>
+                            <field name="partner_id" string="Client / Claimant"
+                                   options="{'no_create': True}"/>
+                            <field name="sale_order_id" options="{'no_create': True}"/>
+                            <field name="container_id" options="{'no_create': True}"/>
+                            <field name="shipment_line_ids" widget="many2many_tags"/>
+                        </group>
+                    </group>
+
+                    <field name="description" placeholder="Describe the claim in detail..."/>
+
+                    <group string="Responsibility &amp; Resolution"
+                           invisible="state in ('draft','open')">
+                        <group>
+                            <field name="responsible_party"/>
+                            <field name="responsible_partner_id" options="{'no_create': True}"/>
+                        </group>
+                        <group>
+                            <field name="resolution_type"/>
+                            <field name="credit_note_id" options="{'no_create': True}"
+                                   invisible="resolution_type != 'credit_note'"/>
+                            <field name="date_closed" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <group string="Amounts" col="4">
+                        <field name="claimed_amount"/>
+                        <field name="currency_id"/>
+                        <field name="approved_amount"/>
+                        <field name="recovered_amount"/>
+                    </group>
+
+                    <field name="resolution_notes" placeholder="Resolution details..."
+                           invisible="state in ('draft','open')"/>
+
+                    <notebook>
+                        <page string="Evidence" name="evidence">
+                            <field name="evidence_ids">
+                                <list editable="bottom">
+                                    <field name="evidence_type" widget="badge"/>
+                                    <field name="name"/>
+                                    <field name="date"/>
+                                    <field name="source" widget="badge"/>
+                                    <field name="attachment_ids" widget="many2many_binary"/>
+                                    <field name="notes" optional="hide"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Communication Log" name="log">
+                            <field name="log_ids">
+                                <list editable="bottom">
+                                    <field name="date"/>
+                                    <field name="log_type" widget="badge"/>
+                                    <field name="subject"/>
+                                    <field name="partner_id"/>
+                                    <field name="user_id"/>
+                                    <field name="attachment_ids" widget="many2many_binary" optional="show"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- ═══ ACTION ═══ -->
+    <record id="action_crfp_claim" model="ir.actions.act_window">
+        <field name="name">Claims</field>
+        <field name="res_model">crfp.claim</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="context">{}</field>
+    </record>
+</odoo>

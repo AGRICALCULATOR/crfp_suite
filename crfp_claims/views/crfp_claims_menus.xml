@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_crfp_claims_root"
+              name="CR Farm Claims"
+              action="action_crfp_claim"
+              web_icon="crfp_claims,static/description/icon.png"
+              sequence="7"/>
+
+    <menuitem id="menu_crfp_claims_all"
+              name="Claims"
+              parent="menu_crfp_claims_root"
+              action="action_crfp_claim"
+              sequence="10"/>
+</odoo>

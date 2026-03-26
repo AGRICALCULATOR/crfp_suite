@@ -94,6 +94,12 @@
                     <button name="action_close" type="object"
                             string="Close" invisible="state != 'delivered'"/>
 
+                    <!-- Create Booking -->
+                    <button name="action_create_booking" type="object"
+                            string="Create Booking" icon="fa-anchor"
+                            class="btn-secondary"
+                            invisible="booking_id or state not in ('space_requested','booking_requested')"/>
+
                     <!-- Document action buttons -->
                     <button name="action_send_booking_crfarm" type="object"
                             string="Send CR Farm Booking" icon="fa-envelope"

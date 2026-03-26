@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_crfp_claim_user,crfp.claim.user,model_crfp_claim,group_crfp_claims_user,1,1,1,0
+access_crfp_claim_manager,crfp.claim.manager,model_crfp_claim,group_crfp_claims_manager,1,1,1,1
+access_crfp_claim_evidence_user,crfp.claim.evidence.user,model_crfp_claim_evidence,group_crfp_claims_user,1,1,1,1
+access_crfp_claim_log_user,crfp.claim.log.user,model_crfp_claim_log,group_crfp_claims_user,1,1,1,0
+access_crfp_claim_log_manager,crfp.claim.log.manager,model_crfp_claim_log,group_crfp_claims_manager,1,1,1,1

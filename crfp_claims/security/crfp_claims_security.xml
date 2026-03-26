@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="group_crfp_claims_user" model="res.groups">
+        <field name="name">CR Farm Claims - User</field>
+        <field name="implied_ids" eval="[(4, ref('crfp_base.group_crfp_user'))]"/>
+    </record>
+
+    <record id="group_crfp_claims_manager" model="res.groups">
+        <field name="name">CR Farm Claims - Manager</field>
+        <field name="implied_ids" eval="[(4, ref('group_crfp_claims_user'))]"/>
+    </record>
+</odoo>

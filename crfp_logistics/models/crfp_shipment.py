@@ -529,6 +529,37 @@ class CrfpShipment(models.Model):
             },
         }
 
+    # ── Create Booking from Shipment ──
+
+    def action_create_booking(self):
+        """Create a booking pre-filled from this shipment."""
+        self.ensure_one()
+        if self.booking_id:
+            raise UserError('This shipment already has a booking linked.')
+        freight_cost = 0
+        if self.crfp_quotation_id and self.crfp_quotation_id.freight_quote_id:
+            freight_cost = self.crfp_quotation_id.freight_quote_id.all_in_freight
+        booking = self.env['crfp.shipment.booking'].create({
+            'shipment_id': self.id,
+            'carrier_partner_id': self.carrier_partner_id.id if self.carrier_partner_id else False,
+            'vessel_name': self.vessel_name or '',
+            'voyage_number': self.voyage_number or '',
+            'container_type_id': self.container_type_id.id if self.container_type_id else False,
+            'etd': self.etd,
+            'eta': self.eta,
+            'cutoff_date': self.cutoff_date,
+            'freight_cost': freight_cost,
+            'state': 'requested',
+        })
+        self.write({'booking_id': booking.id})
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'crfp.shipment.booking',
+            'res_id': booking.id,
+            'view_mode': 'form',
+            'target': 'current',
+        }
+
     # ── Navigation actions ──
 
     def action_view_sale_order(self):

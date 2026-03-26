@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="seq_crfp_claim" model="ir.sequence">
+            <field name="name">CR Farm Claim</field>
+            <field name="code">crfp.claim</field>
+            <field name="prefix">CLAIM-%(year)s-</field>
+            <field name="padding">4</field>
+        </record>
+    </data>
+</odoo>
