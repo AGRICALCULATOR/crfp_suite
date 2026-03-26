@@ -73,6 +73,11 @@
                             class="btn-primary" invisible="state not in ('investigation','response_pending')"/>
                     <button name="action_close" type="object" string="Close"
                             class="btn-primary" invisible="state != 'resolved'"/>
+                    <button name="action_send_claim_email" type="object"
+                            string="📧 Send Formal Claim"
+                            class="btn-primary"
+                            invisible="state in ('draft','closed','cancelled')"
+                            icon="fa-envelope"/>
                     <button name="action_cancel" type="object" string="Cancel"
                             invisible="state in ('closed','cancelled')"/>
                     <field name="state" widget="statusbar"
@@ -112,11 +117,11 @@
 
                     <field name="description" placeholder="Describe the claim in detail..."/>
 
-                    <group string="Responsibility &amp; Resolution"
-                           invisible="state in ('draft','open')">
+                    <group string="Responsibility &amp; Resolution">
                         <group>
                             <field name="responsible_party"/>
-                            <field name="responsible_partner_id" options="{'no_create': True}"/>
+                            <field name="responsible_partner_id" string="Responsible Company"
+                                   options="{'no_create': True}"/>
                         </group>
                         <group>
                             <field name="resolution_type"/>

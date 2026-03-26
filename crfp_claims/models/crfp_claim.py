@@ -148,6 +148,139 @@ class CrfpClaim(models.Model):
         for rec in self:
             rec.write({'state': 'cancelled'})
 
+    # ── Send Claim Email ──
+    def action_send_claim_email(self):
+        """Open email composer with formal legal claim letter."""
+        self.ensure_one()
+        ship = self.shipment_id
+        recipient = self.responsible_partner_id or self.partner_id
+
+        # Build claim type label
+        type_labels = dict(self._fields['claim_type'].selection)
+        claim_type_label = type_labels.get(self.claim_type, self.claim_type)
+
+        # Build shipment details
+        ship_details = ''
+        if ship:
+            ship_details = (
+                f'<li><strong>Shipment Reference:</strong> {ship.name}</li>'
+                f'<li><strong>Bill of Lading / Booking:</strong> {ship.booking_id.booking_reference if ship.booking_id else "N/A"}</li>'
+                f'<li><strong>Vessel / Voyage:</strong> {ship.vessel_name or "N/A"} / {ship.voyage_number or "N/A"}</li>'
+                f'<li><strong>Container Number:</strong> {ship.container_ids[0].container_number if ship.container_ids else "N/A"}</li>'
+                f'<li><strong>Port of Origin:</strong> {ship.port_origin_id.name if ship.port_origin_id else "N/A"}</li>'
+                f'<li><strong>Port of Destination:</strong> {ship.port_destination_id.name if ship.port_destination_id else "N/A"}</li>'
+                f'<li><strong>ETD:</strong> {ship.etd or "N/A"}</li>'
+                f'<li><strong>ETA:</strong> {ship.eta or "N/A"}</li>'
+            )
+
+        # Build evidence list
+        evidence_list = ''
+        if self.evidence_ids:
+            for ev in self.evidence_ids:
+                evidence_list += f'<li>{ev.name} ({dict(ev._fields["evidence_type"].selection).get(ev.evidence_type, "")})</li>'
+
+        # Currency
+        currency = self.currency_id.name if self.currency_id else 'USD'
+
+        subject = f'FORMAL CARGO CLAIM — {self.name} — {claim_type_label} — {ship.name if ship else ""}'
+
+        body = f'''
+<p style="font-family: Arial, sans-serif; font-size: 13px;">
+<strong style="font-size: 15px;">FORMAL NOTICE OF CARGO CLAIM</strong><br/>
+<em>Under the Hague-Visby Rules / COGSA — Carriage of Goods by Sea Act</em>
+</p>
+
+<p><strong>Date:</strong> {fields.Date.today()}<br/>
+<strong>Claim Reference:</strong> {self.name}<br/>
+<strong>Claim Type:</strong> {claim_type_label}</p>
+
+<p><strong>From:</strong><br/>
+CR FARM PRODUCTS VYM Y M SOCIEDAD ANONIMA<br/>
+Tax ID: 3-101-808635<br/>
+Costa Rica</p>
+
+<p><strong>To:</strong><br/>
+{recipient.name if recipient else "—"}</p>
+
+<hr/>
+
+<p>Dear Sir/Madam,</p>
+
+<p>We hereby formally notify you of our claim for <strong>{claim_type_label.lower()}</strong>
+in connection with the following shipment:</p>
+
+<p><strong>SHIPMENT DETAILS:</strong></p>
+<ul>{ship_details}</ul>
+
+<p><strong>DESCRIPTION OF CLAIM:</strong></p>
+<div style="background: #f9f9f9; padding: 10px; border-left: 3px solid #c00; margin: 10px 0;">
+{self.description or "See attached documentation."}
+</div>
+
+<p><strong>CLAIMED AMOUNT:</strong> {currency} {self.claimed_amount:,.2f}</p>
+
+<p>This amount represents the value of the damaged/lost/delayed cargo as evidenced
+by the commercial invoice and supporting documentation.</p>
+
+{"<p><strong>SUPPORTING EVIDENCE:</strong></p><ul>" + evidence_list + "</ul>" if evidence_list else ""}
+
+<p><strong>LEGAL BASIS:</strong></p>
+<p>This claim is submitted pursuant to the applicable international conventions governing
+the carriage of goods by sea, including but not limited to the Hague-Visby Rules and/or
+the Carriage of Goods by Sea Act (COGSA). We reserve all our rights under these
+conventions and applicable law.</p>
+
+<p><strong>REQUESTED ACTION:</strong></p>
+<p>We formally request:</p>
+<ol>
+<li>Acknowledgment of receipt of this claim within 7 business days</li>
+<li>A formal written response addressing liability within 30 days</li>
+<li>Full compensation of {currency} {self.claimed_amount:,.2f} for the damages described above</li>
+</ol>
+
+<p><strong>PRESERVATION OF EVIDENCE:</strong></p>
+<p>All damaged goods and packaging have been preserved for inspection.
+We are available to arrange a joint survey at your earliest convenience.</p>
+
+<p>Please direct all correspondence regarding this claim to the undersigned.</p>
+
+<p>Sincerely,<br/><br/>
+<strong>CR FARM PRODUCTS VYM S.A.</strong><br/>
+Export Department<br/>
+Claim Reference: {self.name}
+</p>
+
+<hr/>
+<p style="font-size: 10px; color: #888;">
+<em>This notice constitutes a formal claim under international maritime law.
+Failure to respond within the specified timeframe may result in further legal action.
+All rights reserved.</em>
+</p>
+'''
+
+        # Collect evidence attachments
+        attachment_ids = []
+        for ev in self.evidence_ids:
+            if ev.attachment_ids:
+                attachment_ids.extend(ev.attachment_ids.ids)
+
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'mail.compose.message',
+            'views': [[False, 'form']],
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_model': 'crfp.claim',
+                'default_res_ids': [self.id],
+                'default_partner_ids': [recipient.id] if recipient else [],
+                'default_subject': subject,
+                'default_body': body,
+                'default_attachment_ids': attachment_ids,
+                'default_composition_mode': 'comment',
+            },
+        }
+
     # Navigation
     def action_view_shipment(self):
         self.ensure_one()
