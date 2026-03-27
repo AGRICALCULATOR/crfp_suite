@@ -9,6 +9,7 @@
                 <field name="shipment_id"/>
                 <field name="carrier_partner_id"/>
                 <field name="vessel_name"/>
+                <field name="container_number" optional="show"/>
                 <field name="etd"/>
                 <field name="containers_qty"/>
                 <field name="freight_cost"/>
@@ -52,6 +53,15 @@
                             <field name="eta"/>
                             <field name="freight_cost"/>
                             <field name="currency_id"/>
+                        </group>
+                    </group>
+                    <group string="Container &amp; Documentation (from carrier confirmation)">
+                        <group>
+                            <field name="container_number" placeholder="e.g. MSCU7234589"/>
+                            <field name="seal_number" placeholder="e.g. CR2026-0412"/>
+                        </group>
+                        <group>
+                            <field name="bl_number" placeholder="e.g. MEDUG1234567"/>
                         </group>
                     </group>
                     <field name="notes" placeholder="Booking notes..."/>

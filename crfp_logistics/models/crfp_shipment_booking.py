@@ -21,8 +21,15 @@ class CrfpShipmentBooking(models.Model):
     vessel_name = fields.Char(string='Vessel')
     voyage_number = fields.Char(string='Voyage')
     container_type_id = fields.Many2one('crfp.container.type', string='Container Type')
-    container_number = fields.Char(string='Container Number',
-                                    help='Container number assigned by carrier on booking confirmation')
+
+    # Container info — carrier provides these on confirmation
+    container_number = fields.Char(string='Container Number', tracking=True,
+                                    help='Container number assigned by carrier, e.g. MSCU7234589')
+    seal_number = fields.Char(string='Seal Number (Marchamo)', tracking=True,
+                               help='Seal/marchamo number for the container')
+    bl_number = fields.Char(string='BL Number', tracking=True,
+                             help='Bill of Lading number')
+
     containers_qty = fields.Integer(string='Containers Qty', default=1)
     cutoff_date = fields.Datetime(string='Cutoff Date')
     etd = fields.Date(string='ETD')
@@ -55,24 +62,44 @@ class CrfpShipmentBooking(models.Model):
             self.freight_cost = ship.crfp_quotation_id.freight_quote_id.all_in_freight
 
     def action_confirm(self):
+        """Confirm booking and sync data back to shipment + create/update container."""
         self.write({'state': 'confirmed', 'confirmation_date': fields.Date.today()})
-        # Sync container number and cutoff to shipment
         for rec in self:
-            if rec.shipment_id:
-                vals = {}
-                if rec.cutoff_date:
-                    vals['cutoff_date'] = rec.cutoff_date
-                if rec.vessel_name:
-                    vals['vessel_name'] = rec.vessel_name
-                if rec.voyage_number:
-                    vals['voyage_number'] = rec.voyage_number
-                if rec.container_number and rec.shipment_id.container_ids:
-                    # Update first container number
-                    rec.shipment_id.container_ids[0].write({
-                        'container_number': rec.container_number
-                    })
-                if vals:
-                    rec.shipment_id.write(vals)
+            if not rec.shipment_id:
+                continue
+            ship = rec.shipment_id
+
+            # Sync transport data back to shipment
+            ship_vals = {}
+            if rec.cutoff_date:
+                ship_vals['cutoff_date'] = rec.cutoff_date
+            if rec.vessel_name:
+                ship_vals['vessel_name'] = rec.vessel_name
+            if rec.voyage_number:
+                ship_vals['voyage_number'] = rec.voyage_number
+            if rec.etd:
+                ship_vals['etd'] = rec.etd
+            if rec.eta:
+                ship_vals['eta'] = rec.eta
+            if ship_vals:
+                ship.write(ship_vals)
+
+            # Create or update container from booking data
+            if rec.container_number:
+                container_vals = {
+                    'container_number': rec.container_number,
+                    'seal_number': rec.seal_number or '',
+                    'container_type_id': rec.container_type_id.id if rec.container_type_id else False,
+                    'temperature_set': ship.temperature_set or 0.0,
+                }
+
+                if ship.container_ids:
+                    # Update first existing container
+                    ship.container_ids[0].write(container_vals)
+                else:
+                    # Create new container
+                    container_vals['shipment_id'] = ship.id
+                    self.env['crfp.shipment.container'].create(container_vals)
 
     def action_cancel(self):
         self.write({'state': 'cancelled'})
