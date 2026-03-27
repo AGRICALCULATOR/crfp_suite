@@ -177,8 +177,7 @@
                             <field name="cutoff_date"/>
                         </group>
                     </group>
-                    <group string="Reefer Settings" col="4"
-                           invisible="state in ('draft','space_requested','booking_requested')">
+                    <group string="Reefer Settings" col="4">
                         <field name="temperature_set" string="Temperature (°C)"/>
                         <field name="ventilation" string="Ventilation"/>
                         <field name="gps_device_id" string="GPS/Thermometer ID"/>
