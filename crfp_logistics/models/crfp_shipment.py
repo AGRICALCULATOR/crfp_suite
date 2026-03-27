@@ -62,7 +62,10 @@ class CrfpShipment(models.Model):
 
     # Reefer / SI fields
     temperature_set = fields.Float(string='Temperature Set (C)')
-    ventilation = fields.Char(string='Ventilation')
+    ventilation = fields.Char(string='Ventilation',
+                              help='e.g. 20 CBM/h or 25%')
+    humidity = fields.Char(string='Relative Humidity (%)',
+                           help='e.g. 85% or 80-90%')
     gps_device_id = fields.Char(string='GPS Device ID')
     commodity_description = fields.Text(string='Commodity Description')
 
@@ -413,23 +416,30 @@ class CrfpShipment(models.Model):
         body = (
             "<h3>BOOKING REQUEST - CR FARM PRODUCTS VYM S.A</h3>"
             "<p><b>Shipper:</b> CR FARM PRODUCTS VYM Y M S.A.</p>"
-            "<p><b>Origin:</b> %s</p>"
-            "<p><b>Destination:</b> %s</p>"
-            "<p><b>ETD Requested:</b> %s</p>"
-            "<p><b>Equipment:</b> 1x %s</p>"
-            "<p><b>Temperature:</b> %s C</p>"
-            "<p><b>Commodity:</b> %s</p>"
-            "<p><b>Est. Pallets:</b> %d / <b>Est. Boxes:</b> %d</p>"
-        ) % (
-            self.port_origin_id.name or 'Puerto Moin, Costa Rica',
-            self.port_destination_id.name or '',
-            self.etd or 'TBD',
-            self.container_type_id.name or '40ft HC Reefer',
-            self.temperature_set or 'TBD',
-            self.commodity_description or 'Fresh tropical roots and vegetables',
-            self.total_pallets_planned or 0,
-            self.total_boxes_planned or 0,
-        )
+            "<p><b>Origin:</b> %(origin)s</p>"
+            "<p><b>Destination:</b> %(dest)s</p>"
+            "<p><b>ETD Requested:</b> %(etd)s</p>"
+            "<p><b>Equipment:</b> 1x %(equip)s</p>"
+            "<hr/>"
+            "<p><b>Temperature:</b> %(temp)s °C</p>"
+            "<p><b>Ventilation:</b> %(vent)s</p>"
+            "<p><b>Relative Humidity:</b> %(humid)s</p>"
+            "<hr/>"
+            "<p><b>Commodity:</b> %(commodity)s</p>"
+            "<p><b>Est. Pallets:</b> %(pallets)d / <b>Est. Boxes:</b> %(boxes)d</p>"
+            "<br/><p>Best regards,<br/><b>CR Farm Products VYM S.A.</b></p>"
+        ) % {
+            'origin': self.port_origin_id.name or 'Puerto Moin, Costa Rica',
+            'dest': self.port_destination_id.name or '',
+            'etd': self.etd or 'TBD',
+            'equip': self.container_type_id.name or '40ft HC Reefer',
+            'temp': self.temperature_set if self.temperature_set else 'TBD',
+            'vent': self.ventilation or 'TBD',
+            'humid': self.humidity or 'TBD',
+            'commodity': self.commodity_description or 'Fresh tropical roots and vegetables',
+            'pallets': self.total_pallets_planned or 0,
+            'boxes': self.total_boxes_planned or 0,
+        }
         return {
             'type': 'ir.actions.act_window',
             'res_model': 'mail.compose.message',
@@ -453,26 +463,39 @@ class CrfpShipment(models.Model):
         notify = self.notify_party_id.name if self.notify_party_id else (self.partner_id.name or '')
         body = (
             "<h3>SHIPPING INSTRUCTIONS - CR FARM PRODUCTS VYM S.A</h3>"
-            "<p><b>Booking Ref:</b> %s</p>"
+            "<p><b>Booking Ref:</b> %(booking)s</p>"
             "<p><b>Shipper:</b> CR FARM PRODUCTS VYM Y M S.A. / RUC: 3-101-808635</p>"
-            "<p><b>Consignee:</b> %s</p>"
-            "<p><b>Notify:</b> %s</p>"
-            "<p><b>Port of Loading:</b> %s</p>"
-            "<p><b>Port of Discharge:</b> %s</p>"
-            "<p><b>Vessel/Voyage:</b> %s / %s</p>"
-            "<p><b>Container Type:</b> %s</p>"
-            "<p><b>Temperature:</b> %s C</p>"
-            "<p><b>Ventilation:</b> %s</p>"
-            "<p><b>Commodity:</b> %s</p>"
-        ) % (
-            booking_ref, consignee, notify,
-            self.port_origin_id.name or 'Puerto Moin',
-            self.port_destination_id.name or '',
-            self.vessel_name or '', self.voyage_number or '',
-            self.container_type_id.name or '40ft HC Reefer',
-            self.temperature_set or '', self.ventilation or '',
-            self.commodity_description or 'Fresh tropical roots and vegetables',
-        )
+            "<p><b>Consignee:</b> %(consignee)s</p>"
+            "<p><b>Notify:</b> %(notify)s</p>"
+            "<hr/>"
+            "<p><b>Port of Loading:</b> %(pol)s</p>"
+            "<p><b>Port of Discharge:</b> %(pod)s</p>"
+            "<p><b>Vessel/Voyage:</b> %(vessel)s / %(voyage)s</p>"
+            "<p><b>Container Type:</b> %(container)s</p>"
+            "<hr/>"
+            "<p><b>Temperature:</b> %(temp)s °C</p>"
+            "<p><b>Ventilation:</b> %(vent)s</p>"
+            "<p><b>Relative Humidity:</b> %(humid)s</p>"
+            "<hr/>"
+            "<p><b>Commodity:</b> %(commodity)s</p>"
+            "<p><b>Est. Pallets:</b> %(pallets)d / <b>Est. Boxes:</b> %(boxes)d</p>"
+            "<br/><p>Best regards,<br/><b>CR Farm Products VYM S.A.</b></p>"
+        ) % {
+            'booking': booking_ref,
+            'consignee': consignee,
+            'notify': notify,
+            'pol': self.port_origin_id.name or 'Puerto Moin',
+            'pod': self.port_destination_id.name or '',
+            'vessel': self.vessel_name or '',
+            'voyage': self.voyage_number or '',
+            'container': self.container_type_id.name or '40ft HC Reefer',
+            'temp': self.temperature_set if self.temperature_set else 'TBD',
+            'vent': self.ventilation or 'TBD',
+            'humid': self.humidity or 'TBD',
+            'commodity': self.commodity_description or 'Fresh tropical roots and vegetables',
+            'pallets': self.total_pallets_planned or 0,
+            'boxes': self.total_boxes_planned or 0,
+        }
         return {
             'type': 'ir.actions.act_window',
             'res_model': 'mail.compose.message',

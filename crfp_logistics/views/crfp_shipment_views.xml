@@ -179,7 +179,8 @@
                     </group>
                     <group string="Reefer Settings" col="4">
                         <field name="temperature_set" string="Temperature (°C)"/>
-                        <field name="ventilation" string="Ventilation"/>
+                        <field name="ventilation" string="Ventilation" placeholder="e.g. 20 CBM/h"/>
+                        <field name="humidity" string="Relative Humidity (%)" placeholder="e.g. 85%"/>
                         <field name="gps_device_id" string="GPS/Thermometer ID"/>
                         <field name="commodity_description"/>
                     </group>
