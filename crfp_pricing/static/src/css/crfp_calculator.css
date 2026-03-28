@@ -56,9 +56,9 @@
 .crfp-client-option:hover { background:var(--crfp-light); }
 .crfp-client-option.crfp-client-selected { background:#e8f5e9; border-left:3px solid var(--crfp-primary); }
 .crfp-client-name { font-size:14px; font-weight:600; color:var(--crfp-dark); }
-.crfp-client-email { font-size:11px; color:#888; }
+.crfp-client-email { font-size:13px; color:#888; }
 .crfp-client-badge {
-    display:inline-block; font-size:10px; font-weight:700; color:var(--crfp-primary);
+    display:inline-block; font-size:14px; font-weight:700; color:var(--crfp-primary);
     background:var(--crfp-light); padding:2px 6px; border-radius:3px; width:fit-content;
 }
 .crfp-client-empty { padding:14px; text-align:center; color:#aaa; font-size:13px; }
@@ -71,7 +71,7 @@
 .crfp-list-btn:hover { background:white; }
 .crfp-btn-new { background:var(--crfp-dark); color:white; }
 .crfp-modified-badge { background:var(--crfp-warn); color:white; border-radius:10px;
-    padding:4px 10px; font-size:12px; font-weight:700; }
+    padding:4px 10px; font-size:14px; font-weight:700; }
 
 /* ─── LAYOUT ─── */
 .crfp-calc-layout { display:grid; grid-template-columns:360px 1fr; flex:1; }
@@ -95,23 +95,23 @@
 .crfp-bold { font-weight:700 !important; }
 
 /* Operation costs section */
-.crfp-opcost-note { font-size:11px; color:#888; margin-bottom:8px; line-height:1.4; }
+.crfp-opcost-note { font-size:13px; color:#888; margin-bottom:8px; line-height:1.4; }
 .crfp-opcost-fq-note { display:block; margin-top:3px; }
 .crfp-opcost-grid { display:flex; flex-direction:column; gap:6px; }
 .crfp-opcost-row { display:flex; align-items:center; gap:6px; }
-.crfp-opcost-row label { font-size:12px; font-weight:600; color:#555; flex:1; min-width:0; }
+.crfp-opcost-row label { font-size:14px; font-weight:600; color:#555; flex:1; min-width:0; }
 .crfp-opcost-input-wrap { display:flex; align-items:center; gap:4px; }
 .crfp-opcost-input-wrap input { width:80px; padding:5px 7px; border:1px solid var(--crfp-border);
     border-radius:5px; font-size:13px; font-family:var(--crfp-mono); text-align:right; }
 .crfp-opcost-input-wrap input:focus { border-color:var(--crfp-secondary); outline:none; }
-.crfp-fq-tag { background:#e8f5e9; color:#1a4d2e; font-size:9px; font-weight:700;
+.crfp-fq-tag { background:#e8f5e9; color:#1a4d2e; font-size:13px; font-weight:700;
     padding:2px 5px; border-radius:3px; white-space:nowrap; }
 .crfp-opcost-total { display:flex; justify-content:space-between; align-items:center;
     margin-top:8px; padding:7px 8px; background:#e8f5e9; border-radius:5px;
     font-size:13px; font-weight:700; color:var(--crfp-primary); }
 
 /* Base prices */
-.crfp-bp-cat { font-size:11px; font-weight:700; color:var(--crfp-secondary); text-transform:uppercase;
+.crfp-bp-cat { font-size:13px; font-weight:700; color:var(--crfp-secondary); text-transform:uppercase;
     letter-spacing:.5px; margin:10px 0 5px; padding-top:6px; border-top:1px solid var(--crfp-border); }
 .crfp-bp-cat:first-child { border-top:none; margin-top:0; }
 .crfp-bp-row { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
@@ -125,7 +125,7 @@
 /* Logistics summary */
 .crfp-log-sum { background:linear-gradient(135deg,var(--crfp-primary),#2d7a4f); color:white;
     border-radius:8px; padding:10px; margin-top:8px; font-family:var(--crfp-mono); }
-.crfp-lr { display:flex; justify-content:space-between; font-size:12px; padding:3px 0;
+.crfp-lr { display:flex; justify-content:space-between; font-size:14px; padding:3px 0;
     border-bottom:1px solid rgba(255,255,255,.1); }
 .crfp-lr-total { border-top:2px solid rgba(255,255,255,.4); border-bottom:none;
     padding-top:5px; margin-top:4px; font-weight:700; font-size:13px; }
@@ -145,12 +145,12 @@
 .crfp-hist-item.active { border-left:4px solid var(--crfp-primary); background:#e8f5e9; }
 .crfp-hist-top { cursor:pointer; }
 .crfp-hist-item strong { font-size:13px; display:block; }
-.crfp-hdate { font-size:11px; color:#888; font-family:var(--crfp-mono); }
+.crfp-hdate { font-size:13px; color:#888; font-family:var(--crfp-mono); }
 .crfp-hist-open { margin-top:5px; padding:4px 10px; background:var(--crfp-light);
-    border:1px solid var(--crfp-border); border-radius:4px; font-size:11px;
+    border:1px solid var(--crfp-border); border-radius:4px; font-size:13px;
     cursor:pointer; color:var(--crfp-primary); font-weight:600; }
 .crfp-hist-open:hover { background:white; }
-.crfp-empty-small { text-align:center; color:#aaa; padding:14px; font-size:12px; }
+.crfp-empty-small { text-align:center; color:#aaa; padding:14px; font-size:14px; }
 
 /* ─── MAIN: Product cards ─── */
 .crfp-calc-main { padding:18px; overflow-y:auto; max-height:calc(100vh - 130px); }
@@ -158,7 +158,7 @@
     margin-bottom:15px; border-bottom:2px solid var(--crfp-light); padding-bottom:8px; }
 .crfp-sec-hdr h2 { color:var(--crfp-primary); margin:0; font-size:20px; font-weight:700; }
 .crfp-toggle-view { padding:6px 12px; background:white; border:1px solid var(--crfp-border);
-    border-radius:6px; cursor:pointer; font-size:12px; color:var(--crfp-dark); font-weight:600; }
+    border-radius:6px; cursor:pointer; font-size:14px; color:var(--crfp-dark); font-weight:600; }
 .crfp-cat-hdr { font-size:16px; font-weight:700; color:var(--crfp-dark); background:var(--crfp-light);
     padding:8px 14px; border-left:4px solid var(--crfp-primary); border-radius:5px;
     margin:12px 0 10px; display:flex; align-items:center; gap:10px; }
@@ -171,18 +171,18 @@
 .crfp-pcard:focus-within { border-color:var(--crfp-primary); box-shadow:0 0 0 2px var(--crfp-primary),0 4px 16px rgba(26,77,46,.1); transform:translateY(-2px); z-index:10; }
 .crfp-pcard-excluded { opacity:.5; }
 .crfp-pcard-hdr { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; border-bottom:2px solid var(--crfp-light); padding-bottom:7px; }
-.crfp-pname { font-weight:700; color:var(--crfp-dark); font-size:15px; }
-.crfp-ptag { font-weight:700; color:var(--crfp-primary); background:var(--crfp-light); padding:4px 10px; border-radius:12px; font-family:var(--crfp-mono); font-size:16px; }
+.crfp-pname { font-weight:700; color:var(--crfp-dark); font-size:16px; }
+.crfp-ptag { font-weight:700; color:var(--crfp-primary); background:var(--crfp-light); padding:5px 12px; border-radius:12px; font-family:var(--crfp-mono); font-size:18px; }
 .crfp-pform { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-.crfp-fg label { display:block; font-size:11px; font-weight:700; color:#888; margin-bottom:3px; text-transform:uppercase; }
+.crfp-fg label { display:block; font-size:13px; font-weight:700; color:#888; margin-bottom:3px; text-transform:uppercase; }
 .crfp-fg input, .crfp-fg select { width:100%; padding:7px 8px; border:1px solid var(--crfp-border); border-radius:5px; font-size:14px; font-family:var(--crfp-mono); }
 .crfp-fg input:focus, .crfp-fg select:focus { border-color:var(--crfp-primary); outline:none; }
-.crfp-dtoggle { grid-column:1/-1; padding:6px 8px; font-size:12px; background:#f5f5f5; border:1px solid var(--crfp-border); border-radius:5px; cursor:pointer; color:var(--crfp-dark); font-weight:700; margin-top:4px; display:flex; justify-content:space-between; align-items:center; }
+.crfp-dtoggle { grid-column:1/-1; padding:6px 8px; font-size:14px; background:#f5f5f5; border:1px solid var(--crfp-border); border-radius:5px; cursor:pointer; color:var(--crfp-dark); font-weight:700; margin-top:4px; display:flex; justify-content:space-between; align-items:center; }
 .crfp-dtoggle:hover { background:#e8f5e9; }
 .crfp-dcont { grid-column:1/-1; padding:10px; background:#fafafa; border:1px solid #eee; border-radius:5px; margin-top:4px; }
 .crfp-ri { display:flex; justify-content:space-between; font-size:13px; font-family:var(--crfp-mono); border-bottom:1px dashed #ddd; padding:3px 0; }
 .crfp-ri-log { color:var(--crfp-secondary); }
-.crfp-fpbox { margin-top:8px; padding:8px; background:#e8f5e9; text-align:center; font-weight:700; color:var(--crfp-primary); border-radius:6px; font-family:var(--crfp-mono); font-size:16px; }
+.crfp-fpbox { margin-top:8px; padding:10px; background:#e8f5e9; text-align:center; font-weight:700; color:var(--crfp-primary); border-radius:6px; font-family:var(--crfp-mono); font-size:20px; }
 .crfp-pdfcb { display:flex; align-items:center; gap:6px; margin-top:8px; font-size:13px; font-weight:700; color:var(--crfp-dark); background:#f9f9f9; padding:6px 8px; border-radius:5px; border:1px solid var(--crfp-border); cursor:pointer; }
 
 /* ─── BOTTOM ACTIONS ─── */

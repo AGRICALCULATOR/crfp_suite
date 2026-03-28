@@ -111,6 +111,7 @@ class CrfpQuotation(models.Model):
                 'product_id': product.id,
                 'product_uom_qty': qty,
                 'price_unit': line.final_price,
+                'discount': 0,
                 'name': (f"{line.crfp_product_id.name} — "
                          f"{line.pallets} pallets × {line.boxes_per_pallet} boxes/pallet"),
             }))
@@ -137,6 +138,15 @@ class CrfpQuotation(models.Model):
             so_vals['commitment_date'] = self.etd
 
         so = self.env['sale.order'].create(so_vals)
+
+        # Force correct prices (Odoo onchange may override price_unit)
+        for idx, line in enumerate(self.line_ids.filtered('include_in_pdf')):
+            if line.pallets <= 0:
+                continue
+            so_line = so.order_line[idx] if idx < len(so.order_line) else None
+            if so_line and abs(so_line.price_unit - line.final_price) > 0.01:
+                so_line.write({'price_unit': line.final_price})
+
         # Store the quotation reference on the SO (for logistics auto-fill)
         try:
             so.write({'crfp_quotation_id': self.id})

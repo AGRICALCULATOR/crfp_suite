@@ -28,6 +28,7 @@ class CrfpShipment(models.Model):
         ('arrived', 'Arrived'),
         ('delivered', 'Delivered'),
         ('closed', 'Closed'),
+        ('cancelled', 'Cancelled'),
     ], string='Status', default='draft', tracking=True, index=True)
 
     # Commercial
@@ -185,7 +186,25 @@ class CrfpShipment(models.Model):
                         vals.setdefault('vessel_name', quotation.vessel_name)
                     if quotation.freight_quote_id and quotation.freight_quote_id.carrier_partner_id:
                         vals.setdefault('carrier_partner_id', quotation.freight_quote_id.carrier_partner_id.id)
-        return super().create(vals_list)
+                    if quotation.freight_quote_id and quotation.freight_quote_id.all_in_freight:
+                        vals.setdefault('freight_cost', quotation.freight_quote_id.all_in_freight)
+        records = super().create(vals_list)
+        # Auto-create lines, documents, checklist for shipments created with SO
+        for rec in records:
+            if rec.sale_order_id and not rec.line_ids:
+                quotation = rec.crfp_quotation_id
+                rec._create_lines_from_so_and_quotation(quotation)
+                rec._auto_load_documents()
+                rec._auto_load_checklist()
+                rec._generate_commodity_description()
+                # Auto-create container if type is set
+                if rec.container_type_id and not rec.container_ids:
+                    self.env['crfp.shipment.container'].create({
+                        'shipment_id': rec.id,
+                        'container_type_id': rec.container_type_id.id,
+                        'temperature_set': rec.temperature_set or 0,
+                    })
+        return records
 
     @api.onchange('sale_order_id')
     def _onchange_sale_order_id(self):
@@ -408,6 +427,20 @@ class CrfpShipment(models.Model):
     def action_close(self):
         for rec in self:
             rec.write({'state': 'closed'})
+
+    def action_cancel(self):
+        """Cancel the shipment. Can be done from any state except closed."""
+        for rec in self:
+            if rec.state == 'closed':
+                raise UserError('Cannot cancel a closed shipment.')
+            rec.write({'state': 'cancelled'})
+
+    def action_reset_draft(self):
+        """Reset a cancelled shipment back to draft."""
+        for rec in self:
+            if rec.state != 'cancelled':
+                raise UserError('Only cancelled shipments can be reset to draft.')
+            rec.write({'state': 'draft'})
 
     # ── Email actions ──
 

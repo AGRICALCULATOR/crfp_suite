@@ -121,6 +121,15 @@
                             class="btn-primary"
                             invisible="state != 'docs_final'"/>
 
+                    <!-- Cancel / Reset -->
+                    <button name="action_cancel" type="object"
+                            string="Cancel" class="btn-secondary"
+                            invisible="state in ('closed','cancelled')"
+                            confirm="Are you sure you want to cancel this shipment?"/>
+                    <button name="action_reset_draft" type="object"
+                            string="Reset to Draft" class="btn-secondary"
+                            invisible="state != 'cancelled'"/>
+
                     <field name="state" widget="statusbar"
                            statusbar_visible="draft,booking_confirmed,si_sent,loading,docs_final,shipped,in_transit,delivered,closed"/>
                 </header>
