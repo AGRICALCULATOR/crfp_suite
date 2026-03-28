@@ -129,6 +129,10 @@
                     <button name="action_reset_draft" type="object"
                             string="Reset to Draft" class="btn-secondary"
                             invisible="state != 'cancelled'"/>
+                    <button name="action_sync_document_states" type="object"
+                            string="Sync Doc Status" class="btn-secondary"
+                            invisible="state in ('draft','cancelled')"
+                            title="Re-synchronize document statuses based on current shipment state"/>
 
                     <field name="state" widget="statusbar"
                            statusbar_visible="draft,booking_confirmed,si_sent,loading,docs_final,shipped,in_transit,delivered,closed"/>

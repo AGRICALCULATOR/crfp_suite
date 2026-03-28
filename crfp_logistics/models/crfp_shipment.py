@@ -352,6 +352,80 @@ class CrfpShipment(models.Model):
             descs.append("%s - %d boxes / %d pallets" % (pname, line.boxes_planned, line.pallets_planned))
         self.commodity_description = '\n'.join(descs) if descs else ''
 
+    # ── Document state sync ──
+
+    def _update_document_states(self, shipment_state):
+        """Auto-update document statuses based on the shipment state reached."""
+        today = fields.Date.context_today(self)
+        # Map: shipment_state -> list of (doc_type, new_doc_state, date_field)
+        state_doc_map = {
+            'space_requested': [
+                ('booking_request', 'in_progress', False),
+            ],
+            'booking_requested': [
+                ('booking_request', 'sent', 'date_sent'),
+            ],
+            'booking_confirmed': [
+                ('booking_request', 'approved', 'date_approved'),
+                ('booking_confirmation', 'received', 'date_received'),
+            ],
+            'si_sent': [
+                ('shipping_instructions', 'sent', 'date_sent'),
+            ],
+            'bl_draft_received': [
+                ('bl_draft', 'received', 'date_received'),
+            ],
+            'loading': [
+                ('packing_list', 'in_progress', False),
+            ],
+            'docs_final': [
+                ('packing_list', 'ready', 'date_ready'),
+                ('commercial_invoice', 'ready', 'date_ready'),
+            ],
+            'shipped': [
+                ('packing_list', 'sent', 'date_sent'),
+                ('commercial_invoice', 'sent', 'date_sent'),
+                ('bl_original', 'in_progress', False),
+                ('customer_copy', 'in_progress', False),
+            ],
+            'delivered': [
+                ('bl_original', 'received', 'date_received'),
+                ('customer_copy', 'sent', 'date_sent'),
+            ],
+            'closed': [
+                ('customer_copy', 'approved', 'date_approved'),
+            ],
+        }
+        updates = state_doc_map.get(shipment_state, [])
+        for doc_type, new_state, date_field in updates:
+            docs = self.document_ids.filtered(
+                lambda d, dt=doc_type: d.doc_type == dt and d.state not in ('approved', 'na', 'rejected')
+            )
+            vals = {'state': new_state}
+            if date_field:
+                vals[date_field] = today
+            if docs:
+                docs.write(vals)
+
+    def action_sync_document_states(self):
+        """Re-sync document states for existing shipments based on current shipment state.
+        Applies all accumulated document updates up to the current state."""
+        state_order = [
+            'draft', 'space_requested', 'booking_requested', 'booking_confirmed',
+            'si_sent', 'bl_draft_received', 'loading', 'docs_final',
+            'shipped', 'in_transit', 'arrived', 'delivered', 'closed',
+        ]
+        for rec in self:
+            if rec.state in ('draft', 'cancelled'):
+                continue
+            try:
+                current_idx = state_order.index(rec.state)
+            except ValueError:
+                continue
+            # Apply all document updates up to the current state
+            for state in state_order[1:current_idx + 1]:
+                rec._update_document_states(state)
+
     # ── State transitions ──
 
     def action_request_space(self):
@@ -368,18 +442,21 @@ class CrfpShipment(models.Model):
         self._auto_load_checklist()
         self._generate_commodity_description()
         self.write({'state': 'space_requested'})
+        self._update_document_states('space_requested')
         # Open email composer for pre-reserva
         return self.action_send_booking_crfarm()
 
     def action_request_booking(self):
         for rec in self:
             rec.write({'state': 'booking_requested'})
+            rec._update_document_states('booking_requested')
 
     def action_confirm_booking(self):
         for rec in self:
             if not rec.booking_id:
                 raise UserError('Create or link a Booking before confirming.')
             rec.write({'state': 'booking_confirmed'})
+            rec._update_document_states('booking_confirmed')
 
     def action_send_si(self):
         for rec in self:
@@ -388,14 +465,17 @@ class CrfpShipment(models.Model):
             if not rec.ventilation:
                 raise UserError('Set Ventilation before sending SI.')
             rec.write({'state': 'si_sent'})
+            rec._update_document_states('si_sent')
 
     def action_bl_draft_received(self):
         for rec in self:
             rec.write({'state': 'bl_draft_received'})
+            rec._update_document_states('bl_draft_received')
 
     def action_start_loading(self):
         for rec in self:
             rec.write({'state': 'loading'})
+            rec._update_document_states('loading')
 
     def action_docs_final(self):
         for rec in self:
@@ -405,12 +485,14 @@ class CrfpShipment(models.Model):
                         pname = line.crfp_product_id.name if line.crfp_product_id else 'Unknown'
                         raise UserError('All lines must have actual boxes > 0. Check "%s".' % pname)
             rec.write({'state': 'docs_final'})
+            rec._update_document_states('docs_final')
 
     def action_ship(self):
         for rec in self:
             if not rec.commercial_invoice_id:
                 raise UserError('Link the Commercial Invoice before shipping.')
             rec.write({'state': 'shipped', 'atd': fields.Datetime.now()})
+            rec._update_document_states('shipped')
 
     def action_in_transit(self):
         for rec in self:
@@ -423,10 +505,12 @@ class CrfpShipment(models.Model):
     def action_deliver(self):
         for rec in self:
             rec.write({'state': 'delivered'})
+            rec._update_document_states('delivered')
 
     def action_close(self):
         for rec in self:
             rec.write({'state': 'closed'})
+            rec._update_document_states('closed')
 
     def action_cancel(self):
         """Cancel the shipment. Can be done from any state except closed."""
