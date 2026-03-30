@@ -85,14 +85,6 @@
                                 <tr style="background: #1a4d2e; color: white;">
                                     <th style="padding: 10px 12px; text-align: left; border-radius: 6px 0 0 0;">Product</th>
                                     <th style="padding: 10px 8px; text-align: center;">Net Kg</th>
-                                    <!-- USA/Caribbean: show Gross Lb, Europe/other: show Gross Kg -->
-                                    <t t-if="o.weight_unit == 'lb'">
-                                        <th style="padding: 10px 8px; text-align: center;">Gross Lb</th>
-                                        <th style="padding: 10px 8px; text-align: center;">Gross Kg</th>
-                                    </t>
-                                    <t t-else="">
-                                        <th style="padding: 10px 8px; text-align: center;">Gross Kg</th>
-                                    </t>
                                     <th style="padding: 10px 8px; text-align: right;">EXW Price</th>
                                     <th style="padding: 10px 8px; text-align: right;">Logistics</th>
                                     <th style="padding: 10px 8px; text-align: right;">Price/Box</th>
@@ -105,14 +97,6 @@
                                     <tr t-attf-style="border-bottom: 1px solid #e8ece9; #{line_index % 2 and 'background: #f8faf9;' or ''}">
                                         <td style="padding: 8px 12px; font-weight: 600;" t-esc="line.crfp_product_id.name"/>
                                         <td style="padding: 8px; text-align: center; font-family: 'Courier New', monospace;" t-esc="'%.1f' % line.net_kg"/>
-                                        <!-- USA: Gross Lb + Gross Kg, Europe: only Gross Kg -->
-                                        <t t-if="o.weight_unit == 'lb'">
-                                            <td style="padding: 8px; text-align: center; font-family: 'Courier New', monospace;" t-esc="'%.1f' % line.gross_lbs"/>
-                                            <td style="padding: 8px; text-align: center; font-family: 'Courier New', monospace;" t-esc="'%.1f' % line.gross_kg"/>
-                                        </t>
-                                        <t t-else="">
-                                            <td style="padding: 8px; text-align: center; font-family: 'Courier New', monospace;" t-esc="'%.1f' % line.gross_kg"/>
-                                        </t>
                                         <td style="padding: 8px; text-align: right; font-family: 'Courier New', monospace; color: #555;" t-esc="'$%.2f' % line.exw_price"/>
                                         <td style="padding: 8px; text-align: right; font-family: 'Courier New', monospace; color: #3d8b5c;" t-esc="'$%.4f' % line.logistics_per_box"/>
                                         <td style="padding: 8px; text-align: right; font-family: 'Courier New', monospace; font-weight: 700; font-size: 12px; color: #1a4d2e;" t-esc="'$%.2f' % line.final_price"/>

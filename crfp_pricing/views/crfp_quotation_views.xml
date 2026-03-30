@@ -70,7 +70,6 @@
                             <field name="freight_quote_id"/>
                             <field name="total_boxes"/>
                             <field name="container_type_id"/>
-                            <field name="weight_unit" widget="radio" options="{'horizontal': true}"/>
                             <field name="sale_order_id" readonly="1"/>
                         </group>
                     </group>
@@ -93,8 +92,6 @@
                                     <field name="total_boxes" string="Total Boxes" readonly="1"/>
                                     <field name="line_total" string="Line Total" readonly="1"/>
                                     <field name="net_kg" string="Net Kg" optional="show"/>
-                                    <field name="gross_lbs" string="Gross Lb" optional="show" readonly="1"/>
-                                    <field name="gross_kg" string="Gross Kg" optional="show" readonly="1"/>
                                     <field name="exw_price" string="EXW" optional="hide" readonly="1"/>
                                     <field name="logistics_per_box" string="Log/Box" optional="hide" readonly="1"/>
                                     <field name="include_in_pdf" string="Incl." widget="boolean"/>
