@@ -26,7 +26,7 @@
                                         CR FARM PRODUCTS
                                     </p>
                                     <p style="margin: 2px 0 0; font-size: 9px; color: rgba(255,255,255,0.55); letter-spacing: 2px; text-transform: uppercase;">
-                                        Fresh Tropical Produce — Costa Rica
+                                        Fresh Tropical Produce - Costa Rica
                                     </p>
                                 </td>
                                 <td style="text-align: right; vertical-align: middle;">
@@ -51,7 +51,7 @@
                                         Prepared for
                                     </p>
                                     <p style="margin: 0; font-size: 14px; font-weight: 700; color: #1a4d2e;">
-                                        <t t-esc="o.partner_id.name or '—'"/>
+                                        <t t-esc="o.partner_id.name or '-'"/>
                                     </p>
                                     <p style="margin: 2px 0 0; color: #888; font-size: 9px;" t-if="o.partner_id.email">
                                         <t t-esc="o.partner_id.email"/>
@@ -71,7 +71,7 @@
                                         </tr>
                                         <tr>
                                             <td style="padding: 2px 8px; color: #999;">Destination</td>
-                                            <td style="padding: 2px 0; font-weight: 600;" t-esc="o.port_id.name or '—'"/>
+                                            <td style="padding: 2px 0; font-weight: 600;" t-esc="o.port_id.name or '-'"/>
                                         </tr>
                                         <tr t-if="o.vessel_name">
                                             <td style="padding: 2px 8px; color: #999;">Vessel</td>
@@ -80,6 +80,10 @@
                                         <tr t-if="o.etd">
                                             <td style="padding: 2px 8px; color: #999;">ETD</td>
                                             <td style="padding: 2px 0;" t-esc="o.etd"/>
+                                        </tr>
+                                        <tr t-if="o.eta">
+                                            <td style="padding: 2px 8px; color: #999;">ETA</td>
+                                            <td style="padding: 2px 0;" t-esc="o.eta"/>
                                         </tr>
                                     </table>
                                 </td>
@@ -146,8 +150,8 @@
                         <table style="width: 100%; font-size: 8px; color: #aaa;">
                             <tr>
                                 <td style="line-height: 1.5;">
-                                    Prices in USD — <strong style="color: #777;"><t t-esc="o.incoterm"/></strong> <t t-esc="o.port_id.name or ''"/>
-                                    · Valid 7 days · Subject to availability
+                                    Prices in USD - <strong style="color: #777;"><t t-esc="o.incoterm"/></strong> <t t-esc="o.port_id.name or ''"/>
+                                    | Valid 7 days | Subject to availability
                                 </td>
                                 <td style="text-align: right; line-height: 1.5;">
                                     CR Farm Products VYM S.A.
