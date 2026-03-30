@@ -85,9 +85,10 @@
                                 <tr style="background: #1a4d2e; color: white;">
                                     <th style="padding: 10px 12px; text-align: left; border-radius: 6px 0 0 0;">Product</th>
                                     <th style="padding: 10px 8px; text-align: center;">Net Kg</th>
-                                    <!-- Dynamic weight column: Lb or Kg based on weight_unit -->
+                                    <!-- USA/Caribbean: show Gross Lb, Europe/other: show Gross Kg -->
                                     <t t-if="o.weight_unit == 'lb'">
                                         <th style="padding: 10px 8px; text-align: center;">Gross Lb</th>
+                                        <th style="padding: 10px 8px; text-align: center;">Gross Kg</th>
                                     </t>
                                     <t t-else="">
                                         <th style="padding: 10px 8px; text-align: center;">Gross Kg</th>
@@ -104,9 +105,10 @@
                                     <tr t-attf-style="border-bottom: 1px solid #e8ece9; #{line_index % 2 and 'background: #f8faf9;' or ''}">
                                         <td style="padding: 8px 12px; font-weight: 600;" t-esc="line.crfp_product_id.name"/>
                                         <td style="padding: 8px; text-align: center; font-family: 'Courier New', monospace;" t-esc="'%.1f' % line.net_kg"/>
-                                        <!-- Dynamic weight value -->
+                                        <!-- USA: Gross Lb + Gross Kg, Europe: only Gross Kg -->
                                         <t t-if="o.weight_unit == 'lb'">
                                             <td style="padding: 8px; text-align: center; font-family: 'Courier New', monospace;" t-esc="'%.1f' % line.gross_lbs"/>
+                                            <td style="padding: 8px; text-align: center; font-family: 'Courier New', monospace;" t-esc="'%.1f' % line.gross_kg"/>
                                         </t>
                                         <t t-else="">
                                             <td style="padding: 8px; text-align: center; font-family: 'Courier New', monospace;" t-esc="'%.1f' % line.gross_kg"/>

@@ -42,10 +42,10 @@ class CrfpQuotation(models.Model):
     container_type_id = fields.Many2one('crfp.container.type', string='Container Type')
     total_boxes = fields.Integer(string='Total Boxes in Container', default=1386)
     weight_unit = fields.Selection([
-        ('lb', 'Pounds (Lb)'),
-        ('kg', 'Kilograms (Kg)'),
-    ], string='Weight Unit', default='lb', required=True,
-       help='Weight display unit for this quotation. US/Caribbean markets typically use Lb, Europe/other markets use Kg.')
+        ('lb', 'Lb + Kg (USA)'),
+        ('kg', 'Kg only (Europe)'),
+    ], string='Weight in PDF', default='lb', required=True,
+       help='USA/Caribbean: shows Gross Lb and Gross Kg. Europe/other: shows only Gross Kg.')
 
     # Shipment info
     etd = fields.Date(string='ETD')
