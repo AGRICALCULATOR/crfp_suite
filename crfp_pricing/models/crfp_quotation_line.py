@@ -34,6 +34,7 @@ class CrfpQuotationLine(models.Model):
     logistics_per_box = fields.Float(string='Logistics/Box (USD)', digits=(12, 4))
     final_price = fields.Float(string='Final Price (USD)', digits=(12, 2))
     gross_lbs = fields.Float(string='Gross Lbs', digits=(12, 1))
+    gross_kg = fields.Float(string='Gross Kg', compute='_compute_gross_kg', store=True, digits=(12, 1))
 
     # Order / pallet config
     pallets = fields.Integer(string='Pallets', default=0)
@@ -44,6 +45,11 @@ class CrfpQuotationLine(models.Model):
     total_boxes = fields.Integer(string='Total Boxes', compute='_compute_totals', store=True)
     pallet_price = fields.Float(string='Price/Pallet', compute='_compute_totals', store=True, digits=(12, 2))
     line_total = fields.Float(string='Line Total', compute='_compute_totals', store=True, digits=(12, 2))
+
+    @api.depends('gross_lbs')
+    def _compute_gross_kg(self):
+        for rec in self:
+            rec.gross_kg = rec.gross_lbs / 2.20462 if rec.gross_lbs else 0.0
 
     @api.depends('pallets', 'boxes_per_pallet', 'final_price')
     def _compute_totals(self):

@@ -41,6 +41,11 @@ class CrfpQuotation(models.Model):
     port_id = fields.Many2one('crfp.port', string='Destination Port')
     container_type_id = fields.Many2one('crfp.container.type', string='Container Type')
     total_boxes = fields.Integer(string='Total Boxes in Container', default=1386)
+    weight_unit = fields.Selection([
+        ('lb', 'Pounds (Lb)'),
+        ('kg', 'Kilograms (Kg)'),
+    ], string='Weight Unit', default='lb', required=True,
+       help='Weight display unit for this quotation. US/Caribbean markets typically use Lb, Europe/other markets use Kg.')
 
     # Shipment info
     etd = fields.Date(string='ETD')
@@ -71,6 +76,15 @@ class CrfpQuotation(models.Model):
     total_pallets = fields.Integer(compute='_compute_totals', string='Total Pallets')
     total_boxes_sum = fields.Integer(compute='_compute_totals', string='Total Boxes')
     total_order_amount = fields.Float(compute='_compute_totals', string='Total Order Amount')
+
+    @api.onchange('port_id')
+    def _onchange_port_id(self):
+        if self.port_id:
+            # US & Caribbean use pounds, rest use kilograms
+            if self.port_id.region in ('north_america', 'caribbean', 'central_america'):
+                self.weight_unit = 'lb'
+            else:
+                self.weight_unit = 'kg'
 
     @api.depends('line_ids')
     def _compute_line_count(self):

@@ -70,6 +70,7 @@
                             <field name="freight_quote_id"/>
                             <field name="total_boxes"/>
                             <field name="container_type_id"/>
+                            <field name="weight_unit" widget="radio" options="{'horizontal': true}"/>
                             <field name="sale_order_id" readonly="1"/>
                         </group>
                     </group>
@@ -86,14 +87,14 @@
                                     <field name="product_id" string="Odoo SKU"
                                            options="{'no_create': True}"
                                            optional="show"/>
-                                    <field name="final_price" string="$/Box" readonly="1"/>
+                                    <field name="final_price" string="$/Box"/>
                                     <field name="boxes_per_pallet" string="Boxes/Pallet"/>
                                     <field name="pallets" string="Pallets"/>
                                     <field name="total_boxes" string="Total Boxes" readonly="1"/>
-                                    <field name="pallet_price" string="$/Pallet" readonly="1"/>
                                     <field name="line_total" string="Line Total" readonly="1"/>
-                                    <field name="net_kg" string="Kg" optional="show"/>
-                                    <field name="gross_lbs" string="Lbs" optional="show" readonly="1"/>
+                                    <field name="net_kg" string="Net Kg" optional="show"/>
+                                    <field name="gross_lbs" string="Gross Lb" optional="show" readonly="1"/>
+                                    <field name="gross_kg" string="Gross Kg" optional="show" readonly="1"/>
                                     <field name="exw_price" string="EXW" optional="hide" readonly="1"/>
                                     <field name="logistics_per_box" string="Log/Box" optional="hide" readonly="1"/>
                                     <field name="include_in_pdf" string="Incl." widget="boolean"/>
