@@ -17,6 +17,7 @@
         'security/ir.model.access.csv',
         'data/crfp_shipment_sequence.xml',
         'data/crfp_checklist_template_data.xml',
+        'data/crfp_document_type_data.xml',
         'data/crfp_alert_cron.xml',
         'report/crfp_packing_list_report.xml',
         'views/crfp_shipment_views.xml',
