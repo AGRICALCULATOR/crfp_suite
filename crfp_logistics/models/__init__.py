@@ -7,6 +7,7 @@ from . import crfp_shipment_checklist
 from . import crfp_shipment_alert
 from . import crfp_shipment_log
 from . import crfp_checklist_template
+from . import crfp_document_type
 from . import crfp_tracking_event
 from . import crfp_tracking_position
 from . import crfp_tracking_temperature
