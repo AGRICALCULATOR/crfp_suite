@@ -11,12 +11,6 @@
               action="action_crfp_port"
               sequence="10"/>
 
-    <menuitem id="menu_crfp_config_carriers"
-              name="Carriers &amp; Forwarders"
-              parent="menu_crfp_config_root"
-              action="action_crfp_carrier"
-              sequence="20"/>
-
     <menuitem id="menu_crfp_config_containers"
               name="Container Types"
               parent="menu_crfp_config_root"
