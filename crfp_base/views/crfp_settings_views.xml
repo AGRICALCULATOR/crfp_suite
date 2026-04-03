@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="crfp_settings_form" model="ir.ui.view">
+        <field name="name">crfp.settings.form</field>
+        <field name="model">crfp.settings</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <h2><field name="name"/></h2>
+
+                    <group string="Exchange Rate Configuration">
+                        <group>
+                            <field name="exchange_rate"/>
+                            <field name="exchange_rate_auto"/>
+                            <field name="exchange_rate_last_update"/>
+                        </group>
+                        <group>
+                            <button name="action_update_exchange_rate"
+                                    string="Update Exchange Rate Now"
+                                    type="object"
+                                    class="oe_highlight"/>
+                        </group>
+                    </group>
+
+                    <group string="Container &amp; Box Configuration">
+                        <group>
+                            <field name="default_total_boxes"/>
+                            <field name="default_boxes_per_pallet"/>
+                        </group>
+                    </group>
+
+                    <group string="Quality &amp; Monitoring">
+                        <group>
+                            <field name="temperature_tolerance"/>
+                            <field name="price_validity_days"/>
+                        </group>
+                    </group>
+
+                    <group string="Company" groups="base.group_multi_company">
+                        <group>
+                            <field name="company_id"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_crfp_settings" model="ir.actions.act_window">
+        <field name="name">Settings</field>
+        <field name="res_model">crfp.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+        <field name="help">Configure CR Farm Export Suite settings including exchange rates, container defaults, and quality parameters.</field>
+    </record>
+</odoo>
+
