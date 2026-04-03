@@ -1,8 +1,6 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_crfp_port_user,crfp.port.user,model_crfp_port,base.group_user,1,0,0,0
 access_crfp_port_manager,crfp.port.manager,model_crfp_port,group_crfp_manager,1,1,1,1
-access_crfp_carrier_user,crfp.carrier.user,model_crfp_carrier,base.group_user,1,0,0,0
-access_crfp_carrier_manager,crfp.carrier.manager,model_crfp_carrier,group_crfp_manager,1,1,1,1
 access_crfp_container_type_user,crfp.container.type.user,model_crfp_container_type,base.group_user,1,0,0,0
 access_crfp_container_type_manager,crfp.container.type.manager,model_crfp_container_type,group_crfp_manager,1,1,1,1
 access_crfp_product_user,crfp.product.user,model_crfp_product,base.group_user,1,0,0,0
@@ -15,3 +13,5 @@ access_crfp_incoterm_matrix_user,crfp.incoterm.matrix.user,model_crfp_incoterm_m
 access_crfp_incoterm_matrix_manager,crfp.incoterm.matrix.manager,model_crfp_incoterm_matrix,group_crfp_manager,1,1,1,1
 access_crfp_fixed_cost_user,crfp.fixed.cost.user,model_crfp_fixed_cost,base.group_user,1,1,1,0
 access_crfp_fixed_cost_manager,crfp.fixed.cost.manager,model_crfp_fixed_cost,group_crfp_manager,1,1,1,1
+access_crfp_settings_user,crfp.settings.user,model_crfp_settings,base.group_user,1,0,0,0
+access_crfp_settings_manager,crfp.settings.manager,model_crfp_settings,group_crfp_manager,1,1,1,1
