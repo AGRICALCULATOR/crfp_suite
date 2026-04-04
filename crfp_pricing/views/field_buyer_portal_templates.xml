@@ -1,50 +1,159 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <template id="field_buyer_portal_template" name="Field Buyer Price Portal">
+    <!-- Sprint 2: mobile-first price INPUT form for field buyers -->
+    <template id="field_buyer_price_form_template" name="Field Buyer — Ingreso de Precios">
         <t t-call="web.layout">
-            <t t-set="title">Weekly Prices — <t t-esc="buyer.name"/></t>
-            <div class="container mt-5">
-                <div class="row justify-content-center">
-                    <div class="col-md-10">
-                        <h2 class="mb-3">
-                            Weekly Prices for <strong t-esc="buyer.name"/>
-                        </h2>
-                        <t t-if="price_list">
-                            <div class="alert alert-info">
-                                <strong>Active Price List:</strong>
-                                <t t-esc="price_list.name"/> — Week
-                                <t t-esc="price_list.week_number"/>/<t t-esc="price_list.year"/>
-                            </div>
-                            <table class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>Product</th>
-                                        <th class="text-end">Price</th>
-                                        <th>Currency</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <t t-foreach="price_list.line_ids" t-as="line">
-                                        <t t-if="not buyer.allowed_product_ids or line.product_id in buyer.allowed_product_ids">
-                                            <tr>
-                                                <td t-esc="line.product_id.name"/>
-                                                <td class="text-end" t-esc="line.price"/>
-                                                <td t-esc="line.currency_id.name"/>
-                                            </tr>
-                                        </t>
-                                    </t>
-                                </tbody>
-                            </table>
-                        </t>
-                        <t t-else="">
-                            <div class="alert alert-warning">
-                                No active price list available at this time.
-                            </div>
-                        </t>
-                        <p class="text-muted mt-4 small">CR Farm Products — confidential use only.</p>
+            <t t-set="title">Precios — <t t-esc="buyer.name"/></t>
+            <style>
+                body { background: #f8f9fa; }
+                .price-form-header {
+                    background: #1a6b3c;
+                    color: #fff;
+                    padding: 1rem 1.25rem;
+                    position: sticky;
+                    top: 0;
+                    z-index: 100;
+                }
+                .price-form-header h5 { margin: 0; font-size: 1rem; }
+                .price-form-header small { opacity: 0.8; font-size: 0.8rem; }
+                .category-card {
+                    background: #fff;
+                    border-radius: 8px;
+                    margin: 0.75rem 0;
+                    box-shadow: 0 1px 4px rgba(0,0,0,.08);
+                    overflow: hidden;
+                }
+                .category-title {
+                    background: #e8f5e9;
+                    color: #1a6b3c;
+                    font-weight: 600;
+                    padding: 0.5rem 1rem;
+                    font-size: 0.85rem;
+                    text-transform: uppercase;
+                    letter-spacing: 0.05em;
+                }
+                .price-row {
+                    display: flex;
+                    align-items: center;
+                    padding: 0.6rem 1rem;
+                    border-bottom: 1px solid #f0f0f0;
+                }
+                .price-row:last-child { border-bottom: none; }
+                .price-label {
+                    flex: 1;
+                    font-size: 0.95rem;
+                    color: #333;
+                }
+                .price-input {
+                    width: 110px;
+                    text-align: right;
+                    border: 1px solid #ced4da;
+                    border-radius: 6px;
+                    padding: 0.35rem 0.5rem;
+                    font-size: 1rem;
+                    -moz-appearance: textfield;
+                }
+                .price-input:focus {
+                    border-color: #1a6b3c;
+                    outline: none;
+                    box-shadow: 0 0 0 2px rgba(26,107,60,.15);
+                }
+                .currency-badge {
+                    font-size: 0.75rem;
+                    color: #888;
+                    margin-left: 0.4rem;
+                    width: 32px;
+                    text-align: left;
+                }
+                .btn-save {
+                    background: #1a6b3c;
+                    color: #fff;
+                    border: none;
+                    width: 100%;
+                    padding: 0.85rem;
+                    font-size: 1.05rem;
+                    border-radius: 8px;
+                    font-weight: 600;
+                    cursor: pointer;
+                }
+                .btn-save:active { background: #14522e; }
+                .alert-success-custom {
+                    background: #d4edda;
+                    color: #155724;
+                    border-radius: 8px;
+                    padding: 0.75rem 1rem;
+                    margin: 0.75rem 0;
+                    font-size: 0.9rem;
+                }
+                .alert-error-custom {
+                    background: #f8d7da;
+                    color: #721c24;
+                    border-radius: 8px;
+                    padding: 0.75rem 1rem;
+                    margin: 0.75rem 0;
+                    font-size: 0.9rem;
+                }
+                .footer-note {
+                    text-align: center;
+                    font-size: 0.75rem;
+                    color: #aaa;
+                    padding: 1.5rem 0 2rem;
+                }
+            </style>
+
+            <!-- Header -->
+            <div class="price-form-header">
+                <h5>CR Farm Products</h5>
+                <small>Comprador: <t t-esc="buyer.name"/> — Semana <t t-esc="week"/>/<t t-esc="year"/></small>
+            </div>
+
+            <div style="max-width:520px; margin:0 auto; padding:0 0.5rem;">
+
+                <!-- Success/Error messages -->
+                <t t-if="success">
+                    <div class="alert-success-custom">
+                        ✓ Precios guardados exitosamente para la semana <t t-esc="week"/>/<t t-esc="year"/>.
                     </div>
-                </div>
+                </t>
+                <t t-if="error">
+                    <div class="alert-error-custom">
+                        ⚠ Error al guardar: <t t-esc="error"/>
+                    </div>
+                </t>
+
+                <form method="post" t-attf-action="/crfp/prices/#{buyer.token}/save">
+                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+
+                    <!-- Product groups by category -->
+                    <t t-foreach="product_groups.items()" t-as="cat_item">
+                        <div class="category-card">
+                            <div class="category-title"><t t-esc="cat_item[1]['label']"/></div>
+                            <t t-foreach="cat_item[1]['products']" t-as="product">
+                                <div class="price-row">
+                                    <span class="price-label"><t t-esc="product.name"/></span>
+                                    <input
+                                        type="number"
+                                        class="price-input"
+                                        t-attf-name="price_#{product.id}"
+                                        t-att-value="'%.0f' % product.raw_price_crc if product.raw_price_crc else ''"
+                                        placeholder="0"
+                                        step="1"
+                                        min="0"
+                                        inputmode="numeric"
+                                    />
+                                    <span class="currency-badge">CRC</span>
+                                </div>
+                            </t>
+                        </div>
+                    </t>
+
+                    <div style="padding:0.75rem 0;">
+                        <button type="submit" class="btn-save">Guardar Precios</button>
+                    </div>
+                </form>
+
+                <div class="footer-note">CR Farm Products — Uso interno confidencial</div>
             </div>
         </t>
     </template>
