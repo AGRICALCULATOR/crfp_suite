@@ -18,9 +18,15 @@
         'report/crfp_quotation_report.xml',
         'views/crfp_freight_quote_views.xml',
         'views/crfp_quotation_views.xml',
+        'views/crfp_price_list_views.xml',
+        'views/crfp_price_history_views.xml',
+        'views/crfp_field_buyer_views.xml',
         'views/crfp_pricing_menus.xml',
+        'views/field_buyer_portal_templates.xml',
         'data/mail_template_data.xml',
         'data/cron_data.xml',
+        'data/crfp_pricing_cron.xml',
+        'data/crfp_pricing_mail.xml',
     ],
     'assets': {
         'web.assets_backend': [

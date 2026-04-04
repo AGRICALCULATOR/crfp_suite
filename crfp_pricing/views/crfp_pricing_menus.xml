@@ -34,6 +34,27 @@
               action="action_crfp_freight_quote"
               sequence="30"/>
 
+    <!-- Price Lists -->
+    <menuitem id="menu_crfp_price_lists"
+              name="Price Lists"
+              parent="menu_crfp_pricing_root"
+              action="action_crfp_price_list"
+              sequence="40"/>
+
+    <!-- Price Trends -->
+    <menuitem id="menu_crfp_price_trends"
+              name="Price Trends"
+              parent="menu_crfp_pricing_root"
+              action="action_crfp_price_history"
+              sequence="50"/>
+
+    <!-- Field Buyers -->
+    <menuitem id="menu_crfp_field_buyers"
+              name="Field Buyers"
+              parent="menu_crfp_pricing_root"
+              action="action_crfp_field_buyer"
+              sequence="60"/>
+
     <!-- Configuration -->
     <menuitem id="menu_crfp_pricing_config"
               name="Configuration"

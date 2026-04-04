@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ── List view ── -->
+    <record id="view_crfp_price_list_tree" model="ir.ui.view">
+        <field name="name">crfp.price.list.tree</field>
+        <field name="model">crfp.price.list</field>
+        <field name="arch" type="xml">
+            <list string="Weekly Price Lists"
+                  decoration-success="status == 'active'"
+                  decoration-muted="status == 'archived'">
+                <field name="name"/>
+                <field name="week_number"/>
+                <field name="year"/>
+                <field name="version"/>
+                <field name="status" widget="badge"/>
+                <field name="activation_date"/>
+                <field name="country_id"/>
+                <field name="client_id"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ── Form view ── -->
+    <record id="view_crfp_price_list_form" model="ir.ui.view">
+        <field name="name">crfp.price.list.form</field>
+        <field name="model">crfp.price.list</field>
+        <field name="arch" type="xml">
+            <form string="Weekly Price List">
+                <header>
+                    <button name="action_confirm" string="Confirm" type="object"
+                            class="btn-primary"
+                            invisible="status != 'draft'"/>
+                    <button name="action_activate" string="Activate" type="object"
+                            class="btn-success"
+                            invisible="status not in ('draft', 'confirmed')"/>
+                    <button name="action_archive_list" string="Archive" type="object"
+                            invisible="status == 'archived'"/>
+                    <field name="status" widget="statusbar"
+                           statusbar_visible="draft,confirmed,active,archived"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="week_number"/>
+                            <field name="year"/>
+                            <field name="version"/>
+                        </group>
+                        <group>
+                            <field name="activation_date"/>
+                            <field name="country_id"/>
+                            <field name="client_id"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Price Lines">
+                            <field name="line_ids">
+                                <list editable="bottom">
+                                    <field name="product_id"/>
+                                    <field name="price"/>
+                                    <field name="currency_id"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ── Search view ── -->
+    <record id="view_crfp_price_list_search" model="ir.ui.view">
+        <field name="name">crfp.price.list.search</field>
+        <field name="model">crfp.price.list</field>
+        <field name="arch" type="xml">
+            <search string="Price Lists">
+                <field name="name"/>
+                <field name="week_number"/>
+                <field name="year"/>
+                <field name="client_id"/>
+                <filter name="filter_active"    string="Active"    domain="[('status','=','active')]"/>
+                <filter name="filter_confirmed" string="Confirmed" domain="[('status','=','confirmed')]"/>
+                <filter name="filter_draft"     string="Draft"     domain="[('status','=','draft')]"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- ── Window action ── -->
+    <record id="action_crfp_price_list" model="ir.actions.act_window">
+        <field name="name">Weekly Price Lists</field>
+        <field name="res_model">crfp.price.list</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first weekly price list!</p>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="field_buyer_portal_template" name="Field Buyer Price Portal">
+        <t t-call="web.layout">
+            <t t-set="title">Weekly Prices — <t t-esc="buyer.name"/></t>
+            <div class="container mt-5">
+                <div class="row justify-content-center">
+                    <div class="col-md-10">
+                        <h2 class="mb-3">
+                            Weekly Prices for <strong t-esc="buyer.name"/>
+                        </h2>
+                        <t t-if="price_list">
+                            <div class="alert alert-info">
+                                <strong>Active Price List:</strong>
+                                <t t-esc="price_list.name"/> — Week
+                                <t t-esc="price_list.week_number"/>/<t t-esc="price_list.year"/>
+                            </div>
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Product</th>
+                                        <th class="text-end">Price</th>
+                                        <th>Currency</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="price_list.line_ids" t-as="line">
+                                        <t t-if="not buyer.allowed_product_ids or line.product_id in buyer.allowed_product_ids">
+                                            <tr>
+                                                <td t-esc="line.product_id.name"/>
+                                                <td class="text-end" t-esc="line.price"/>
+                                                <td t-esc="line.currency_id.name"/>
+                                            </tr>
+                                        </t>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </t>
+                        <t t-else="">
+                            <div class="alert alert-warning">
+                                No active price list available at this time.
+                            </div>
+                        </t>
+                        <p class="text-muted mt-4 small">CR Farm Products — confidential use only.</p>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+</odoo>

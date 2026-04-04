@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="mail_template_price_list_activated" model="mail.template">
+        <field name="name">CRFP: Weekly Price List Activated</field>
+        <field name="model_id" ref="model_crfp_price_list"/>
+        <field name="subject">Weekly Prices Activated — {{ object.name }}</field>
+        <field name="body_html"><![CDATA[
+<div style="font-family: Arial, sans-serif;">
+    <p>Dear team,</p>
+    <p>The weekly price list <strong>{{ object.name }}</strong> has been activated.</p>
+    <table>
+        <tr><td><strong>Week:</strong></td><td>{{ object.week_number }}/{{ object.year }}</td></tr>
+        <tr><td><strong>Version:</strong></td><td>{{ object.version }}</td></tr>
+        <tr><td><strong>Activation Date:</strong></td><td>{{ object.activation_date }}</td></tr>
+        <tr><td><strong>Lines:</strong></td><td>{{ object.line_ids | length }}</td></tr>
+    </table>
+    <p>Please review the prices in the system.</p>
+    <p>CR Farm Products</p>
+</div>
+        ]]></field>
+        <field name="auto_delete" eval="True"/>
+    </record>
+
+</odoo>
