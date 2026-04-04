@@ -46,10 +46,10 @@ class CrfpFieldBuyer(models.Model):
                 'message': self.public_url,
                 'type': 'success',
                 'sticky': False,
-                'next': {
-                    'type': 'ir.actions.client',
-                    'tag': 'crfp_pricing.copy_to_clipboard',
-                    'params': {'text': self.public_url},
-                },
+            },
+            'next': {
+                'type': 'ir.actions.client',
+                'tag': 'crfp_pricing.copy_to_clipboard',
+                'params': {'text': self.public_url},
             },
         }

@@ -31,6 +31,7 @@
     'assets': {
         'web.assets_backend': [
             'crfp_pricing/static/src/css/crfp_calculator.css',
+            'crfp_pricing/static/src/js/copy_clipboard_action.js',
             'crfp_pricing/static/src/js/calculator_service.js',
             'crfp_pricing/static/src/js/product_card.js',
             'crfp_pricing/static/src/js/crfp_calculator.js',
