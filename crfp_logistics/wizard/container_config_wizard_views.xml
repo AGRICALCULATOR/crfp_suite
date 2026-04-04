@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ═══ WIZARD FORM ═══ -->
+    <record id="view_container_config_wizard_form" model="ir.ui.view">
+        <field name="name">crfp.container.config.wizard.form</field>
+        <field name="model">crfp.container.config.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Configure Container">
+                <sheet>
+                    <div class="oe_title">
+                        <h2>Container Configuration Wizard</h2>
+                    </div>
+
+                    <group string="Step 1 — Container Type">
+                        <group>
+                            <field name="container_type_id"/>
+                            <field name="capacity_boxes" readonly="1" string="Container Capacity (boxes)"/>
+                        </group>
+                        <group>
+                            <field name="sale_order_id" string="Link to Sales Order (optional)"/>
+                        </group>
+                    </group>
+
+                    <group string="Step 2 — Pallet &amp; Box Setup">
+                        <group>
+                            <field name="pallet_config_id"
+                                   help="Select to auto-fill boxes/pallet and weight per box"/>
+                            <field name="box_type_id"/>
+                        </group>
+                        <group>
+                            <field name="num_pallets"/>
+                            <field name="boxes_per_pallet"/>
+                            <field name="net_weight_per_box_kg"/>
+                        </group>
+                    </group>
+
+                    <group string="Step 3 — Capacity Preview">
+                        <group>
+                            <field name="total_boxes" readonly="1"/>
+                            <field name="total_weight_kg" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="total_volume_m3" readonly="1"/>
+                            <field name="fill_rate_pct" readonly="1" widget="percentage"
+                                   string="Container Fill Rate (%)"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <field name="notes" placeholder="Optional notes..." colspan="2"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_save_config" type="object"
+                            string="Save Configuration" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>

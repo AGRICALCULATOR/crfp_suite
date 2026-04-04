@@ -8,6 +8,14 @@ class SaleOrder(models.Model):
                                          help='Link to the CR Farm export quotation')
     crfp_shipment_id = fields.Many2one('crfp.shipment', string='Shipment',
                                         compute='_compute_crfp_shipment', store=False)
+    crfp_container_config_ids = fields.One2many(
+        'crfp.container.config', 'sale_order_id',
+        string='Container Configurations',
+    )
+    crfp_container_config_count = fields.Integer(
+        string='Container Configs',
+        compute='_compute_crfp_container_config_count',
+    )
 
     def _compute_crfp_shipment(self):
         for rec in self:
@@ -15,6 +23,10 @@ class SaleOrder(models.Model):
                 ('sale_order_id', '=', rec.id)
             ], limit=1)
             rec.crfp_shipment_id = shipment.id if shipment else False
+
+    def _compute_crfp_container_config_count(self):
+        for rec in self:
+            rec.crfp_container_config_count = len(rec.crfp_container_config_ids)
 
     def action_create_shipment(self):
         """Create a shipment from this SO with ALL data pre-filled."""
@@ -97,4 +109,26 @@ class SaleOrder(models.Model):
             'res_id': self.crfp_shipment_id.id,
             'view_mode': 'form',
             'target': 'current',
+        }
+
+    def action_open_container_config_wizard(self):
+        """Launch the container configuration wizard pre-linked to this SO."""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'crfp.container.config.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {'default_sale_order_id': self.id},
+        }
+
+    def action_view_container_configs(self):
+        """Open the list of container configurations linked to this SO."""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'crfp.container.config',
+            'view_mode': 'list,form',
+            'domain': [('sale_order_id', '=', self.id)],
+            'context': {'default_sale_order_id': self.id},
         }

@@ -23,3 +23,6 @@ access_crfp_tracking_temperature_user,crfp.tracking.temperature.user,model_crfp_
 access_crfp_tracking_temperature_manager,crfp.tracking.temperature.manager,model_crfp_tracking_temperature,group_crfp_logistics_manager,1,1,1,1
 access_crfp_document_type_user,crfp.document.type.user,model_crfp_document_type,base.group_user,1,0,0,0
 access_crfp_document_type_manager,crfp.document.type.manager,model_crfp_document_type,group_crfp_logistics_manager,1,1,1,1
+access_crfp_container_config_user,crfp.container.config.user,model_crfp_container_config,base.group_user,1,1,1,0
+access_crfp_container_config_manager,crfp.container.config.manager,model_crfp_container_config,group_crfp_logistics_manager,1,1,1,1
+access_crfp_container_config_wizard_user,crfp.container.config.wizard.user,model_crfp_container_config_wizard,base.group_user,1,1,1,1

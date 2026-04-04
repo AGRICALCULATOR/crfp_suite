@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Container Configurations under Logistics > Configuration -->
+    <menuitem id="menu_crfp_container_configs"
+              name="Container Configurations"
+              parent="menu_crfp_logistics_config"
+              action="action_crfp_container_config"
+              sequence="20"/>
+
+    <!-- Quick wizard entry under root -->
+    <menuitem id="menu_crfp_container_config_wizard"
+              name="New Container Config"
+              parent="menu_crfp_logistics_root"
+              action="action_crfp_container_config_wizard"
+              sequence="35"/>
+
+</odoo>

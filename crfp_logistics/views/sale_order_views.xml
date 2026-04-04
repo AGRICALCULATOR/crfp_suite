@@ -16,6 +16,17 @@
                         invisible="not crfp_shipment_id">
                     <field name="crfp_shipment_id" widget="statinfo" string="Shipment"/>
                 </button>
+                <button name="action_open_container_config_wizard" type="object"
+                        class="oe_stat_button" icon="fa-cube"
+                        string="Configure Container"
+                        invisible="crfp_container_config_count != 0"/>
+                <button name="action_view_container_configs" type="object"
+                        class="oe_stat_button" icon="fa-cube"
+                        invisible="crfp_container_config_count == 0">
+                    <field name="crfp_container_config_count" widget="statinfo"
+                           string="Container Configs"/>
+                </button>
+                <field name="crfp_container_config_ids" invisible="1"/>
             </xpath>
         </field>
     </record>

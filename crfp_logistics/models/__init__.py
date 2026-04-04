@@ -11,4 +11,5 @@ from . import crfp_document_type
 from . import crfp_tracking_event
 from . import crfp_tracking_position
 from . import crfp_tracking_temperature
+from . import crfp_container_config
 from . import sale_order

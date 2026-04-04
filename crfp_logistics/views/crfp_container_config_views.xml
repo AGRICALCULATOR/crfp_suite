@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ═══ ACTIONS ═══ -->
+    <record id="action_crfp_container_config" model="ir.actions.act_window">
+        <field name="name">Container Configurations</field>
+        <field name="res_model">crfp.container.config</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{}</field>
+    </record>
+
+    <record id="action_crfp_container_config_wizard" model="ir.actions.act_window">
+        <field name="name">New Container Configuration</field>
+        <field name="res_model">crfp.container.config.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <!-- ═══ LIST VIEW ═══ -->
+    <record id="view_crfp_container_config_list" model="ir.ui.view">
+        <field name="name">crfp.container.config.list</field>
+        <field name="model">crfp.container.config</field>
+        <field name="arch" type="xml">
+            <list string="Container Configurations" decoration-muted="state == 'draft'">
+                <field name="date"/>
+                <field name="name"/>
+                <field name="sale_order_id"/>
+                <field name="container_type_id"/>
+                <field name="pallet_config_id"/>
+                <field name="num_pallets"/>
+                <field name="boxes_per_pallet"/>
+                <field name="total_boxes"/>
+                <field name="total_weight_kg"/>
+                <field name="fill_rate_pct" string="Fill %"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'confirmed'"
+                       decoration-warning="state == 'draft'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ═══ FORM VIEW ═══ -->
+    <record id="view_crfp_container_config_form" model="ir.ui.view">
+        <field name="name">crfp.container.config.form</field>
+        <field name="model">crfp.container.config</field>
+        <field name="arch" type="xml">
+            <form string="Container Configuration">
+                <header>
+                    <button name="action_confirm" type="object" string="Confirm"
+                            class="btn-primary"
+                            invisible="state == 'confirmed'"/>
+                    <button name="action_reset_to_draft" type="object" string="Reset to Draft"
+                            invisible="state == 'draft'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,confirmed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="General">
+                            <field name="date"/>
+                            <field name="sale_order_id"/>
+                        </group>
+                        <group string="Container">
+                            <field name="container_type_id"/>
+                            <field name="capacity_boxes" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Pallet &amp; Box Setup">
+                            <field name="pallet_config_id"/>
+                            <field name="box_type_id"/>
+                            <field name="num_pallets"/>
+                            <field name="boxes_per_pallet"/>
+                            <field name="net_weight_per_box_kg"/>
+                        </group>
+                        <group string="Calculated Totals">
+                            <field name="total_boxes" readonly="1"/>
+                            <field name="total_weight_kg" readonly="1"/>
+                            <field name="total_volume_m3" readonly="1"/>
+                            <field name="fill_rate_pct" readonly="1" widget="percentage"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <field name="notes" placeholder="Additional notes..." colspan="2"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ═══ SEARCH VIEW ═══ -->
+    <record id="view_crfp_container_config_search" model="ir.ui.view">
+        <field name="name">crfp.container.config.search</field>
+        <field name="model">crfp.container.config</field>
+        <field name="arch" type="xml">
+            <search string="Search Configurations">
+                <field name="name"/>
+                <field name="sale_order_id"/>
+                <field name="container_type_id"/>
+                <filter string="Draft" name="filter_draft" domain="[('state','=','draft')]"/>
+                <filter string="Confirmed" name="filter_confirmed" domain="[('state','=','confirmed')]"/>
+                <filter string="With Sales Order" name="filter_with_so" domain="[('sale_order_id','!=',False)]"/>
+                <group by="container_type_id" string="Container Type"/>
+                <group by="state" string="Status"/>
+            </search>
+        </field>
+    </record>
+
+</odoo>
