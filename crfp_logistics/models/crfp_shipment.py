@@ -107,7 +107,7 @@ class CrfpShipment(models.Model):
     total_net_weight_actual = fields.Float(compute='_compute_totals', store=True, digits=(12, 2))
     total_gross_weight_actual = fields.Float(compute='_compute_totals', store=True, digits=(12, 2))
     has_shortages = fields.Boolean(compute='_compute_totals', store=True)
-    line_count = fields.Integer(compute='_compute_totals')
+    line_count = fields.Integer(compute='_compute_line_count')
     docs_complete = fields.Boolean(compute='_compute_docs_progress')
     docs_pending_count = fields.Integer(compute='_compute_docs_progress')
     checklist_progress = fields.Float(compute='_compute_checklist_progress')
@@ -133,7 +133,11 @@ class CrfpShipment(models.Model):
             rec.total_net_weight_actual = sum(l.net_weight_actual for l in lines)
             rec.total_gross_weight_actual = sum(l.gross_weight_actual for l in lines)
             rec.has_shortages = any(l.has_shortage for l in lines)
-            rec.line_count = len(lines)
+
+    @api.depends('line_ids')
+    def _compute_line_count(self):
+        for rec in self:
+            rec.line_count = len(rec.line_ids)
 
     @api.depends('document_ids.state', 'document_ids.is_required')
     def _compute_docs_progress(self):
