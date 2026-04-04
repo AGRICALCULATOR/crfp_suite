@@ -35,8 +35,14 @@
                         </group>
                         <group>
                             <field name="token" readonly="1"/>
+                            <field name="public_url" readonly="1" widget="url" string="Link de Precios"/>
                         </group>
                     </group>
+                    <div class="o_field_widget mb-3 ms-2">
+                        <button name="action_copy_link" type="object"
+                                string="Copiar Link" class="btn btn-primary"
+                                invisible="not token"/>
+                    </div>
                     <notebook>
                         <page string="Allowed Products">
                             <field name="allowed_product_ids" widget="many2many_tags" nolabel="1"/>
