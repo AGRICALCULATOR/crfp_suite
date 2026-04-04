@@ -16,8 +16,10 @@ class CrfpFreightQuote(models.Model):
     carrier_name = fields.Char(
         related='carrier_partner_id.name', store=True, string='Carrier Name')
 
-    # Keep old field for backward compatibility but make it optional
-    carrier_id = fields.Many2one('crfp.carrier', string='Legacy Carrier (old)')
+    # DEPRECATED (Sprint 0): carrier_id will be removed in v2.0.
+    # Use carrier_partner_id (res.partner) instead.
+    # Kept for backward compat with existing data only.
+    carrier_id = fields.Many2one('crfp.carrier', string='Legacy Carrier (deprecated)')
 
     port_id = fields.Many2one('crfp.port', string='Destination Port', required=True)
     container_type_id = fields.Many2one('crfp.container.type', string='Container Type')

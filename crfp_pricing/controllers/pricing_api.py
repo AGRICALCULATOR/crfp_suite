@@ -31,12 +31,6 @@ class CrfpPricingAPI(http.Controller):
             order='region, name',
         )
 
-        carriers = env['crfp.carrier'].search_read(
-            [('active', '=', True)],
-            ['id', 'name', 'carrier_type', 'scac_code'],
-            order='name',
-        )
-
         container_types = env['crfp.container.type'].search_read(
             [('active', '=', True)],
             ['id', 'code', 'name', 'capacity_boxes', 'is_reefer'],
@@ -81,7 +75,6 @@ class CrfpPricingAPI(http.Controller):
         return {
             'products': products,
             'ports': ports,
-            'carriers': carriers,
             'container_types': container_types,
             'box_types': box_types,
             'pallet_configs': pallet_configs,
@@ -235,12 +228,47 @@ class CrfpPricingAPI(http.Controller):
         if quotation_id:
             quotation = env['crfp.quotation'].browse(quotation_id)
             quotation.write(vals)
-            # Delete existing lines and recreate
-            quotation.line_ids.unlink()
+            # Update-in-place: match by crfp_product_id, update existing, create new, delete removed
+            existing_lines = {l.crfp_product_id.id: l for l in quotation.line_ids}
+            incoming_product_ids = set()
+            for l in lines_data:
+                pid = l['crfp_product_id']
+                incoming_product_ids.add(pid)
+                line_vals = {
+                    'quotation_id': quotation.id,
+                    'crfp_product_id': pid,
+                    'raw_price_crc': l.get('raw_price_crc', 0),
+                    'net_kg': l.get('net_kg', 0),
+                    'box_cost': l.get('box_cost', 0),
+                    'labor_per_kg': l.get('labor_per_kg', 0),
+                    'materials_per_kg': l.get('materials_per_kg', 0),
+                    'indirect_per_kg': l.get('indirect_per_kg', 0),
+                    'profit': l.get('profit', 0),
+                    'purchase_cost': l.get('purchase_cost', 0),
+                    'packing_cost': l.get('packing_cost', 0),
+                    'exw_price': l.get('exw_price', 0),
+                    'logistics_per_box': l.get('logistics_per_box', 0),
+                    'final_price': l.get('final_price', 0),
+                    'gross_lbs': l.get('gross_lbs', 0),
+                    'pallets': l.get('pallets', 0),
+                    'boxes_per_pallet': l.get('boxes_per_pallet', 66),
+                    'include_in_pdf': l.get('include_in_pdf', True),
+                }
+                if pid in existing_lines:
+                    existing_lines[pid].write(line_vals)
+                else:
+                    env['crfp.quotation.line'].create(line_vals)
+            # Remove lines no longer in the quotation
+            to_remove = quotation.line_ids.filtered(
+                lambda ln: ln.crfp_product_id.id not in incoming_product_ids
+            )
+            if to_remove:
+                to_remove.unlink()
+            lines_data = []  # prevent double-creation below
         else:
             quotation = env['crfp.quotation'].create(vals)
 
-        # Create lines
+        # Create lines (new quotations only)
         for l in lines_data:
             line_vals = {
                 'quotation_id': quotation.id,

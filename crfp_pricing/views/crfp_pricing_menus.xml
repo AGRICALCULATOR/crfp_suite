@@ -63,8 +63,6 @@
 
     <menuitem id="menu_crfp_pc_ports" name="Ports"
               parent="menu_crfp_pricing_config" action="crfp_base.action_crfp_port" sequence="10"/>
-    <menuitem id="menu_crfp_pc_carriers" name="Carriers &amp; Forwarders"
-              parent="menu_crfp_pricing_config" action="crfp_base.action_crfp_carrier" sequence="20"/>
     <menuitem id="menu_crfp_pc_containers" name="Container Types"
               parent="menu_crfp_pricing_config" action="crfp_base.action_crfp_container_type" sequence="30"/>
     <menuitem id="menu_crfp_pc_products" name="Export Products"

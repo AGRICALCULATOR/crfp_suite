@@ -1,30 +1,38 @@
-# CR Farm Products - Export Suite (crfp_suite)
+# CRFP Suite — CR Farm Products Odoo Modules
 
 ## Proyecto
-Módulos Odoo 19 Enterprise para gestión de precios de exportación y logística.
+
+Módulos Odoo 19 para CR Farm Products.
+
+- **Repositorio:** AGRICALCULATOR/crfp_suite
+- **Staging:** Odoo.sh → proyecto `agricalculator-odoo-crfarm`, rama `staging-test-modules`
 
 ## Módulos
-- **crfp_base** - Datos maestros (puertos, carriers, productos, cajas, pallets, incoterms)
-- **crfp_pricing** - Calculadora de precios con UI Owl personalizada + integración con Ventas
-- **crfp_claims** - Gestión de reclamaciones
-- **crfp_logistics** - Logística de exportación
 
-## Stack técnico
-- Odoo 19 Enterprise
-- Python 3 (modelos ORM)
-- JavaScript/OWL (componentes frontend)
-- XML (vistas, datos, seguridad)
+| Módulo | Descripción |
+|--------|-------------|
+| `crfp_base` | Base compartida: tipos de documento, lógica común |
+| `crfp_pricing` | Gestión de precios y tarifas |
+| `crfp_logistics` | Logística y transporte |
+| `crfp_claims` | Gestión de reclamos |
 
-## Convenciones
-- Prefijo de módulos: `crfp_`
-- Rutas JSON-RPC: usar `type="jsonrpc"` (no `type="json"`) para Odoo 19
-- Seguir estructura estándar de módulos Odoo: models/, views/, security/, data/, static/
+## Reglas de desarrollo Odoo 19
 
-## Comandos útiles
-```bash
-# Reiniciar Odoo con actualización de módulo
-./odoo-bin -u crfp_base,crfp_pricing -d <database> --stop-after-init
+### Rutas HTTP
+- Usar `type='jsonrpc'` en los decoradores `@http.route` (no `type='json'`).
+- Ejemplo correcto: `@http.route('/crfp/endpoint', type='jsonrpc', auth='user')`
 
-# Ver logs en tiempo real
-tail -f /var/log/odoo/odoo.log
-```
+### XML — Vistas de formulario
+- No usar el atributo `expand` en tags `<group>`.
+- No usar `<separator/>` standalone innecesarios.
+
+### XML — Search views
+- No usar `<separator/>` dentro de `<search>`.
+- No usar `<group string="...">` dentro de `<search>`.
+- Los filtros van directamente como `<filter>` e `<group by="...">` sin wrapper de grupo con string.
+
+## Flujo de trabajo
+
+1. Desarrollar en rama feature.
+2. Hacer PR hacia `main`.
+3. Merge a `staging-test-modules` para probar en Odoo.sh.

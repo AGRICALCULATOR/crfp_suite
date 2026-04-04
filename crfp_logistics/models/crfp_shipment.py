@@ -155,6 +155,28 @@ class CrfpShipment(models.Model):
         for rec in self:
             rec.alert_count = len(rec.alert_ids.filtered(lambda a: not a.is_resolved))
 
+    def _check_blocking_tasks(self, target_state):
+        """Raise UserError if any blocking checklist items are not done for the transition."""
+        self.ensure_one()
+        # Map: target state -> checklist categories that must be clear
+        blocking_map = {
+            'booking_requested': ['logistics'],
+            'si_sent': ['logistics', 'documentation'],
+            'docs_final': ['documentation', 'logistics'],
+            'shipped': ['documentation', 'commercial'],
+        }
+        categories = blocking_map.get(target_state)
+        if not categories:
+            return
+        blocking = self.checklist_ids.filtered(
+            lambda c: c.is_blocking and c.category in categories and c.state not in ('done', 'na')
+        )
+        if blocking:
+            names = ', '.join(blocking.mapped('name'))
+            raise UserError(
+                'Cannot proceed to "%s". Complete these blocking tasks first: %s' % (target_state, names)
+            )
+
     def _default_origin_port(self):
         port = self.env['crfp.port'].search([('code', '=', 'MOI')], limit=1)
         return port.id if port else False
@@ -295,25 +317,35 @@ class CrfpShipment(models.Model):
             })
 
     def _auto_load_documents(self):
+        """Load documents from crfp.document.type master data (dynamic)."""
         self.ensure_one()
         Doc = self.env['crfp.shipment.document']
-        base_docs = [
-            ('booking_request', 'generated'), ('booking_confirmation', 'received'),
-            ('shipping_instructions', 'generated'), ('packing_list', 'generated'),
-            ('commercial_invoice', 'odoo_ref'), ('bl_draft', 'received'),
-            ('bl_original', 'received'), ('phytosanitary', 'received'),
-            ('cert_origin', 'received'), ('customer_copy', 'generated'),
-        ]
-        if self.port_destination_id and self.port_destination_id.region == 'europe':
-            base_docs.append(('eur1', 'received'))
-        if self.incoterm in ('CIF', 'CIP', 'DAP', 'DDP'):
-            base_docs.append(('insurance', 'received'))
-        for doc_type, doc_source in base_docs:
-            existing = Doc.search([('shipment_id', '=', self.id), ('doc_type', '=', doc_type)], limit=1)
+        DocType = self.env['crfp.document.type']
+
+        region = self.port_destination_id.region if self.port_destination_id else ''
+        incoterm = self.incoterm or ''
+
+        all_types = DocType.search([('active', '=', True)])
+        for dt in all_types:
+            # Skip Europe-only docs if not going to Europe
+            if dt.applies_to_europe and region != 'europe':
+                continue
+            # Skip incoterm-specific docs if incoterm doesn't match
+            if dt.applies_to_incoterms:
+                allowed = [i.strip() for i in dt.applies_to_incoterms.split(',')]
+                if incoterm not in allowed:
+                    continue
+            existing = Doc.search([
+                ('shipment_id', '=', self.id),
+                ('doc_type', '=', dt.code),
+            ], limit=1)
             if not existing:
                 Doc.create({
-                    'shipment_id': self.id, 'doc_type': doc_type,
-                    'doc_source': doc_source, 'is_required': True, 'state': 'pending',
+                    'shipment_id': self.id,
+                    'doc_type': dt.code,
+                    'doc_source': dt.default_source or 'received',
+                    'is_required': dt.is_required_default,
+                    'state': 'pending',
                 })
 
     def _auto_load_checklist(self):
@@ -448,6 +480,7 @@ class CrfpShipment(models.Model):
 
     def action_request_booking(self):
         for rec in self:
+            rec._check_blocking_tasks('booking_requested')
             rec.write({'state': 'booking_requested'})
             rec._update_document_states('booking_requested')
 
@@ -460,6 +493,7 @@ class CrfpShipment(models.Model):
 
     def action_send_si(self):
         for rec in self:
+            rec._check_blocking_tasks('si_sent')
             if not rec.temperature_set:
                 raise UserError('Set Temperature before sending SI.')
             if not rec.ventilation:
@@ -479,6 +513,7 @@ class CrfpShipment(models.Model):
 
     def action_docs_final(self):
         for rec in self:
+            rec._check_blocking_tasks('docs_final')
             if rec.line_ids:
                 for line in rec.line_ids:
                     if not line.boxes_actual or line.boxes_actual <= 0:
@@ -489,6 +524,7 @@ class CrfpShipment(models.Model):
 
     def action_ship(self):
         for rec in self:
+            rec._check_blocking_tasks('shipped')
             if not rec.commercial_invoice_id:
                 raise UserError('Link the Commercial Invoice before shipping.')
             rec.write({'state': 'shipped', 'atd': fields.Datetime.now()})
