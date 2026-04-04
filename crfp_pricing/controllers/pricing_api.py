@@ -11,7 +11,7 @@ class CrfpPricingAPI(http.Controller):
 
     # ─── MASTER DATA ────────────────────────────────────────────
 
-    @http.route('/crfp/api/master-data', type='json', auth='user')
+    @http.route('/crfp/api/master-data', type='jsonrpc', auth='user')
     def get_master_data(self):
         """Return all master data needed by the calculator in one call."""
         env = request.env
@@ -91,7 +91,7 @@ class CrfpPricingAPI(http.Controller):
 
     # ─── FREIGHT QUOTES ─────────────────────────────────────────
 
-    @http.route('/crfp/api/freight-quotes', type='json', auth='user')
+    @http.route('/crfp/api/freight-quotes', type='jsonrpc', auth='user')
     def get_freight_quotes(self, port_id=None):
         """Get freight quotes, optionally filtered by port."""
         domain = [('active', '=', True)]
@@ -110,7 +110,7 @@ class CrfpPricingAPI(http.Controller):
         )
         return quotes
 
-    @http.route('/crfp/api/freight-quote/save', type='json', auth='user')
+    @http.route('/crfp/api/freight-quote/save', type='jsonrpc', auth='user')
     def save_freight_quote(self, vals):
         """Create or update a freight quote."""
         env = request.env['crfp.freight.quote']
@@ -123,7 +123,7 @@ class CrfpPricingAPI(http.Controller):
             record = env.create(vals)
             return record.id
 
-    @http.route('/crfp/api/freight-quote/delete', type='json', auth='user')
+    @http.route('/crfp/api/freight-quote/delete', type='jsonrpc', auth='user')
     def delete_freight_quote(self, quote_id):
         """Delete a freight quote."""
         request.env['crfp.freight.quote'].browse(quote_id).unlink()
@@ -131,7 +131,7 @@ class CrfpPricingAPI(http.Controller):
 
     # ─── QUOTATIONS (SAVE / LOAD) ───────────────────────────────
 
-    @http.route('/crfp/api/quotations', type='json', auth='user')
+    @http.route('/crfp/api/quotations', type='jsonrpc', auth='user')
     def get_quotations(self):
         """List all saved quotations."""
         return request.env['crfp.quotation'].search_read(
@@ -143,7 +143,7 @@ class CrfpPricingAPI(http.Controller):
             limit=100,
         )
 
-    @http.route('/crfp/api/quotation/load', type='json', auth='user')
+    @http.route('/crfp/api/quotation/load', type='jsonrpc', auth='user')
     def load_quotation(self, quotation_id):
         """Load full quotation with lines."""
         q = request.env['crfp.quotation'].browse(quotation_id)
@@ -204,7 +204,7 @@ class CrfpPricingAPI(http.Controller):
             'lines': lines,
         }
 
-    @http.route('/crfp/api/quotation/save', type='json', auth='user')
+    @http.route('/crfp/api/quotation/save', type='jsonrpc', auth='user')
     def save_quotation(self, data):
         """Save (create or update) a full quotation with lines."""
         env = request.env
@@ -271,7 +271,7 @@ class CrfpPricingAPI(http.Controller):
 
     # ─── SALE ORDER CREATION ─────────────────────────────────────
 
-    @http.route('/crfp/api/quotation/create-so', type='json', auth='user')
+    @http.route('/crfp/api/quotation/create-so', type='jsonrpc', auth='user')
     def create_sale_order(self, quotation_id):
         """Create sale.order from a quotation."""
         quotation = request.env['crfp.quotation'].browse(quotation_id)
@@ -285,7 +285,7 @@ class CrfpPricingAPI(http.Controller):
 
     # ─── PARTNERS ────────────────────────────────────────────────
 
-    @http.route('/crfp/api/partners', type='json', auth='user')
+    @http.route('/crfp/api/partners', type='jsonrpc', auth='user')
     def get_partners(self):
         """Get all contacts for the client selector."""
         return request.env['res.partner'].search_read(
@@ -297,7 +297,7 @@ class CrfpPricingAPI(http.Controller):
 
     # ─── PRICE HISTORY ───────────────────────────────────────────
 
-    @http.route('/crfp/api/price-history', type='json', auth='user')
+    @http.route('/crfp/api/price-history', type='jsonrpc', auth='user')
     def get_price_history(self, product_id=None):
         """Get price history, optionally for a specific product."""
         domain = []
@@ -312,7 +312,7 @@ class CrfpPricingAPI(http.Controller):
 
     # ─── FIXED COSTS (save from calculator) ──────────────────────
 
-    @http.route('/crfp/api/fixed-costs/save', type='json', auth='user')
+    @http.route('/crfp/api/fixed-costs/save', type='jsonrpc', auth='user')
     def save_fixed_costs(self, vals):
         """Update fixed costs from the calculator UI."""
         fc = request.env['crfp.fixed.cost'].get_fixed_costs()
