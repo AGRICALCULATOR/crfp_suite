@@ -1,0 +1,390 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     CR Farm Logistics — Customer Portal Templates
+     Base: portal.portal_layout (Odoo 19 standard portal)
+     ═══════════════════════════════════════════════════════════════════════ -->
+
+<!-- ── Portal Home — shipment counter badge ── -->
+<template id="portal_home_crfarm_shipments" inherit_id="portal.portal_breadcrumbs"
+          priority="10">
+    <!-- no-op: breadcrumb override not needed -->
+</template>
+
+<!-- Add CR Farm shipments to portal home panel -->
+<template id="portal_my_home_crfarm" inherit_id="portal.portal_my_home"
+          customize_show="True" name="CR Farm Shipments">
+    <xpath expr="//div[contains(@class,'o_portal_docs')]" position="inside">
+        <t t-if="crfarm_shipment_count != None">
+            <div class="col-lg-3 col-md-4 col-sm-6 o_portal_category">
+                <a t-attf-href="/my/crfarm-shipments"
+                   class="o_portal_docs_entry d-flex align-items-center py-2 px-3 gap-3
+                          text-decoration-none rounded-2 border bg-white shadow-sm">
+                    <span class="fs-3">🚢</span>
+                    <span>
+                        <span class="fw-bold text-dark">My Shipments</span>
+                        <t t-if="crfarm_shipment_count">
+                            <span class="badge bg-success ms-2">
+                                <t t-esc="crfarm_shipment_count"/>
+                            </span>
+                        </t>
+                    </span>
+                </a>
+            </div>
+        </t>
+    </xpath>
+</template>
+
+<!-- ════════════════════════════════════════════
+     SHIPMENTS LIST
+     ════════════════════════════════════════════ -->
+<template id="portal_shipments_list" name="My Shipments">
+    <t t-call="portal.portal_layout">
+        <t t-set="breadcrumbs_searchbar" t-value="True"/>
+
+        <t t-call="portal.portal_searchbar">
+            <t t-set="title">My Shipments</t>
+        </t>
+
+        <t t-if="not shipments">
+            <div class="alert alert-info text-center py-5">
+                <div style="font-size:48px; margin-bottom:16px;">🚢</div>
+                <h4>No Shipments Yet</h4>
+                <p class="text-muted">Your confirmed shipments will appear here once processed by CR Farm Products.</p>
+                <a href="/crfarm/contact" class="btn btn-success mt-2">Contact Export Team</a>
+            </div>
+        </t>
+        <t t-else="">
+            <!-- Sort bar -->
+            <div class="d-flex align-items-center gap-2 mb-3 flex-wrap">
+                <span class="text-muted small">Sort by:</span>
+                <t t-foreach="sortby_options" t-as="key">
+                    <a t-attf-href="/my/crfarm-shipments?sortby={{ key }}"
+                       t-att-class="'btn btn-sm ' + ('btn-success' if sortby == key else 'btn-outline-secondary')">
+                        <t t-esc="sortby_options[key][1]"/>
+                    </a>
+                </t>
+            </div>
+
+            <!-- Shipment cards -->
+            <div class="row g-3">
+                <t t-foreach="shipments" t-as="s">
+                    <div class="col-md-6 col-lg-4">
+                        <a t-attf-href="/my/crfarm-shipments/{{ s.id }}"
+                           class="text-decoration-none d-block h-100">
+                            <div class="card h-100 shadow-sm border-0 rounded-3 overflow-hidden
+                                        crfarm-portal-card">
+                                <!-- Status header -->
+                                <div t-attf-class="card-header d-flex justify-content-between align-items-center
+                                                   bg-{{ state_colors.get(s.state, 'secondary') }} bg-opacity-10
+                                                   border-bottom-0 py-2">
+                                    <span class="fw-bold small" style="color:#1B4332;">
+                                        <t t-esc="s.name"/>
+                                    </span>
+                                    <span t-attf-class="badge bg-{{ state_colors.get(s.state,'secondary') }}">
+                                        <t t-esc="state_labels.get(s.state, s.state)"/>
+                                    </span>
+                                </div>
+                                <div class="card-body py-3 px-3">
+                                    <table class="table table-sm table-borderless mb-0 small">
+                                        <tr t-if="s.port_destination_id">
+                                            <td class="text-muted ps-0" style="width:45%">Destination</td>
+                                            <td class="fw-semibold"><t t-esc="s.port_destination_id.name"/></td>
+                                        </tr>
+                                        <tr t-if="s.container_type_id">
+                                            <td class="text-muted ps-0">Container</td>
+                                            <td class="fw-semibold"><t t-esc="s.container_type_id.name"/></td>
+                                        </tr>
+                                        <tr t-if="s.etd">
+                                            <td class="text-muted ps-0">ETD</td>
+                                            <td class="fw-semibold"><t t-esc="s.etd"/></td>
+                                        </tr>
+                                        <tr t-if="s.eta">
+                                            <td class="text-muted ps-0">ETA</td>
+                                            <td class="fw-semibold"><t t-esc="s.eta"/></td>
+                                        </tr>
+                                        <tr t-if="s.container_number">
+                                            <td class="text-muted ps-0">Container #</td>
+                                            <td class="fw-semibold"><t t-esc="s.container_number"/></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="card-footer bg-transparent border-top py-2 px-3">
+                                    <small class="text-muted">
+                                        <t t-if="s.docs_pending_count">
+                                            ⚠️ <t t-esc="s.docs_pending_count"/> docs pending
+                                        </t>
+                                        <t t-else="">
+                                            ✅ Documents complete
+                                        </t>
+                                    </small>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </t>
+            </div>
+
+            <!-- Pager -->
+            <div class="o_portal_pager text-center mt-4">
+                <t t-call="portal.pager"/>
+            </div>
+        </t>
+    </t>
+</template>
+
+<!-- ════════════════════════════════════════════
+     SHIPMENT DETAIL
+     ════════════════════════════════════════════ -->
+<template id="portal_shipment_detail" name="Shipment Detail">
+    <t t-call="portal.portal_layout">
+        <t t-set="o_portal_fullwidth_alert" t-value="True"/>
+
+        <!-- Breadcrumb -->
+        <t t-set="portal_page_header">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="/my/home">My Account</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="/my/crfarm-shipments">My Shipments</a>
+                    </li>
+                    <li class="breadcrumb-item active">
+                        <t t-esc="shipment.name"/>
+                    </li>
+                </ol>
+            </nav>
+        </t>
+
+        <!-- Page content -->
+        <div class="container py-4">
+            <!-- Header card -->
+            <div class="card border-0 shadow-sm rounded-3 mb-4 overflow-hidden">
+                <div style="background:linear-gradient(135deg,#1B4332,#2D6A4F); padding:24px 28px;"
+                     class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                    <div>
+                        <div class="text-white-50 small text-uppercase fw-bold mb-1">Shipment Reference</div>
+                        <h2 class="text-white fw-bold mb-0"><t t-esc="shipment.name"/></h2>
+                    </div>
+                    <span t-attf-class="badge bg-{{ state_color }} fs-6 px-4 py-2">
+                        <t t-esc="state_label"/>
+                    </span>
+                </div>
+
+                <!-- Status progress bar -->
+                <div class="card-body py-3 px-4">
+                    <div class="d-flex gap-1 align-items-center overflow-auto pb-1">
+                        <t t-set="states_seq" t-value="['booking_confirmed','si_sent','loading','shipped','in_transit','arrived','delivered']"/>
+                        <t t-foreach="states_seq" t-as="st">
+                            <t t-set="is_past" t-value="True"/>
+                            <div t-attf-class="flex-shrink-0 px-2 py-1 rounded small fw-semibold
+                                 {{ 'bg-success text-white' if st == shipment.state else ('bg-success bg-opacity-25 text-success' if is_past else 'bg-light text-muted') }}"
+                                 style="font-size:11px;">
+                                <t t-esc="state_labels.get(st, st)"/>
+                            </div>
+                            <t t-if="not st_last">
+                                <div class="text-muted" style="font-size:10px;">›</div>
+                            </t>
+                        </t>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4">
+
+                <!-- LEFT: Shipment details -->
+                <div class="col-lg-8">
+
+                    <!-- Commercial / Route -->
+                    <div class="card border-0 shadow-sm rounded-3 mb-4">
+                        <div class="card-header bg-white fw-bold py-3">
+                            📦 Shipment Details
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-0">
+                                <div class="col-sm-6">
+                                    <table class="table table-sm table-borderless mb-0">
+                                        <tr t-if="shipment.incoterm">
+                                            <td class="text-muted">Incoterm</td>
+                                            <td class="fw-semibold"><t t-esc="shipment.incoterm"/></td>
+                                        </tr>
+                                        <tr t-if="shipment.container_type_id">
+                                            <td class="text-muted">Container</td>
+                                            <td class="fw-semibold"><t t-esc="shipment.container_type_id.name"/></td>
+                                        </tr>
+                                        <tr t-if="shipment.container_number">
+                                            <td class="text-muted">Container #</td>
+                                            <td class="fw-semibold"><t t-esc="shipment.container_number"/></td>
+                                        </tr>
+                                        <tr t-if="shipment.port_origin_id">
+                                            <td class="text-muted">Origin Port</td>
+                                            <td class="fw-semibold"><t t-esc="shipment.port_origin_id.name"/></td>
+                                        </tr>
+                                        <tr t-if="shipment.port_destination_id">
+                                            <td class="text-muted">Destination Port</td>
+                                            <td class="fw-semibold"><t t-esc="shipment.port_destination_id.name"/></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="col-sm-6">
+                                    <table class="table table-sm table-borderless mb-0">
+                                        <tr t-if="shipment.vessel_name">
+                                            <td class="text-muted">Vessel</td>
+                                            <td class="fw-semibold">
+                                                <t t-esc="shipment.vessel_name"/>
+                                                <t t-if="shipment.voyage_number"> / <t t-esc="shipment.voyage_number"/></t>
+                                            </td>
+                                        </tr>
+                                        <tr t-if="shipment.etd">
+                                            <td class="text-muted">ETD</td>
+                                            <td class="fw-semibold"><t t-esc="shipment.etd"/></td>
+                                        </tr>
+                                        <tr t-if="shipment.eta">
+                                            <td class="text-muted">ETA</td>
+                                            <td class="fw-semibold text-success"><t t-esc="shipment.eta"/></td>
+                                        </tr>
+                                        <tr t-if="shipment.atd">
+                                            <td class="text-muted">ATD</td>
+                                            <td class="fw-semibold"><t t-esc="shipment.atd"/></td>
+                                        </tr>
+                                        <tr t-if="shipment.ata">
+                                            <td class="text-muted">ATA</td>
+                                            <td class="fw-semibold text-success"><t t-esc="shipment.ata"/></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cargo lines -->
+                    <t t-if="shipment.line_ids">
+                        <div class="card border-0 shadow-sm rounded-3 mb-4">
+                            <div class="card-header bg-white fw-bold py-3">
+                                🥦 Cargo
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-sm mb-0">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Product</th>
+                                                <th class="text-end">Boxes (Plan)</th>
+                                                <th class="text-end">Boxes (Act.)</th>
+                                                <th class="text-end">Net Weight kg</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <t t-foreach="shipment.line_ids" t-as="line">
+                                                <tr>
+                                                    <td><t t-esc="line.product_name or ''"/></td>
+                                                    <td class="text-end"><t t-esc="line.boxes_planned"/></td>
+                                                    <td class="text-end">
+                                                        <t t-esc="line.boxes_actual"/>
+                                                        <t t-if="line.has_shortage">
+                                                            <span class="badge bg-warning ms-1">shortage</span>
+                                                        </t>
+                                                    </td>
+                                                    <td class="text-end"><t t-esc="'%.2f' % line.net_weight_actual"/></td>
+                                                </tr>
+                                            </t>
+                                        </tbody>
+                                        <tfoot class="table-light fw-bold">
+                                            <tr>
+                                                <td>Total</td>
+                                                <td class="text-end"><t t-esc="shipment.total_boxes_planned"/></td>
+                                                <td class="text-end"><t t-esc="shipment.total_boxes_actual"/></td>
+                                                <td class="text-end"><t t-esc="'%.2f' % shipment.total_net_weight_actual"/></td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+
+                    <!-- Tracking events -->
+                    <t t-if="shipment.tracking_event_ids">
+                        <div class="card border-0 shadow-sm rounded-3 mb-4">
+                            <div class="card-header bg-white fw-bold py-3">
+                                📍 Tracking Events
+                            </div>
+                            <div class="card-body">
+                                <t t-foreach="shipment.tracking_event_ids" t-as="ev">
+                                    <div class="d-flex gap-3 mb-3">
+                                        <div class="text-success fw-bold" style="min-width:120px; font-size:13px;">
+                                            <t t-esc="ev.event_date or ''"/>
+                                        </div>
+                                        <div>
+                                            <div class="fw-semibold small"><t t-esc="ev.location or ''"/></div>
+                                            <div class="text-muted small"><t t-esc="ev.description or ''"/></div>
+                                        </div>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+                    </t>
+
+                </div>
+
+                <!-- RIGHT: Documents -->
+                <div class="col-lg-4">
+                    <div class="card border-0 shadow-sm rounded-3 mb-4">
+                        <div class="card-header bg-white fw-bold py-3">
+                            📄 Documents
+                        </div>
+                        <div class="card-body p-0">
+                            <t t-if="not portal_docs">
+                                <div class="p-4 text-center text-muted small">
+                                    No documents available yet. They will appear here once ready.
+                                </div>
+                            </t>
+                            <t t-else="">
+                                <t t-foreach="portal_docs" t-as="doc">
+                                    <div class="px-3 py-2 border-bottom">
+                                        <div class="fw-semibold small mb-1">
+                                            <t t-esc="doc.doc_type.replace('_',' ').title()"/>
+                                        </div>
+                                        <t t-foreach="doc.attachment_ids" t-as="att">
+                                            <a t-attf-href="/my/crfarm-shipments/{{ shipment.id }}/attachment/{{ att.id }}"
+                                               class="btn btn-sm btn-outline-success mb-1 me-1">
+                                                ⬇ <t t-esc="att.name"/>
+                                            </a>
+                                        </t>
+                                    </div>
+                                </t>
+                            </t>
+                        </div>
+                    </div>
+
+                    <!-- Contact box -->
+                    <div class="card border-0 shadow-sm rounded-3"
+                         style="background:linear-gradient(135deg,#f0fdf4,#d1fae5);">
+                        <div class="card-body p-4 text-center">
+                            <div style="font-size:36px; margin-bottom:12px;">🤝</div>
+                            <h6 class="fw-bold" style="color:#1B4332;">Need Help?</h6>
+                            <p class="text-muted small mb-3">Contact your CR Farm export coordinator for any questions about this shipment.</p>
+                            <a href="/crfarm/contact"
+                               class="btn btn-success btn-sm w-100">Contact Export Team</a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </t>
+</template>
+
+<!-- Small CSS for portal card hover -->
+<template id="portal_assets" inherit_id="web.assets_frontend" customize_show="False">
+    <xpath expr="." position="inside">
+        <style>
+            .crfarm-portal-card { transition: transform 0.2s, box-shadow 0.2s; }
+            .crfarm-portal-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(27,67,50,0.15) !important; }
+        </style>
+    </xpath>
+</template>
+
+</odoo>

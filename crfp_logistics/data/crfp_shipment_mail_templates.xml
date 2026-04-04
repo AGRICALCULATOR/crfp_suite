@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ══════════════════════════════════════════════════════════════
+         CR Farm Logistics — Client Status Notification Email Templates
+         Sent automatically when shipment reaches key states.
+         ══════════════════════════════════════════════════════════════ -->
+
+    <!-- Base: Shipped (vessel departed) -->
+    <record id="email_template_shipment_shipped" model="mail.template">
+        <field name="name">CR Farm: Shipment Departed</field>
+        <field name="model_id" ref="crfp_logistics.model_crfp_shipment"/>
+        <field name="subject">Your shipment {{ object.name }} has departed — CR Farm Products</field>
+        <field name="partner_to">{{ object.partner_id.id }}</field>
+        <field name="auto_delete">True</field>
+        <field name="body_html"><![CDATA[
+<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto; background: #fff; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0;">
+    <div style="background: linear-gradient(135deg, #1B4332, #2D6A4F); padding: 32px 24px; text-align: center;">
+        <h1 style="color: #fff; margin: 0; font-size: 24px;">🚢 Shipment Departed</h1>
+        <p style="color: rgba(255,255,255,0.8); margin: 8px 0 0;">CR Farm Products — Export Update</p>
+    </div>
+    <div style="padding: 32px 24px;">
+        <p style="font-size: 16px; color: #1a1a1a;">Dear {{ object.partner_id.name }},</p>
+        <p style="color: #444; line-height: 1.6;">
+            Great news! Your shipment <strong>{{ object.name }}</strong> has departed and is now on its way to you.
+        </p>
+        <div style="background: #f0fdf4; border-left: 4px solid #2D6A4F; padding: 20px; border-radius: 4px; margin: 24px 0;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr>
+                    <td style="padding: 6px 0; color: #666; width: 40%;">Shipment Reference</td>
+                    <td style="padding: 6px 0; font-weight: 700; color: #1B4332;">{{ object.name }}</td>
+                </tr>
+                {% if object.vessel_name %}
+                <tr>
+                    <td style="padding: 6px 0; color: #666;">Vessel</td>
+                    <td style="padding: 6px 0; font-weight: 600;">{{ object.vessel_name }}{% if object.voyage_number %} / {{ object.voyage_number }}{% endif %}</td>
+                </tr>
+                {% endif %}
+                {% if object.container_number %}
+                <tr>
+                    <td style="padding: 6px 0; color: #666;">Container #</td>
+                    <td style="padding: 6px 0; font-weight: 600;">{{ object.container_number }}</td>
+                </tr>
+                {% endif %}
+                {% if object.port_destination_id %}
+                <tr>
+                    <td style="padding: 6px 0; color: #666;">Destination Port</td>
+                    <td style="padding: 6px 0; font-weight: 600;">{{ object.port_destination_id.name }}</td>
+                </tr>
+                {% endif %}
+                {% if object.eta %}
+                <tr>
+                    <td style="padding: 6px 0; color: #666;">Estimated Arrival (ETA)</td>
+                    <td style="padding: 6px 0; font-weight: 600; color: #1B4332;">{{ object.eta }}</td>
+                </tr>
+                {% endif %}
+            </table>
+        </div>
+        <p style="color: #444; line-height: 1.6;">
+            You can track your shipment status at any time through our
+            <a href="{{ ctx.get('base_url', '') }}/my/crfarm-shipments/{{ object.id }}" style="color: #2D6A4F; font-weight: 600;">customer portal</a>.
+        </p>
+        <p style="color: #444; line-height: 1.6;">
+            If you have any questions, please don't hesitate to contact your CR Farm export coordinator.
+        </p>
+        <p style="margin-top: 32px; color: #1a1a1a;">
+            Best regards,<br/>
+            <strong>CR Farm Products Export Team</strong><br/>
+            San Carlos, Costa Rica
+        </p>
+    </div>
+    <div style="background: #f5f5f5; padding: 16px 24px; text-align: center; font-size: 12px; color: #999;">
+        CR Farm Products VYM S.A. · San Carlos, Alajuela, Costa Rica<br/>
+        <a href="{{ ctx.get('base_url', '') }}/my/crfarm-shipments" style="color: #2D6A4F;">View all your shipments</a>
+    </div>
+</div>
+        ]]></field>
+    </record>
+
+    <!-- Arrived at destination port -->
+    <record id="email_template_shipment_arrived" model="mail.template">
+        <field name="name">CR Farm: Shipment Arrived at Port</field>
+        <field name="model_id" ref="crfp_logistics.model_crfp_shipment"/>
+        <field name="subject">Your shipment {{ object.name }} has arrived — CR Farm Products</field>
+        <field name="partner_to">{{ object.partner_id.id }}</field>
+        <field name="auto_delete">True</field>
+        <field name="body_html"><![CDATA[
+<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto; background: #fff; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0;">
+    <div style="background: linear-gradient(135deg, #1B4332, #2D6A4F); padding: 32px 24px; text-align: center;">
+        <h1 style="color: #fff; margin: 0; font-size: 24px;">⚓ Shipment Arrived</h1>
+        <p style="color: rgba(255,255,255,0.8); margin: 8px 0 0;">CR Farm Products — Export Update</p>
+    </div>
+    <div style="padding: 32px 24px;">
+        <p style="font-size: 16px; color: #1a1a1a;">Dear {{ object.partner_id.name }},</p>
+        <p style="color: #444; line-height: 1.6;">
+            Your shipment <strong>{{ object.name }}</strong> has arrived at the destination port and is ready for customs clearance.
+        </p>
+        <div style="background: #f0fdf4; border-left: 4px solid #2D6A4F; padding: 20px; border-radius: 4px; margin: 24px 0;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr>
+                    <td style="padding: 6px 0; color: #666; width: 40%;">Shipment Reference</td>
+                    <td style="padding: 6px 0; font-weight: 700; color: #1B4332;">{{ object.name }}</td>
+                </tr>
+                {% if object.port_destination_id %}
+                <tr>
+                    <td style="padding: 6px 0; color: #666;">Arrival Port</td>
+                    <td style="padding: 6px 0; font-weight: 600;">{{ object.port_destination_id.name }}</td>
+                </tr>
+                {% endif %}
+                {% if object.container_number %}
+                <tr>
+                    <td style="padding: 6px 0; color: #666;">Container #</td>
+                    <td style="padding: 6px 0; font-weight: 600;">{{ object.container_number }}</td>
+                </tr>
+                {% endif %}
+            </table>
+        </div>
+        <p style="color: #444; line-height: 1.6;">
+            Please ensure your customs broker is ready to proceed with the import declaration.
+            All required shipping documents are available for download in your
+            <a href="{{ ctx.get('base_url', '') }}/my/crfarm-shipments/{{ object.id }}" style="color: #2D6A4F; font-weight: 600;">customer portal</a>.
+        </p>
+        <p style="margin-top: 32px; color: #1a1a1a;">
+            Best regards,<br/>
+            <strong>CR Farm Products Export Team</strong>
+        </p>
+    </div>
+    <div style="background: #f5f5f5; padding: 16px 24px; text-align: center; font-size: 12px; color: #999;">
+        CR Farm Products VYM S.A. · San Carlos, Alajuela, Costa Rica
+    </div>
+</div>
+        ]]></field>
+    </record>
+
+    <!-- Delivered -->
+    <record id="email_template_shipment_delivered" model="mail.template">
+        <field name="name">CR Farm: Shipment Delivered</field>
+        <field name="model_id" ref="crfp_logistics.model_crfp_shipment"/>
+        <field name="subject">Your shipment {{ object.name }} is delivered — CR Farm Products</field>
+        <field name="partner_to">{{ object.partner_id.id }}</field>
+        <field name="auto_delete">True</field>
+        <field name="body_html"><![CDATA[
+<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto; background: #fff; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0;">
+    <div style="background: linear-gradient(135deg, #1B4332, #2D6A4F); padding: 32px 24px; text-align: center;">
+        <h1 style="color: #fff; margin: 0; font-size: 24px;">✅ Shipment Delivered</h1>
+        <p style="color: rgba(255,255,255,0.8); margin: 8px 0 0;">CR Farm Products — Export Update</p>
+    </div>
+    <div style="padding: 32px 24px;">
+        <p style="font-size: 16px; color: #1a1a1a;">Dear {{ object.partner_id.name }},</p>
+        <p style="color: #444; line-height: 1.6;">
+            We're pleased to confirm that your shipment <strong>{{ object.name }}</strong> has been delivered successfully. Thank you for your continued business with CR Farm Products.
+        </p>
+        <div style="background: #f0fdf4; border-left: 4px solid #2D6A4F; padding: 20px; border-radius: 4px; margin: 24px 0;">
+            <p style="margin: 0; color: #1B4332; font-weight: 600;">Need to place your next order?</p>
+            <p style="margin: 8px 0 0; color: #444; font-size: 14px;">Our export team is ready to prepare a quotation for your next shipment.</p>
+        </div>
+        <div style="text-align: center; margin: 32px 0;">
+            <a href="{{ ctx.get('base_url', '') }}/crfarm/contact" style="background: #1B4332; color: #fff; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 700; display: inline-block;">
+                Request Next Quotation
+            </a>
+        </div>
+        <p style="margin-top: 32px; color: #1a1a1a;">
+            Best regards,<br/>
+            <strong>CR Farm Products Export Team</strong>
+        </p>
+    </div>
+    <div style="background: #f5f5f5; padding: 16px 24px; text-align: center; font-size: 12px; color: #999;">
+        CR Farm Products VYM S.A. · San Carlos, Alajuela, Costa Rica
+    </div>
+</div>
+        ]]></field>
+    </record>
+
+</odoo>

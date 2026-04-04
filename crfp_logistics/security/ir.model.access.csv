@@ -26,3 +26,8 @@ access_crfp_document_type_manager,crfp.document.type.manager,model_crfp_document
 access_crfp_container_config_user,crfp.container.config.user,model_crfp_container_config,base.group_user,1,1,1,0
 access_crfp_container_config_manager,crfp.container.config.manager,model_crfp_container_config,group_crfp_logistics_manager,1,1,1,1
 access_crfp_container_config_wizard_user,crfp.container.config.wizard.user,model_crfp_container_config_wizard,base.group_user,1,1,1,1
+access_crfp_shipment_portal,crfp.shipment.portal,model_crfp_shipment,base.group_portal,1,0,0,0
+access_crfp_shipment_document_portal,crfp.shipment.document.portal,model_crfp_shipment_document,base.group_portal,1,0,0,0
+access_crfp_shipment_line_portal,crfp.shipment.line.portal,model_crfp_shipment_line,base.group_portal,1,0,0,0
+access_crfp_shipment_container_portal,crfp.shipment.container.portal,model_crfp_shipment_container,base.group_portal,1,0,0,0
+access_crfp_tracking_event_portal,crfp.tracking.event.portal,model_crfp_tracking_event,base.group_portal,1,0,0,0
