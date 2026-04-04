@@ -2,249 +2,296 @@
 <odoo>
 
 <!-- ═══════════════════════════════════════════════════════════════════════
-     CR FARM WEBSITE — QWeb Templates
-     Content migrated from crfarmproducts.com
+     CR FARM PRODUCTS — Corporate B2B Website Templates
+     Target audience: importers, distributors, supermarket chains
      ═══════════════════════════════════════════════════════════════════════ -->
 
-<!-- ═══ HOME PAGE ═══ -->
-<template id="page_home" name="CR Farm — Inicio">
+<!-- ════════════════════════════════════════════
+     HOME PAGE
+     ════════════════════════════════════════════ -->
+<template id="page_home" name="CR Farm — Home">
     <t t-call="website.layout">
-        <t t-set="title">CR Farm Products | Agricultural Exports from Costa Rica</t>
-        <t t-set="meta_description">CR Farm Products exports fresh tropical roots, cassava, eddoes, malanga, and more from Costa Rica to the USA, Europe and the Caribbean. GLOBALG.A.P. certified.</t>
+        <t t-set="title">CR Farm Products | Tropical Agricultural Exports from Costa Rica</t>
+        <t t-set="meta_description">CR Farm Products — GLOBALG.A.P. certified exporter of cassava, eddoes, malanga, taro and tropical roots from Costa Rica. Serving importers and distributors in the USA, Europe and Caribbean.</t>
 
-        <!-- Hero -->
-        <section class="crfarm-hero d-flex align-items-center" style="min-height:540px; background:linear-gradient(135deg,#1a5c2a 0%,#2e8b47 60%,#4caf50 100%); color:#fff;">
-            <div class="container py-5">
-                <div class="row align-items-center">
-                    <div class="col-lg-8">
-                        <p class="text-uppercase fw-bold mb-2" style="letter-spacing:3px; color:#a8e6b0;">San Carlos, Costa Rica</p>
-                        <h1 class="display-4 fw-bold mb-3">We Harvest for You<br/>&amp; Your Family's Health</h1>
-                        <p class="lead mb-4 opacity-90">Family-owned agricultural export company specializing in cassava, eddoes, malanga and tropical roots. Serving buyers in the United States, Europe and the Caribbean since 2005.</p>
+        <!-- ── HERO ── -->
+        <section class="crfarm-hero d-flex align-items-center">
+            <div class="container py-5 py-lg-6 position-relative">
+                <div class="row align-items-center gy-4">
+                    <div class="col-lg-7">
+                        <div class="crfarm-hero-badge">San Carlos, Costa Rica · Est. 2005</div>
+                        <h1 class="crfarm-hero h1 mb-4">
+                            Your Reliable Partner for<br/>
+                            <span style="color:#D4A017;">Tropical Agricultural</span><br/>
+                            Exports
+                        </h1>
+                        <p class="lead mb-5" style="color:rgba(255,255,255,0.88); font-size:1.15rem;">
+                            GLOBALG.A.P. certified exporter of cassava, eddoes, malanga, taro and tropical roots.
+                            Serving importers, distributors and supermarket chains in the USA, Europe and the Caribbean.
+                        </p>
                         <div class="d-flex gap-3 flex-wrap">
-                            <a href="/crfarm/products" class="btn btn-warning btn-lg fw-bold px-4">View Products</a>
-                            <a href="/crfarm/contact" class="btn btn-outline-light btn-lg px-4">Get a Quote</a>
+                            <a href="/crfarm/products" class="crfarm-hero-cta-primary">View Product Catalog</a>
+                            <a href="/crfarm/contact" class="crfarm-hero-cta-secondary">Request a Quote</a>
                         </div>
                     </div>
-                    <div class="col-lg-4 text-center d-none d-lg-block">
-                        <div style="font-size:7rem; line-height:1;">🌱</div>
-                        <p class="mt-2 fw-bold" style="color:#a8e6b0;">From our fields to your table</p>
+                    <div class="col-lg-5 d-none d-lg-block">
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <div class="crfarm-stats-bar rounded-3 p-3 text-center text-white">
+                                    <div class="fw-800 fs-3">20+</div>
+                                    <div class="small opacity-75">Years Exporting</div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="crfarm-stats-bar rounded-3 p-3 text-center text-white">
+                                    <div class="fw-800 fs-3">8+</div>
+                                    <div class="small opacity-75">Export Products</div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="crfarm-stats-bar rounded-3 p-3 text-center text-white">
+                                    <div class="fw-800 fs-3">3</div>
+                                    <div class="small opacity-75">Key Markets</div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="crfarm-stats-bar rounded-3 p-3 text-center text-white">
+                                    <div class="fw-800 fs-3">GAP</div>
+                                    <div class="small opacity-75">GLOBALG.A.P. Cert.</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Certifications bar -->
-        <section style="background:#2e8b47; color:#fff;">
-            <div class="container py-3">
-                <div class="row align-items-center text-center g-0">
-                    <div class="col-12 col-md-3 border-end border-white border-opacity-25 py-2">
+        <!-- ── CERTIFICATIONS STRIP ── -->
+        <div class="crfarm-cert-strip">
+            <div class="container">
+                <div class="row g-0 text-center">
+                    <div class="col-6 col-md-3 crfarm-cert-item border-end border-white border-opacity-10">
                         <div class="fw-bold">✅ GLOBALG.A.P.</div>
                         <div class="small opacity-75">Food Safety Certified</div>
                     </div>
-                    <div class="col-12 col-md-3 border-end border-white border-opacity-25 py-2">
+                    <div class="col-6 col-md-3 crfarm-cert-item border-end border-white border-opacity-10">
                         <div class="fw-bold">🇨🇷 Esencial Costa Rica</div>
-                        <div class="small opacity-75">Country Brand Certified</div>
+                        <div class="small opacity-75">Country Brand</div>
                     </div>
-                    <div class="col-12 col-md-3 border-end border-white border-opacity-25 py-2">
+                    <div class="col-6 col-md-3 crfarm-cert-item border-end border-white border-opacity-10">
                         <div class="fw-bold">🏢 PYME Costa Rica</div>
                         <div class="small opacity-75">Certified SME</div>
                     </div>
-                    <div class="col-12 col-md-3 py-2">
-                        <div class="fw-bold">☀️ Renewable Energy</div>
-                        <div class="small opacity-75">Sustainable Operations</div>
+                    <div class="col-6 col-md-3 crfarm-cert-item">
+                        <div class="fw-bold">🌿 Sustainable</div>
+                        <div class="small opacity-75">Renewable Energy</div>
                     </div>
                 </div>
             </div>
-        </section>
+        </div>
 
-        <!-- Product highlights -->
-        <section class="py-5">
+        <!-- ── PRODUCT CATEGORIES ── -->
+        <section class="py-6" style="background:#fff;">
             <div class="container">
-                <h2 class="text-center fw-bold mb-2" style="color:#1a5c2a;">Our Products</h2>
-                <p class="text-center text-muted mb-5">Grown in the best agroclimatic zones of Costa Rica — available year-round</p>
+                <div class="text-center mb-5 crfarm-reveal">
+                    <div class="crfarm-section-tag">Our Portfolio</div>
+                    <h2 class="crfarm-section-title display-6">Tropical Products for International Markets</h2>
+                    <p class="text-muted">Grown in Costa Rica's volcanic highlands — consistent quality, year-round availability</p>
+                </div>
                 <div class="row g-4">
-                    <t t-foreach="product_groups" t-as="cat_key">
-                        <div class="col-sm-6 col-lg-3">
-                            <a t-att-href="'/crfarm/products#' + cat_key" class="text-decoration-none">
-                                <div class="card h-100 border-0 shadow-sm text-center p-3 crfarm-product-card" style="transition:transform .2s;">
-                                    <div class="fs-1 mb-2">
-                                        <t t-if="cat_key == 'tubers'">🌱</t>
-                                        <t t-elif="cat_key == 'coconut'">🥥</t>
-                                        <t t-elif="cat_key == 'sugar_cane'">🎋</t>
-                                        <t t-else="">🥦</t>
+                    <t t-foreach="website_products" t-as="product">
+                        <div class="col-sm-6 col-lg-3 crfarm-reveal" t-att-style="'transition-delay:' + str(product_index * 0.1) + 's'">
+                            <div class="crfarm-product-card">
+                                <t t-if="product.image_url">
+                                    <img t-att-src="product.image_url" t-att-alt="product.name"
+                                         class="crfarm-product-img" loading="lazy"/>
+                                </t>
+                                <t t-else="">
+                                    <div class="crfarm-product-img-placeholder">🌱</div>
+                                </t>
+                                <div class="crfarm-product-body">
+                                    <span class="crfarm-product-category-badge">
+                                        <t t-esc="product.category"/>
+                                    </span>
+                                    <div class="crfarm-product-name"><t t-esc="product.name"/></div>
+                                    <div class="crfarm-product-scientific"><t t-esc="product.scientific_name"/></div>
+                                    <div class="crfarm-product-spec-row">
+                                        <span class="crfarm-spec-label">Season</span>
+                                        <span class="crfarm-spec-value"><t t-esc="product.production_season"/></span>
                                     </div>
-                                    <h5 class="fw-bold mb-1" style="color:#1a5c2a;">
-                                        <t t-esc="product_groups[cat_key]['label']"/>
-                                    </h5>
-                                    <p class="small text-muted mb-0">
-                                        <t t-esc="len(product_groups[cat_key]['products'])"/> varieties available
-                                    </p>
+                                    <div class="crfarm-format-tags">
+                                        <t t-if="product.format_fresh"><span class="crfarm-format-tag">Fresh</span></t>
+                                        <t t-if="product.format_peeled"><span class="crfarm-format-tag">Peeled</span></t>
+                                        <t t-if="product.format_frozen"><span class="crfarm-format-tag">Frozen</span></t>
+                                    </div>
+                                    <div class="crfarm-product-actions">
+                                        <a href="/crfarm/products" class="crfarm-btn-primary">View Specs</a>
+                                        <a href="/crfarm/contact" class="crfarm-btn-outline">Inquiry</a>
+                                    </div>
                                 </div>
-                            </a>
+                            </div>
                         </div>
                     </t>
                 </div>
-                <div class="text-center mt-4">
-                    <a href="/crfarm/products" class="btn btn-success px-5">Full Product Catalog →</a>
+                <div class="text-center mt-5 crfarm-reveal">
+                    <a href="/crfarm/products" class="crfarm-hero-cta-primary" style="background:var(--crfarm-primary); color:#fff;">
+                        Full Technical Catalog →
+                    </a>
                 </div>
             </div>
         </section>
 
-        <!-- Why CR Farm -->
-        <section class="py-5" style="background:#f8fdf9;">
+        <!-- ── MARKETS ── -->
+        <section class="py-5" style="background:var(--crfarm-bg-light);">
+            <div class="container text-center">
+                <div class="crfarm-reveal">
+                    <div class="crfarm-section-tag">Our Markets</div>
+                    <h2 class="crfarm-section-title h3 mb-4">Serving International Buyers in 3 Regions</h2>
+                </div>
+                <div class="d-flex gap-3 flex-wrap justify-content-center crfarm-reveal crfarm-reveal-delay-1">
+                    <span class="crfarm-market-badge">🇺🇸 United States</span>
+                    <span class="crfarm-market-badge">🇨🇦 Canada</span>
+                    <span class="crfarm-market-badge">🇪🇸 Spain</span>
+                    <span class="crfarm-market-badge">🇬🇧 United Kingdom</span>
+                    <span class="crfarm-market-badge">🇳🇱 Netherlands</span>
+                    <span class="crfarm-market-badge">🇮🇹 Italy</span>
+                    <span class="crfarm-market-badge">🏝️ Caribbean</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- ── WHY CR FARM ── -->
+        <section class="py-6" style="background:#fff;">
             <div class="container">
-                <h2 class="text-center fw-bold mb-2" style="color:#1a5c2a;">Why Choose CR Farm?</h2>
-                <p class="text-center text-muted mb-5">Reliable partners in tropical agricultural exports</p>
+                <div class="text-center mb-5 crfarm-reveal">
+                    <div class="crfarm-section-tag">Why CR Farm</div>
+                    <h2 class="crfarm-section-title display-6">Built for Reliable International Trade</h2>
+                </div>
                 <div class="row g-4">
-                    <div class="col-md-4 text-center">
-                        <div class="display-6 mb-3">💰</div>
-                        <h5 class="fw-bold">Competitive Pricing</h5>
-                        <p class="text-muted">Competitive pricing relative to quality with direct access to our own production farms in San Carlos.</p>
+                    <div class="col-md-4 crfarm-reveal crfarm-reveal-delay-1">
+                        <div class="crfarm-why-card">
+                            <span class="crfarm-why-icon">🏅</span>
+                            <h5 class="fw-bold mb-2" style="color:var(--crfarm-primary);">GLOBALG.A.P. Certified</h5>
+                            <p class="text-muted mb-0">Full food safety traceability from our fields to your port. Required certification for European retail chains and US importers.</p>
+                        </div>
                     </div>
-                    <div class="col-md-4 text-center">
-                        <div class="display-6 mb-3">📦</div>
-                        <h5 class="fw-bold">Custom Packaging</h5>
-                        <p class="text-muted">Box design and branding support. Flexible packaging options: fresh, peeled or frozen for USA, Europe and Caribbean specs.</p>
+                    <div class="col-md-4 crfarm-reveal crfarm-reveal-delay-2">
+                        <div class="crfarm-why-card">
+                            <span class="crfarm-why-icon">📦</span>
+                            <h5 class="fw-bold mb-2" style="color:var(--crfarm-primary);">Flexible Packaging</h5>
+                            <p class="text-muted mb-0">EU-spec 20 kg boxes and USA 40 lb boxes. Custom sizing available. Peeled vacuum-packed and IQF frozen formats for foodservice.</p>
+                        </div>
                     </div>
-                    <div class="col-md-4 text-center">
-                        <div class="display-6 mb-3">🤝</div>
-                        <h5 class="fw-bold">Personalized Service</h5>
-                        <p class="text-muted">Extended customer service hours with agricultural expertise. Freight rate quotations and full export documentation handled in-house.</p>
+                    <div class="col-md-4 crfarm-reveal crfarm-reveal-delay-3">
+                        <div class="crfarm-why-card">
+                            <span class="crfarm-why-icon">🚢</span>
+                            <h5 class="fw-bold mb-2" style="color:var(--crfarm-primary);">Full-Container Exports</h5>
+                            <p class="text-muted mb-0">Direct FCL and LCL shipments from Puerto Limón. FOB, CIF, CFR and DAP incoterms available. Experienced logistics team.</p>
+                        </div>
                     </div>
-                    <div class="col-md-4 text-center">
-                        <div class="display-6 mb-3">🌡️</div>
-                        <h5 class="fw-bold">Product Freshness</h5>
-                        <p class="text-muted">Guaranteed freshness with refrigerated containers and strict cold-chain management from harvest to port of destination.</p>
+                    <div class="col-md-4 crfarm-reveal crfarm-reveal-delay-1">
+                        <div class="crfarm-why-card">
+                            <span class="crfarm-why-icon">📅</span>
+                            <h5 class="fw-bold mb-2" style="color:var(--crfarm-primary);">Year-Round Availability</h5>
+                            <p class="text-muted mb-0">Costa Rica's equatorial climate and volcanic soil enable continuous harvest. No seasonal gaps for your supply chain.</p>
+                        </div>
                     </div>
-                    <div class="col-md-4 text-center">
-                        <div class="display-6 mb-3">☀️</div>
-                        <h5 class="fw-bold">Sustainability</h5>
-                        <p class="text-muted">Renewable energy usage in our operations. Certified by Esencial Costa Rica for sustainability, innovation and ethical practices.</p>
+                    <div class="col-md-4 crfarm-reveal crfarm-reveal-delay-2">
+                        <div class="crfarm-why-card">
+                            <span class="crfarm-why-icon">🌿</span>
+                            <h5 class="fw-bold mb-2" style="color:var(--crfarm-primary);">Sustainable Farming</h5>
+                            <p class="text-muted mb-0">Powered by renewable energy. Environmentally responsible practices certified by Esencial Costa Rica country brand program.</p>
+                        </div>
                     </div>
-                    <div class="col-md-4 text-center">
-                        <div class="display-6 mb-3">✅</div>
-                        <h5 class="fw-bold">GLOBALG.A.P. Certified</h5>
-                        <p class="text-muted">International certification ensuring the highest standards of food safety, worker welfare and environmental care.</p>
+                    <div class="col-md-4 crfarm-reveal crfarm-reveal-delay-3">
+                        <div class="crfarm-why-card">
+                            <span class="crfarm-why-icon">🤝</span>
+                            <h5 class="fw-bold mb-2" style="color:var(--crfarm-primary);">Family Business Commitment</h5>
+                            <p class="text-muted mb-0">Founded in 2005 by the Vega brothers. Direct owner relationships, responsive communication, and long-term partnership focus.</p>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Markets -->
-        <section class="py-5">
-            <div class="container">
-                <h2 class="text-center fw-bold mb-2" style="color:#1a5c2a;">Export Markets</h2>
-                <p class="text-center text-muted mb-4">We export tropical products to buyers across three continents</p>
-                <div class="d-flex flex-wrap justify-content-center gap-3">
-                    <span class="badge rounded-pill px-4 py-2 fs-6" style="background:#1a5c2a;">🇺🇸 United States</span>
-                    <span class="badge rounded-pill px-4 py-2 fs-6" style="background:#1a5c2a;">🇫🇷 France</span>
-                    <span class="badge rounded-pill px-4 py-2 fs-6" style="background:#1a5c2a;">🇪🇸 Spain</span>
-                    <span class="badge rounded-pill px-4 py-2 fs-6" style="background:#1a5c2a;">🇳🇱 Netherlands</span>
-                    <span class="badge rounded-pill px-4 py-2 fs-6" style="background:#1a5c2a;">🇬🇧 United Kingdom</span>
-                    <span class="badge rounded-pill px-4 py-2 fs-6" style="background:#2e8b47;">🌊 Caribbean</span>
+        <!-- ── CTA ── -->
+        <section class="crfarm-cta-section py-6">
+            <div class="container text-center">
+                <div class="crfarm-reveal">
+                    <h2 class="h2 fw-bold text-white mb-3">Ready to Start Importing?</h2>
+                    <p class="text-white opacity-75 mb-4 lead">Contact our export team for pricing, samples, and technical specifications.</p>
+                    <div class="d-flex gap-3 justify-content-center flex-wrap">
+                        <a href="/crfarm/contact" class="crfarm-hero-cta-primary">Request a Quote</a>
+                        <a href="https://wa.me/50688888888" target="_blank"
+                           class="crfarm-hero-cta-secondary">
+                            💬 WhatsApp Us
+                        </a>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- CTA -->
-        <section class="py-5 text-center" style="background:#1a5c2a; color:#fff;">
-            <div class="container">
-                <h2 class="fw-bold mb-3">Ready to import tropical products from Costa Rica?</h2>
-                <p class="lead opacity-90 mb-4">Tell us about your business and we'll send you a personalized quote.</p>
-                <div class="d-flex justify-content-center gap-3 flex-wrap">
-                    <a href="/crfarm/contact" class="btn btn-warning btn-lg px-5 fw-bold">Request a Quote</a>
-                    <a href="https://wa.me/50663141562" target="_blank" class="btn btn-outline-light btn-lg px-4">💬 WhatsApp</a>
-                </div>
-                <p class="mt-3 opacity-75 small">📞 CR: (+506) 2462-1338 &nbsp;|&nbsp; 🇺🇸 US: (786) 247-4565</p>
-            </div>
-        </section>
     </t>
 </template>
 
-
-<!-- ═══ ABOUT US ═══ -->
-<template id="page_about" name="CR Farm — About">
+<!-- ════════════════════════════════════════════
+     ABOUT PAGE
+     ════════════════════════════════════════════ -->
+<template id="page_about" name="CR Farm — About Us">
     <t t-call="website.layout">
-        <t t-set="title">About Us | CR Farm Products</t>
+        <t t-set="title">About CR Farm Products | Costa Rican Agricultural Exporter</t>
+        <t t-set="meta_description">CR Farm Products VYM S.A. — family-owned Costa Rican exporter of tropical root vegetables. GLOBALG.A.P. certified since 2005.</t>
 
-        <section style="background:linear-gradient(135deg,#1a5c2a,#2e8b47); color:#fff;" class="py-5">
+        <!-- Page Hero -->
+        <section style="background:linear-gradient(135deg,var(--crfarm-primary),var(--crfarm-accent)); color:#fff; padding:80px 0 60px;">
             <div class="container text-center">
-                <h1 class="display-5 fw-bold">About CR Farm Products</h1>
-                <p class="lead opacity-90 mt-2">A family-owned agricultural legacy from San Carlos, Costa Rica</p>
+                <div class="crfarm-section-tag" style="color:#D4A017;">Our Story</div>
+                <h1 class="display-5 fw-bold text-white mt-2">About CR Farm Products</h1>
+                <p class="lead text-white opacity-75 mt-3">A Costa Rican family committed to delivering the world's finest tropical roots</p>
             </div>
         </section>
 
-        <section class="py-5">
+        <!-- Company Story -->
+        <section class="py-6" style="background:#fff;">
             <div class="container">
-                <div class="row align-items-center g-5">
-                    <div class="col-lg-6">
-                        <h2 class="fw-bold mb-4" style="color:#1a5c2a;">Our Story</h2>
-                        <p class="lead">CR Farm Products is a family-owned agricultural export business based in San Carlos, Costa Rica, specializing in cassava (yuca) and eddoes (ñampi), along with a wide range of tropical root vegetables.</p>
-                        <p>Our roots trace back generations. Our founder's grandparents and great-grandparents were deeply connected to the land, and this agricultural tradition was carried forward by each generation. In <strong>2005, four brothers</strong> expanded this family legacy by formally establishing CR Farm Products.</p>
-                        <p>We began by exporting <strong>ginger and squash</strong> to the United States. Over the years, we broadened our product range and expanded into European and Caribbean markets, always maintaining our core commitment to quality and family values.</p>
-                        <div class="mt-4">
-                            <a href="/crfarm/history" class="btn btn-outline-success me-2">Our History →</a>
-                            <a href="/crfarm/contact" class="btn btn-success">Contact Us</a>
-                        </div>
+                <div class="row align-items-center gy-5">
+                    <div class="col-lg-6 crfarm-reveal">
+                        <div class="crfarm-section-tag">Founded 2005</div>
+                        <h2 class="crfarm-section-title h2">From the Volcanic Highlands of San Carlos</h2>
+                        <p class="text-muted mb-3">CR Farm Products VYM S.A. was founded in 2005 by four brothers from San Carlos, Costa Rica — a region known for its fertile volcanic soil, high rainfall, and ideal agroclimatic conditions for tropical root vegetables.</p>
+                        <p class="text-muted mb-3">What started as a small family farm has grown into a professionally managed export operation serving importers, distributors, and supermarket chains in the United States, Europe, and the Caribbean.</p>
+                        <p class="text-muted">We operate our own packing facility, maintain full traceability from field to container, and hold GLOBALG.A.P. certification — the standard demanded by European retail chains and major US importers.</p>
                     </div>
-                    <div class="col-lg-6">
+                    <div class="col-lg-6 crfarm-reveal crfarm-reveal-delay-2">
                         <div class="row g-3">
                             <div class="col-6">
-                                <div class="card border-0 shadow-sm p-3 text-center">
-                                    <div class="fw-bold fs-2 mb-1" style="color:#2e8b47;">2005</div>
-                                    <div class="text-muted small">Year founded by 4 brothers</div>
+                                <div class="crfarm-cert-card text-center">
+                                    <span class="crfarm-cert-icon">🌋</span>
+                                    <div class="fw-bold" style="color:var(--crfarm-primary);">San Carlos</div>
+                                    <div class="small text-muted">Alajuela Province, Costa Rica</div>
                                 </div>
                             </div>
                             <div class="col-6">
-                                <div class="card border-0 shadow-sm p-3 text-center">
-                                    <div class="fw-bold fs-2 mb-1" style="color:#2e8b47;">6+</div>
-                                    <div class="text-muted small">Export destinations</div>
+                                <div class="crfarm-cert-card text-center">
+                                    <span class="crfarm-cert-icon">👨‍👨‍👦‍👦</span>
+                                    <div class="fw-bold" style="color:var(--crfarm-primary);">Family Owned</div>
+                                    <div class="small text-muted">4 Brothers · 20+ Years</div>
                                 </div>
                             </div>
                             <div class="col-6">
-                                <div class="card border-0 shadow-sm p-3 text-center">
-                                    <div class="fw-bold fs-2 mb-1" style="color:#2e8b47;">8+</div>
-                                    <div class="text-muted small">Product varieties</div>
+                                <div class="crfarm-cert-card text-center">
+                                    <span class="crfarm-cert-icon">✅</span>
+                                    <div class="fw-bold" style="color:var(--crfarm-primary);">GLOBALG.A.P.</div>
+                                    <div class="small text-muted">Food Safety Certified</div>
                                 </div>
                             </div>
                             <div class="col-6">
-                                <div class="card border-0 shadow-sm p-3 text-center">
-                                    <div class="fw-bold fs-2 mb-1" style="color:#2e8b47;">3</div>
-                                    <div class="text-muted small">International certifications</div>
+                                <div class="crfarm-cert-card text-center">
+                                    <span class="crfarm-cert-icon">🚢</span>
+                                    <div class="fw-bold" style="color:var(--crfarm-primary);">FCL Exports</div>
+                                    <div class="small text-muted">Puerto Limón, CR</div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="py-5" style="background:#f8fdf9;">
-            <div class="container">
-                <h2 class="text-center fw-bold mb-5" style="color:#1a5c2a;">Our Values</h2>
-                <div class="row g-4">
-                    <div class="col-md-4">
-                        <div class="card h-100 border-0 shadow-sm p-4">
-                            <h4 class="fw-bold mb-3" style="color:#2e8b47;">🎯 Our Mission</h4>
-                            <p>To connect Costa Rican agricultural producers with international buyers, delivering fresh tropical products with the highest standards of food safety, quality and service.</p>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card h-100 border-0 shadow-sm p-4">
-                            <h4 class="fw-bold mb-3" style="color:#2e8b47;">🌟 Our Vision</h4>
-                            <p>To be the reference Costa Rican tropical agricultural exporter recognized globally for quality, sustainability and our commitment to the farming communities of San Carlos.</p>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card h-100 border-0 shadow-sm p-4">
-                            <h4 class="fw-bold mb-3" style="color:#2e8b47;">💚 Core Values</h4>
-                            <ul class="mb-0">
-                                <li>High quality standards</li>
-                                <li>Unwavering commitment to work</li>
-                                <li>Deep connection to land and heritage</li>
-                                <li>Transparent and ethical business</li>
-                                <li>Environmental sustainability</li>
-                            </ul>
                         </div>
                     </div>
                 </div>
@@ -252,471 +299,779 @@
         </section>
 
         <!-- Certifications -->
-        <section class="py-5">
+        <section class="py-6" style="background:var(--crfarm-bg-light);">
             <div class="container">
-                <h2 class="text-center fw-bold mb-5" style="color:#1a5c2a;">Our Certifications</h2>
+                <div class="text-center mb-5 crfarm-reveal">
+                    <div class="crfarm-section-tag">Credentials</div>
+                    <h2 class="crfarm-section-title h2">Certifications &amp; Standards</h2>
+                </div>
                 <div class="row g-4 justify-content-center">
-                    <div class="col-md-4 text-center">
-                        <div class="card border-0 shadow-sm p-4 h-100">
-                            <div class="fs-1 mb-3">✅</div>
-                            <h5 class="fw-bold">GLOBALG.A.P.</h5>
-                            <p class="text-muted small">International standard ensuring high standards of food safety, worker welfare and environmental care throughout the supply chain.</p>
+                    <div class="col-md-4 crfarm-reveal crfarm-reveal-delay-1">
+                        <div class="crfarm-cert-card text-center">
+                            <span class="crfarm-cert-icon">🌍</span>
+                            <div class="crfarm-cert-name">GLOBALG.A.P.</div>
+                            <div class="crfarm-cert-issuer">FoodPLUS GmbH</div>
+                            <p class="text-muted small">International food safety standard covering crop production, handling, and traceability. Required by European retailers including Tesco, Carrefour, and Lidl.</p>
+                            <a href="/crfarm/certifications" class="crfarm-btn-outline mt-3">View Certificate</a>
                         </div>
                     </div>
-                    <div class="col-md-4 text-center">
-                        <div class="card border-0 shadow-sm p-4 h-100">
-                            <div class="fs-1 mb-3">🇨🇷</div>
-                            <h5 class="fw-bold">Esencial Costa Rica</h5>
-                            <p class="text-muted small">Costa Rica's country brand certification recognizing sustainability, innovation and ethical practices aligned with the country's global values.</p>
+                    <div class="col-md-4 crfarm-reveal crfarm-reveal-delay-2">
+                        <div class="crfarm-cert-card text-center">
+                            <span class="crfarm-cert-icon">🇨🇷</span>
+                            <div class="crfarm-cert-name">Esencial Costa Rica</div>
+                            <div class="crfarm-cert-issuer">PROCOMER / Costa Rica</div>
+                            <p class="text-muted small">Official Costa Rican country brand recognizing companies that embody sustainability, innovation, and quality. Awarded by PROCOMER.</p>
+                            <a href="/crfarm/certifications" class="crfarm-btn-outline mt-3">Learn More</a>
                         </div>
                     </div>
-                    <div class="col-md-4 text-center">
-                        <div class="card border-0 shadow-sm p-4 h-100">
-                            <div class="fs-1 mb-3">🏢</div>
-                            <h5 class="fw-bold">PYME Costa Rica</h5>
-                            <p class="text-muted small">Certified small and medium enterprise recognized for sustainable growth and supporting local agricultural development in Costa Rica.</p>
+                    <div class="col-md-4 crfarm-reveal crfarm-reveal-delay-3">
+                        <div class="crfarm-cert-card text-center">
+                            <span class="crfarm-cert-icon">🏢</span>
+                            <div class="crfarm-cert-name">PYME Costa Rica</div>
+                            <div class="crfarm-cert-issuer">MEIC — Ministry of Economy</div>
+                            <p class="text-muted small">Certified Small and Medium Enterprise by the Costa Rican Ministry of Economy, Industry and Commerce. Eligible for export promotion programs.</p>
+                            <a href="/crfarm/certifications" class="crfarm-btn-outline mt-3">Learn More</a>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
+
+        <!-- CTA -->
+        <section class="crfarm-cta-section py-5">
+            <div class="container text-center">
+                <h2 class="h3 fw-bold text-white mb-3">Interested in Partnering with Us?</h2>
+                <a href="/crfarm/contact" class="crfarm-hero-cta-primary">Contact Our Export Team</a>
+            </div>
+        </section>
+
     </t>
 </template>
 
-
-<!-- ═══ COMPANY HISTORY ═══ -->
-<template id="page_history" name="CR Farm — History">
+<!-- ════════════════════════════════════════════
+     HISTORY PAGE
+     ════════════════════════════════════════════ -->
+<template id="page_history" name="CR Farm — Company History">
     <t t-call="website.layout">
-        <t t-set="title">Our History | CR Farm Products</t>
+        <t t-set="title">Company History | CR Farm Products</t>
+        <t t-set="meta_description">The story of CR Farm Products — from a San Carlos family farm to an international tropical agricultural exporter serving the USA, Europe and Caribbean.</t>
 
-        <section style="background:linear-gradient(135deg,#1a5c2a,#2e8b47); color:#fff;" class="py-5">
+        <section style="background:linear-gradient(135deg,var(--crfarm-primary),var(--crfarm-accent)); color:#fff; padding:80px 0 60px;">
             <div class="container text-center">
-                <h1 class="display-5 fw-bold">Our History</h1>
-                <p class="lead opacity-90 mt-2">A family legacy rooted in the land of San Carlos, Costa Rica</p>
+                <div class="crfarm-section-tag" style="color:#D4A017;">Our Journey</div>
+                <h1 class="display-5 fw-bold text-white mt-2">20 Years of Growing Excellence</h1>
             </div>
         </section>
 
-        <section class="py-5">
-            <div class="container" style="max-width:800px;">
-
-                <div class="row g-0 mb-5">
-                    <div class="col-auto text-center" style="width:80px;">
-                        <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-2" style="width:52px;height:52px;background:#2e8b47;color:#fff;font-weight:bold;font-size:.8rem;">Roots</div>
-                        <div style="height:100%;width:2px;background:#d0e8d4;margin:0 auto;min-height:60px;"></div>
-                    </div>
-                    <div class="col ps-4 pb-5">
-                        <h4 class="fw-bold" style="color:#1a5c2a;">Generational Roots</h4>
-                        <p>Our agricultural story began long before the company was founded. The founder's grandparents and great-grandparents cultivated deep ties to the land in the verdant valleys of San Carlos, Alajuela — one of Costa Rica's most productive agricultural regions. This love of farming and the land was passed down through each generation.</p>
-                    </div>
-                </div>
-
-                <div class="row g-0 mb-5">
-                    <div class="col-auto text-center" style="width:80px;">
-                        <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-2" style="width:52px;height:52px;background:#2e8b47;color:#fff;font-weight:bold;">2005</div>
-                        <div style="height:100%;width:2px;background:#d0e8d4;margin:0 auto;min-height:60px;"></div>
-                    </div>
-                    <div class="col ps-4 pb-5">
-                        <h4 class="fw-bold" style="color:#1a5c2a;">2005 — CR Farm Products Is Born</h4>
-                        <p>Four brothers decided to formalize the family's agricultural legacy and founded <strong>CR Farm Products</strong>. The company's first exports were <strong>ginger and squash</strong> to buyers in the United States. The positive market response validated the vision: high-quality Costa Rican tropical products had strong international demand.</p>
-                    </div>
-                </div>
-
-                <div class="row g-0 mb-5">
-                    <div class="col-auto text-center" style="width:80px;">
-                        <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-2" style="width:52px;height:52px;background:#2e8b47;color:#fff;font-weight:bold;font-size:.85rem;">2008+</div>
-                        <div style="height:100%;width:2px;background:#d0e8d4;margin:0 auto;min-height:60px;"></div>
-                    </div>
-                    <div class="col ps-4 pb-5">
-                        <h4 class="fw-bold" style="color:#1a5c2a;">Expansion: Cassava, Eddoes &amp; Malanga</h4>
-                        <p>The product portfolio expanded significantly. Cassava (yuca) and eddoes (ñampi) became the flagship exports, complemented by malanga lila, malanga blanca, malanga isleña, ñame and other tropical roots. Each product was carefully selected for its international market appeal and CR Farm's capacity to supply consistently.</p>
-                    </div>
-                </div>
-
-                <div class="row g-0 mb-5">
-                    <div class="col-auto text-center" style="width:80px;">
-                        <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-2" style="width:52px;height:52px;background:#2e8b47;color:#fff;font-weight:bold;font-size:.85rem;">Europe</div>
-                        <div style="height:100%;width:2px;background:#d0e8d4;margin:0 auto;min-height:60px;"></div>
-                    </div>
-                    <div class="col ps-4 pb-5">
-                        <h4 class="fw-bold" style="color:#1a5c2a;">Reaching Europe</h4>
-                        <p>CR Farm Products expanded its export routes to <strong>France, Spain, the Netherlands and the United Kingdom</strong>, tapping into the growing demand from Caribbean and Latin American diaspora communities across Europe. Customized packaging formats were developed for each market's specific requirements.</p>
-                    </div>
-                </div>
-
-                <div class="row g-0 mb-5">
-                    <div class="col-auto text-center" style="width:80px;">
-                        <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-2" style="width:52px;height:52px;background:#2e8b47;color:#fff;font-weight:bold;font-size:.8rem;">Cert.</div>
-                        <div style="height:100%;width:2px;background:#d0e8d4;margin:0 auto;min-height:60px;"></div>
-                    </div>
-                    <div class="col ps-4 pb-5">
-                        <h4 class="fw-bold" style="color:#1a5c2a;">International Certifications</h4>
-                        <p>CR Farm Products achieved <strong>GLOBALG.A.P.</strong> certification, the international benchmark for food safety and sustainable farming. This milestone was followed by the <strong>Esencial Costa Rica</strong> country brand certification and recognition as a <strong>PYME</strong> (certified SME) for sustainable growth and local agricultural development.</p>
-                    </div>
-                </div>
-
-                <div class="row g-0">
-                    <div class="col-auto text-center" style="width:80px;">
-                        <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto" style="width:52px;height:52px;background:#f0a500;color:#fff;font-weight:bold;">Now</div>
-                    </div>
-                    <div class="col ps-4">
-                        <h4 class="fw-bold" style="color:#1a5c2a;">Today — Still Growing</h4>
-                        <p>CR Farm Products continues to grow from its roots in San Carlos, Costa Rica. With offices also in <strong>Miami, Florida</strong>, we serve buyers across three continents. We operate with modern ERP systems for full traceability, renewable energy in our facilities, and a team as committed to excellence as the brothers who started it all in 2005.</p>
-                        <p class="fw-semibold" style="color:#2e8b47;">"We Harvest for You &amp; Your Family's Health" — and always will.</p>
-                    </div>
-                </div>
-
-            </div>
-        </section>
-
-        <section class="py-4 text-center" style="background:#f8fdf9;">
+        <section class="py-6">
             <div class="container">
-                <a href="/crfarm/contact" class="btn btn-success px-5">Become Part of Our Story →</a>
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="crfarm-timeline">
+
+                            <div class="crfarm-timeline-item crfarm-reveal">
+                                <div class="crfarm-timeline-year">Generations Ago</div>
+                                <div class="crfarm-timeline-title">Agricultural Roots</div>
+                                <p class="text-muted">The Vega family has farmed the highlands of San Carlos, Alajuela, for generations. The region's volcanic soil, abundant rainfall, and tropical climate create ideal conditions for root vegetables — knowledge passed down from generation to generation.</p>
+                            </div>
+
+                            <div class="crfarm-timeline-item crfarm-reveal crfarm-reveal-delay-1">
+                                <div class="crfarm-timeline-year">2005</div>
+                                <div class="crfarm-timeline-title">CR Farm Products VYM S.A. Founded</div>
+                                <p class="text-muted">Four brothers formalize the family operation as CR Farm Products VYM S.A. The company begins exporting cassava and eddoes to the US Hispanic market through established importers in Miami and New York.</p>
+                            </div>
+
+                            <div class="crfarm-timeline-item crfarm-reveal crfarm-reveal-delay-2">
+                                <div class="crfarm-timeline-year">2008 – 2012</div>
+                                <div class="crfarm-timeline-title">Product Portfolio Expansion</div>
+                                <p class="text-muted">The company adds malanga lila, malanga isleña, big taro, ñame, and yampi to its export portfolio. Investment in a dedicated packing and cold-chain facility in San Carlos enables consistent quality and capacity for full-container shipments.</p>
+                            </div>
+
+                            <div class="crfarm-timeline-item crfarm-reveal crfarm-reveal-delay-1">
+                                <div class="crfarm-timeline-year">2015</div>
+                                <div class="crfarm-timeline-title">GLOBALG.A.P. Certification</div>
+                                <p class="text-muted">CR Farm Products achieves GLOBALG.A.P. certification — a prerequisite for supplying European retail chains. This opens the door to markets in Spain, the UK, Italy, and the Netherlands, where demand for ethnic tropical vegetables is growing rapidly.</p>
+                            </div>
+
+                            <div class="crfarm-timeline-item crfarm-reveal crfarm-reveal-delay-2">
+                                <div class="crfarm-timeline-year">2018</div>
+                                <div class="crfarm-timeline-title">Esencial Costa Rica &amp; PYME Certifications</div>
+                                <p class="text-muted">Recognized with the Esencial Costa Rica country brand for sustainable practices and commitment to quality. Also certified as PYME Costa Rica, qualifying for export support programs by PROCOMER.</p>
+                            </div>
+
+                            <div class="crfarm-timeline-item crfarm-reveal crfarm-reveal-delay-1">
+                                <div class="crfarm-timeline-year">2020 – Present</div>
+                                <div class="crfarm-timeline-title">Digital Transformation &amp; Growth</div>
+                                <p class="text-muted">Investment in renewable energy for sustainable operations. Expansion of the peeled and frozen product line for foodservice and food processing clients. Implementation of ERP system (Odoo) for full supply-chain traceability and buyer portal access.</p>
+                            </div>
+
+                            <div class="crfarm-timeline-item crfarm-reveal crfarm-reveal-delay-2">
+                                <div class="crfarm-timeline-year">Today</div>
+                                <div class="crfarm-timeline-title">Trusted by Importers Worldwide</div>
+                                <p class="text-muted">CR Farm Products exports year-round to buyers in the USA, Canada, Europe, and the Caribbean. The company maintains direct buyer relationships and offers competitive FOB, CIF, and DAP pricing with 3–5 week lead times from order to delivery at destination port.</p>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
+
+        <section class="crfarm-cta-section py-5">
+            <div class="container text-center">
+                <h2 class="h3 fw-bold text-white mb-3">Be Part of Our Next Chapter</h2>
+                <a href="/crfarm/contact" class="crfarm-hero-cta-primary">Contact Us</a>
+            </div>
+        </section>
+
     </t>
 </template>
 
-
-<!-- ═══ PRODUCT CATALOG ═══ -->
-<template id="page_catalog" name="CR Farm — Products">
+<!-- ════════════════════════════════════════════
+     PRODUCT CATALOG PAGE
+     ════════════════════════════════════════════ -->
+<template id="page_catalog" name="CR Farm — Product Catalog">
     <t t-call="website.layout">
-        <t t-set="title">Our Products | CR Farm Products</t>
-        <t t-set="meta_description">CR Farm Products exports cassava, eddoes, malanga lila, malanga blanca, malanga isleña, ñame and tropical vegetables from Costa Rica. GLOBALG.A.P. certified.</t>
+        <t t-set="title">Product Catalog | CR Farm Products</t>
+        <t t-set="meta_description">Technical specifications for all CR Farm Products: cassava, eddoes, malanga, taro, yam. HS codes, packaging by market, available formats.</t>
 
-        <section style="background:linear-gradient(135deg,#1a5c2a,#2e8b47); color:#fff;" class="py-5">
+        <section style="background:linear-gradient(135deg,var(--crfarm-primary),var(--crfarm-accent)); color:#fff; padding:80px 0 60px;">
             <div class="container text-center">
-                <h1 class="display-5 fw-bold">Our Products</h1>
-                <p class="lead opacity-90 mt-2">Fresh tropical roots and vegetables from San Carlos, Costa Rica</p>
+                <div class="crfarm-section-tag" style="color:#D4A017;">B2B Technical Catalog</div>
+                <h1 class="display-5 fw-bold text-white mt-2">Our Export Products</h1>
+                <p class="lead text-white opacity-75 mt-3">Full technical specifications for international buyers and importers</p>
             </div>
         </section>
 
-        <!-- Product specs reference -->
-        <section class="py-3" style="background:#f8fdf9; border-bottom:1px solid #e0f0e3;">
+        <section class="py-5" style="background:#fff;">
             <div class="container">
-                <div class="row text-center small text-muted g-2">
-                    <div class="col-md-3">📦 <strong>Packaging:</strong> Europe (10-18 kg) / USA-Canada (13.65-16 kg)</div>
-                    <div class="col-md-3">🌡️ <strong>Condition:</strong> Fresh, Peeled or Frozen</div>
-                    <div class="col-md-3">🚢 <strong>Shipment:</strong> 20-22 pallets / container</div>
-                    <div class="col-md-3">✅ <strong>Certified:</strong> GLOBALG.A.P.</div>
-                </div>
-            </div>
-        </section>
 
-        <section class="py-5">
-            <div class="container">
-                <!-- Nav tabs by category -->
-                <div class="d-flex flex-wrap gap-2 justify-content-center mb-5">
-                    <t t-foreach="product_groups" t-as="cat_key">
-                        <a t-att-href="'#' + cat_key" class="btn btn-outline-success btn-sm px-3">
-                            <t t-esc="product_groups[cat_key]['label']"/>
-                        </a>
-                    </t>
+                <!-- Category filter -->
+                <div class="crfarm-filter-bar">
+                    <button class="crfarm-filter-btn active" data-category="all">All Products</button>
+                    <button class="crfarm-filter-btn" data-category="tubers">Roots &amp; Tubers</button>
+                    <button class="crfarm-filter-btn" data-category="coconut">Coconut</button>
+                    <button class="crfarm-filter-btn" data-category="sugar_cane">Sugar Cane</button>
+                    <button class="crfarm-filter-btn" data-category="vegetables">Vegetables</button>
                 </div>
 
-                <!-- Tubers detailed specs (static, from crfarmproducts.com) -->
-                <div id="tubers" class="mb-5">
-                    <h2 class="fw-bold border-bottom pb-2 mb-4" style="color:#1a5c2a;">🌱 Roots &amp; Tubers</h2>
+                <!-- Products grid -->
+                <div class="row g-4">
+                    <t t-foreach="website_products" t-as="p">
+                        <div class="col-md-6 col-lg-4 crfarm-catalog-item crfarm-reveal"
+                             t-att-data-category="p.category">
+                            <div class="crfarm-product-card h-100">
 
-                    <!-- Yuca -->
-                    <div class="card border-0 shadow-sm mb-4">
-                        <div class="card-body p-4">
-                            <div class="row">
-                                <div class="col-md-8">
-                                    <h4 class="fw-bold mb-1" style="color:#1a5c2a;">Yuca / Cassava</h4>
-                                    <p class="text-muted small mb-2"><em>Manihot esculenta</em> · Tariff: 071410000011</p>
-                                    <p>The most versatile tropical root, available fresh, peeled or frozen year-round. Highly demanded in USA, Europe and Caribbean communities.</p>
-                                    <div class="row g-2 small">
-                                        <div class="col-6"><span class="text-success fw-bold">📅 Season:</span> Year-round</div>
-                                        <div class="col-6"><span class="text-success fw-bold">📦 Europe:</span> 18 kg boxes</div>
-                                        <div class="col-6"><span class="text-success fw-bold">📦 USA/Canada:</span> 16–13.65 kg</div>
-                                        <div class="col-6"><span class="text-success fw-bold">📏 Min. length (fresh):</span> 20 cm</div>
-                                        <div class="col-6"><span class="text-success fw-bold">📏 Min. length (peeled):</span> 8 cm</div>
-                                        <div class="col-6"><span class="text-success fw-bold">🪵 Pallet:</span> 60–66 boxes</div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4 text-center d-flex align-items-center justify-content-center">
-                                    <div style="font-size:5rem;">🌱</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Ñampi -->
-                    <div class="card border-0 shadow-sm mb-4">
-                        <div class="card-body p-4">
-                            <div class="row">
-                                <div class="col-md-8">
-                                    <h4 class="fw-bold mb-1" style="color:#1a5c2a;">Ñampi / Eddoes</h4>
-                                    <p class="text-muted small mb-2"><em>Colocasia esculenta</em> · Tariff: 071450100011</p>
-                                    <p>CR Farm's specialty and a cornerstone export. Ñampi (small taro) is highly popular in Caribbean and West African diaspora communities worldwide.</p>
-                                    <div class="row g-2 small">
-                                        <div class="col-6"><span class="text-success fw-bold">📅 Season:</span> Year-round</div>
-                                        <div class="col-6"><span class="text-success fw-bold">📦 Europe:</span> 10 kg boxes</div>
-                                        <div class="col-6"><span class="text-success fw-bold">📦 USA/Canada:</span> 13.65–16 kg</div>
-                                        <div class="col-6"><span class="text-success fw-bold">⚖️ Small-Med:</span> 80–120 g</div>
-                                        <div class="col-6"><span class="text-success fw-bold">⚖️ Large:</span> 120 g+</div>
-                                        <div class="col-6"><span class="text-success fw-bold">🪵 Pallet:</span> 60–100 boxes</div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4 text-center d-flex align-items-center justify-content-center">
-                                    <div style="font-size:5rem;">🫚</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Malanga group -->
-                    <div class="card border-0 shadow-sm mb-4">
-                        <div class="card-body p-4">
-                            <h4 class="fw-bold mb-3" style="color:#1a5c2a;">Malanga / Taro Varieties</h4>
-                            <p class="text-muted small mb-3">Season: November – May &nbsp;·&nbsp; Tariff: 071450100011 &nbsp;·&nbsp; 60 boxes/pallet &nbsp;·&nbsp; 20-22 pallets/container</p>
-                            <div class="row g-3">
-                                <div class="col-md-4">
-                                    <div class="border rounded p-3">
-                                        <h6 class="fw-bold mb-1">Malanga Lila</h6>
-                                        <p class="small text-muted mb-1"><em>Xanthosoma sagittifolium</em></p>
-                                        <p class="small mb-0">Also: Purple Tiquisque, Purple Yautia. 1st class min. 15 cm / 2nd class 10-15 cm.</p>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="border rounded p-3">
-                                        <h6 class="fw-bold mb-1">Malanga Blanca</h6>
-                                        <p class="small text-muted mb-1"><em>Xanthosoma sagittifolium</em></p>
-                                        <p class="small mb-0">Also: Tiquisque Blanco, Yautia Blanca. Same specs as Lila.</p>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="border rounded p-3">
-                                        <h6 class="fw-bold mb-1">Malanga Isleña</h6>
-                                        <p class="small text-muted mb-1"><em>Colocasia esculenta</em></p>
-                                        <p class="small mb-0">Weight range 400 g – 2 kg. Highly demanded in Caribbean markets.</p>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="border rounded p-3">
-                                        <h6 class="fw-bold mb-1">Big Taro / Malanga Coco</h6>
-                                        <p class="small text-muted mb-1"><em>Colocasia esculenta</em> (variant)</p>
-                                        <p class="small mb-0">Large-size taro preferred in Asian and Caribbean specialty markets.</p>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="border rounded p-3">
-                                        <h6 class="fw-bold mb-1">Ñame / White Yam</h6>
-                                        <p class="small text-muted mb-1">Tropical yam</p>
-                                        <p class="small mb-0">Staple root with strong demand in Caribbean and African communities in Europe and USA.</p>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="border rounded p-3">
-                                        <h6 class="fw-bold mb-1">Yampi / Chinese Papa</h6>
-                                        <p class="small text-muted mb-1">Asian-origin yam</p>
-                                        <p class="small mb-0">Popular in Asian and Caribbean specialty food markets across North America.</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Dynamic categories from crfp.product -->
-                <t t-foreach="product_groups" t-as="cat_key">
-                    <t t-if="cat_key != 'tubers'">
-                        <div t-att-id="cat_key" class="mb-5">
-                            <h2 class="fw-bold border-bottom pb-2 mb-4" style="color:#1a5c2a;">
-                                <t t-if="cat_key == 'coconut'">🥥 </t>
-                                <t t-elif="cat_key == 'sugar_cane'">🎋 </t>
-                                <t t-else="">🥦 </t>
-                                <t t-esc="product_groups[cat_key]['label']"/>
-                            </h2>
-                            <div class="row g-3">
-                                <t t-foreach="product_groups[cat_key]['products']" t-as="product">
-                                    <div class="col-sm-6 col-lg-4">
-                                        <div class="card h-100 border-0 shadow-sm p-3">
-                                            <h6 class="fw-bold mb-1" style="color:#1a5c2a;">
-                                                <t t-esc="product.name"/>
-                                            </h6>
-                                            <t t-if="product.net_kg">
-                                                <span class="badge bg-light text-dark border small">
-                                                    <t t-esc="product.net_kg"/> kg/box
-                                                </span>
-                                            </t>
-                                        </div>
-                                    </div>
+                                <!-- Product Image -->
+                                <t t-if="p.image_url">
+                                    <img t-att-src="p.image_url" t-att-alt="p.name"
+                                         class="crfarm-product-img" loading="lazy"/>
                                 </t>
+                                <t t-else="">
+                                    <div class="crfarm-product-img-placeholder">🌱</div>
+                                </t>
+
+                                <div class="crfarm-product-body">
+
+                                    <!-- Header -->
+                                    <span class="crfarm-product-category-badge">
+                                        <t t-esc="p.category"/>
+                                    </span>
+                                    <div class="crfarm-product-name"><t t-esc="p.name"/></div>
+                                    <div class="crfarm-product-scientific">
+                                        <i><t t-esc="p.scientific_name"/></i>
+                                    </div>
+                                    <t t-if="p.also_known_as">
+                                        <div class="small text-muted mb-3">Also: <t t-esc="p.also_known_as"/></div>
+                                    </t>
+
+                                    <!-- B2B Description -->
+                                    <t t-if="p.description">
+                                        <p class="small text-muted mb-3"><t t-esc="p.description"/></p>
+                                    </t>
+
+                                    <!-- Specs table -->
+                                    <div class="mb-3">
+                                        <div class="crfarm-product-spec-row">
+                                            <span class="crfarm-spec-label">Season</span>
+                                            <span class="crfarm-spec-value"><t t-esc="p.production_season"/></span>
+                                        </div>
+                                        <t t-if="p.size_specs">
+                                            <div class="crfarm-product-spec-row">
+                                                <span class="crfarm-spec-label">Caliber</span>
+                                                <span class="crfarm-spec-value"><t t-esc="p.size_specs"/></span>
+                                            </div>
+                                        </t>
+                                        <t t-if="p.box_weight_eu_kg">
+                                            <div class="crfarm-product-spec-row">
+                                                <span class="crfarm-spec-label">Box EU</span>
+                                                <span class="crfarm-spec-value"><t t-esc="p.box_weight_eu_kg"/> kg</span>
+                                            </div>
+                                        </t>
+                                        <t t-if="p.box_weight_usa_ca_kg">
+                                            <div class="crfarm-product-spec-row">
+                                                <span class="crfarm-spec-label">Box USA/CA</span>
+                                                <span class="crfarm-spec-value"><t t-esc="p.box_weight_usa_ca_kg"/> lbs</span>
+                                            </div>
+                                        </t>
+                                        <t t-if="p.boxes_per_pallet">
+                                            <div class="crfarm-product-spec-row">
+                                                <span class="crfarm-spec-label">Boxes / Pallet</span>
+                                                <span class="crfarm-spec-value"><t t-esc="p.boxes_per_pallet"/></span>
+                                            </div>
+                                        </t>
+                                        <t t-if="p.pallets_per_container">
+                                            <div class="crfarm-product-spec-row">
+                                                <span class="crfarm-spec-label">Pallets / 40' FCL</span>
+                                                <span class="crfarm-spec-value"><t t-esc="p.pallets_per_container"/></span>
+                                            </div>
+                                        </t>
+                                        <t t-if="p.tariff_code">
+                                            <div class="crfarm-product-spec-row">
+                                                <span class="crfarm-spec-label">HS Code</span>
+                                                <span class="crfarm-spec-value"><t t-esc="p.tariff_code"/></span>
+                                            </div>
+                                        </t>
+                                    </div>
+
+                                    <!-- Available formats -->
+                                    <div class="crfarm-format-tags">
+                                        <t t-if="p.format_fresh"><span class="crfarm-format-tag">Fresh / Whole</span></t>
+                                        <t t-if="p.format_peeled"><span class="crfarm-format-tag">Peeled</span></t>
+                                        <t t-if="p.format_frozen"><span class="crfarm-format-tag">IQF Frozen</span></t>
+                                        <t t-if="p.format_halved"><span class="crfarm-format-tag">Halved</span></t>
+                                        <t t-if="p.format_custom"><span class="crfarm-format-tag"><t t-esc="p.format_custom"/></span></t>
+                                    </div>
+
+                                    <!-- Actions -->
+                                    <div class="crfarm-product-actions mt-auto pt-3">
+                                        <a href="/crfarm/contact" class="crfarm-btn-primary flex-fill text-center">Request Price</a>
+                                        <t t-if="p.onedrive_url">
+                                            <a t-att-href="p.onedrive_url" target="_blank"
+                                               class="crfarm-btn-outline" title="View product photos">📷</a>
+                                        </t>
+                                    </div>
+
+                                </div>
                             </div>
                         </div>
                     </t>
-                </t>
-
-                <div class="text-center mt-4 p-4 rounded" style="background:#f8fdf9;">
-                    <h4 class="fw-bold mb-2" style="color:#1a5c2a;">Don't see what you're looking for?</h4>
-                    <p class="text-muted mb-3">We work with a wide range of products. Contact us and we'll check availability.</p>
-                    <a href="/crfarm/contact" class="btn btn-success px-4">Check Availability</a>
                 </div>
+
+                <!-- Incoterms note -->
+                <div class="mt-5 p-4 rounded-3 crfarm-reveal" style="background:var(--crfarm-bg-light); border:1px solid var(--crfarm-border);">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h5 class="fw-bold mb-1" style="color:var(--crfarm-primary);">Available Incoterms</h5>
+                            <p class="text-muted mb-0">We offer FOB Puerto Limón (CR), CFR, CIF, and DAP to major ports in the USA, Europe and Caribbean. Contact us for specific port pricing.</p>
+                        </div>
+                        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                            <div class="d-flex gap-2 justify-content-md-end flex-wrap">
+                                <span class="badge bg-success fs-6">FOB</span>
+                                <span class="badge bg-success fs-6">CFR</span>
+                                <span class="badge bg-success fs-6">CIF</span>
+                                <span class="badge bg-success fs-6">DAP</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </section>
+
+        <section class="crfarm-cta-section py-5">
+            <div class="container text-center">
+                <h2 class="h3 fw-bold text-white mb-3">Need Samples or Custom Specs?</h2>
+                <a href="/crfarm/contact" class="crfarm-hero-cta-primary">Talk to Our Export Team</a>
+            </div>
+        </section>
+
     </t>
 </template>
 
+<!-- ════════════════════════════════════════════
+     GALLERY PAGE
+     ════════════════════════════════════════════ -->
+<template id="page_gallery" name="CR Farm — Photo Gallery">
+    <t t-call="website.layout">
+        <t t-set="title">Photo Gallery | CR Farm Products</t>
+        <t t-set="meta_description">Photos from CR Farm Products fields, packing facility, and export operations in San Carlos, Costa Rica.</t>
 
-<!-- ═══ CONTACT FORM ═══ -->
+        <section style="background:linear-gradient(135deg,var(--crfarm-primary),var(--crfarm-accent)); color:#fff; padding:80px 0 60px;">
+            <div class="container text-center">
+                <div class="crfarm-section-tag" style="color:#D4A017;">Our Operations</div>
+                <h1 class="display-5 fw-bold text-white mt-2">Photo Gallery</h1>
+                <p class="lead text-white opacity-75 mt-3">Fields, packing facility, and export operations in San Carlos, Costa Rica</p>
+            </div>
+        </section>
+
+        <section class="py-6" style="background:#fff;">
+            <div class="container">
+                <div class="crfarm-gallery-grid">
+                    <div class="crfarm-gallery-item crfarm-reveal">
+                        <img src="https://crfarmproducts.com/wp-content/uploads/2025/02/20221009_101208-scaled-1-768x1024.webp"
+                             alt="CR Farm Products — Field Operations" loading="lazy"/>
+                    </div>
+                    <div class="crfarm-gallery-item crfarm-reveal crfarm-reveal-delay-1">
+                        <img src="https://crfarmproducts.com/wp-content/uploads/2025/02/6fdd42fb-e071-4fec-a5f3-254858525da6-1024x766.webp"
+                             alt="CR Farm Products — Tropical Roots" loading="lazy"/>
+                    </div>
+                    <div class="crfarm-gallery-item crfarm-reveal crfarm-reveal-delay-2">
+                        <img src="https://crfarmproducts.com/wp-content/uploads/2025/02/1366_2000-1024x683.jpg"
+                             alt="CR Farm Products — Export Quality" loading="lazy"/>
+                    </div>
+                    <div class="crfarm-gallery-item crfarm-reveal crfarm-reveal-delay-3">
+                        <img src="https://crfarmproducts.com/wp-content/uploads/2025/02/20221009_101208-scaled-1-768x1024.webp"
+                             alt="CR Farm — Packing Facility" loading="lazy"/>
+                    </div>
+                    <div class="crfarm-gallery-item crfarm-reveal crfarm-reveal-delay-1">
+                        <img src="https://crfarmproducts.com/wp-content/uploads/2025/02/6fdd42fb-e071-4fec-a5f3-254858525da6-1024x766.webp"
+                             alt="CR Farm — Cassava Harvest" loading="lazy"/>
+                    </div>
+                    <div class="crfarm-gallery-item crfarm-reveal crfarm-reveal-delay-2">
+                        <img src="https://crfarmproducts.com/wp-content/uploads/2025/02/1366_2000-1024x683.jpg"
+                             alt="CR Farm — Export Packaging" loading="lazy"/>
+                    </div>
+                    <div class="crfarm-gallery-item crfarm-reveal crfarm-reveal-delay-3">
+                        <img src="https://crfarmproducts.com/wp-content/uploads/2025/02/20221009_101208-scaled-1-768x1024.webp"
+                             alt="CR Farm — Tropical Roots Processing" loading="lazy"/>
+                    </div>
+                    <div class="crfarm-gallery-item crfarm-reveal crfarm-reveal-delay-1">
+                        <img src="https://crfarmproducts.com/wp-content/uploads/2025/02/6fdd42fb-e071-4fec-a5f3-254858525da6-1024x766.webp"
+                             alt="CR Farm — San Carlos Fields" loading="lazy"/>
+                    </div>
+                    <div class="crfarm-gallery-item crfarm-reveal crfarm-reveal-delay-2">
+                        <img src="https://crfarmproducts.com/wp-content/uploads/2025/02/1366_2000-1024x683.jpg"
+                             alt="CR Farm — Export Containers" loading="lazy"/>
+                    </div>
+                </div>
+                <div class="text-center mt-5 crfarm-reveal">
+                    <p class="text-muted">More photos available upon request. Contact us for full resolution images and video tours of our facility.</p>
+                    <a href="/crfarm/contact" class="crfarm-btn-primary mt-3">Request Full Media Kit</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Lightbox -->
+        <div id="crfarm-lightbox">
+            <button id="crfarm-lightbox-close">&times;</button>
+            <button id="crfarm-lightbox-prev">&#8592;</button>
+            <img id="crfarm-lightbox-img" src="" alt="CR Farm Gallery"/>
+            <button id="crfarm-lightbox-next">&#8594;</button>
+        </div>
+
+    </t>
+</template>
+
+<!-- ════════════════════════════════════════════
+     CERTIFICATIONS PAGE
+     ════════════════════════════════════════════ -->
+<template id="page_certifications" name="CR Farm — Certifications">
+    <t t-call="website.layout">
+        <t t-set="title">Certifications | CR Farm Products</t>
+        <t t-set="meta_description">CR Farm Products holds GLOBALG.A.P., Esencial Costa Rica, and PYME Costa Rica certifications — guaranteeing food safety, sustainability, and quality for international buyers.</t>
+
+        <section style="background:linear-gradient(135deg,var(--crfarm-primary),var(--crfarm-accent)); color:#fff; padding:80px 0 60px;">
+            <div class="container text-center">
+                <div class="crfarm-section-tag" style="color:#D4A017;">Quality Assurance</div>
+                <h1 class="display-5 fw-bold text-white mt-2">Our Certifications</h1>
+                <p class="lead text-white opacity-75 mt-3">International standards that guarantee food safety, traceability and sustainability</p>
+            </div>
+        </section>
+
+        <section class="py-6" style="background:#fff;">
+            <div class="container">
+
+                <!-- GLOBALG.A.P. -->
+                <div class="row align-items-center gy-4 mb-6 crfarm-reveal">
+                    <div class="col-lg-4 text-center">
+                        <div style="font-size:80px;">🌍</div>
+                        <div class="crfarm-cert-name mt-3">GLOBALG.A.P.</div>
+                        <div class="crfarm-cert-issuer">FoodPLUS GmbH — Germany</div>
+                    </div>
+                    <div class="col-lg-8">
+                        <h3 style="color:var(--crfarm-primary);">The Global Standard for Food Safety</h3>
+                        <p class="text-muted mb-3">GLOBALG.A.P. is the world's leading farm assurance program, ensuring food safety and sustainability in agricultural production. The standard covers over 135 countries and is required by virtually all European supermarket chains.</p>
+                        <p class="text-muted mb-3">CR Farm Products holds GLOBALG.A.P. certification covering:</p>
+                        <ul class="text-muted">
+                            <li>Crop protection product management and application records</li>
+                            <li>Worker health, safety, and welfare</li>
+                            <li>Environmental impact and waste management</li>
+                            <li>Full traceability from field to post-harvest handling</li>
+                            <li>Soil and water management practices</li>
+                        </ul>
+                        <p class="text-muted"><strong>Accepted by:</strong> Tesco, Carrefour, Lidl, Walmart, Whole Foods, and 50,000+ other retailers globally.</p>
+                        <a href="/crfarm/contact" class="crfarm-btn-primary mt-3">Request Certificate Copy</a>
+                    </div>
+                </div>
+
+                <hr style="border-color:var(--crfarm-border);" class="my-5"/>
+
+                <!-- Esencial Costa Rica -->
+                <div class="row align-items-center gy-4 mb-6 crfarm-reveal">
+                    <div class="col-lg-4 text-center order-lg-2">
+                        <div style="font-size:80px;">🇨🇷</div>
+                        <div class="crfarm-cert-name mt-3">Esencial Costa Rica</div>
+                        <div class="crfarm-cert-issuer">PROCOMER — Costa Rica</div>
+                    </div>
+                    <div class="col-lg-8 order-lg-1">
+                        <h3 style="color:var(--crfarm-primary);">Costa Rica's Official Country Brand</h3>
+                        <p class="text-muted mb-3">Esencial Costa Rica is the official country brand of Costa Rica, promoted by PROCOMER (Costa Rican Investment and Trade Development Agency). It recognizes companies that embody the values of sustainability, excellence, and innovation associated with the Costa Rican brand.</p>
+                        <p class="text-muted mb-3">To qualify, companies must demonstrate:</p>
+                        <ul class="text-muted">
+                            <li>Environmental sustainability practices</li>
+                            <li>High-quality products or services</li>
+                            <li>Innovation in processes or product development</li>
+                            <li>Contribution to Costa Rica's reputation internationally</li>
+                        </ul>
+                        <p class="text-muted"><strong>Benefit for buyers:</strong> Assurance that CR Farm Products meets Costa Rica's high environmental and quality standards — and qualifies for PROCOMER export promotion programs.</p>
+                    </div>
+                </div>
+
+                <hr style="border-color:var(--crfarm-border);" class="my-5"/>
+
+                <!-- PYME -->
+                <div class="row align-items-center gy-4 crfarm-reveal">
+                    <div class="col-lg-4 text-center">
+                        <div style="font-size:80px;">🏢</div>
+                        <div class="crfarm-cert-name mt-3">PYME Costa Rica</div>
+                        <div class="crfarm-cert-issuer">MEIC — Ministry of Economy</div>
+                    </div>
+                    <div class="col-lg-8">
+                        <h3 style="color:var(--crfarm-primary);">Certified SME — Ministry of Economy</h3>
+                        <p class="text-muted mb-3">PYME (Pequeña y Mediana Empresa) certification is granted by Costa Rica's Ministry of Economy, Industry and Commerce (MEIC). It officially recognizes CR Farm Products as a certified Small and Medium Enterprise.</p>
+                        <p class="text-muted mb-3">This certification provides access to:</p>
+                        <ul class="text-muted">
+                            <li>PROCOMER export promotion and market access programs</li>
+                            <li>Government-backed financing and development programs</li>
+                            <li>Priority participation in international trade fairs</li>
+                            <li>Technical assistance and capacity building</li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <section class="crfarm-cta-section py-5">
+            <div class="container text-center">
+                <h2 class="h3 fw-bold text-white mb-3">Need Our Certificates for Customs?</h2>
+                <p class="text-white opacity-75 mb-4">We can provide official certificate copies, export documentation, and phytosanitary certificates upon request.</p>
+                <a href="/crfarm/contact" class="crfarm-hero-cta-primary">Contact Export Team</a>
+            </div>
+        </section>
+
+    </t>
+</template>
+
+<!-- ════════════════════════════════════════════
+     CONTACT PAGE (B2B FORM)
+     ════════════════════════════════════════════ -->
 <template id="page_contact" name="CR Farm — Contact">
     <t t-call="website.layout">
-        <t t-set="title">Contact Us | CR Farm Products</t>
+        <t t-set="title">Contact Us | CR Farm Products Export Inquiries</t>
+        <t t-set="meta_description">Contact CR Farm Products for export pricing, samples, and import inquiries. We serve importers, distributors and supermarket chains in the USA, Europe and Caribbean.</t>
 
-        <section style="background:linear-gradient(135deg,#1a5c2a,#2e8b47); color:#fff;" class="py-5">
+        <section style="background:linear-gradient(135deg,var(--crfarm-primary),var(--crfarm-accent)); color:#fff; padding:80px 0 60px;">
             <div class="container text-center">
-                <h1 class="display-5 fw-bold">Get In Touch</h1>
-                <p class="lead opacity-90 mt-2">Tell us about your business — we respond within 24 business hours</p>
+                <div class="crfarm-section-tag" style="color:#D4A017;">Export Inquiries</div>
+                <h1 class="display-5 fw-bold text-white mt-2">Contact Our Export Team</h1>
+                <p class="lead text-white opacity-75 mt-3">Tell us about your import needs and we'll respond within 24 hours</p>
             </div>
         </section>
 
-        <section class="py-5">
+        <section class="py-6" style="background:var(--crfarm-bg-light);">
             <div class="container">
-                <div class="row justify-content-center g-5">
 
+                <!-- Error alert -->
+                <t t-if="error">
+                    <div class="alert alert-danger mb-4"><t t-esc="error"/></div>
+                </t>
+
+                <div class="row gy-5">
+
+                    <!-- FORM -->
                     <div class="col-lg-7">
-                        <div class="card border-0 shadow p-4 p-md-5">
-                            <h3 class="fw-bold mb-4" style="color:#1a5c2a;">Request a Quote or Information</h3>
+                        <div class="crfarm-contact-card">
+                            <h3 class="fw-bold mb-4" style="color:var(--crfarm-primary);">Import Inquiry Form</h3>
 
-                            <t t-if="error">
-                                <div class="alert alert-danger" t-esc="error"/>
-                            </t>
+                            <form method="POST" action="/crfarm/contact">
+                                <input type="hidden" name="csrf_token"
+                                       t-att-value="request.csrf_token()"/>
 
-                            <form method="post" action="/crfarm/contact">
-                                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
-
-                                <div class="row g-3">
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-semibold">Full Name *</label>
-                                        <input type="text" name="contact_name" class="form-control"
-                                               required="required" placeholder="Your full name"
-                                               t-att-value="values.get('contact_name', '')"/>
+                                <!-- Row 1: Name + Company -->
+                                <div class="row g-3 mb-3">
+                                    <div class="col-sm-6">
+                                        <label class="crfarm-form-label">Full Name *</label>
+                                        <input type="text" name="contact_name" class="crfarm-form-control"
+                                               placeholder="Jane Smith" required="required"
+                                               t-att-value="values.get('contact_name','')"/>
                                     </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-semibold">Company / Business</label>
-                                        <input type="text" name="company_name" class="form-control"
-                                               placeholder="Your company name"
-                                               t-att-value="values.get('company_name', '')"/>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-semibold">Email Address *</label>
-                                        <input type="email" name="email" class="form-control"
-                                               required="required" placeholder="your@email.com"
-                                               t-att-value="values.get('email', '')"/>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-semibold">Phone / WhatsApp</label>
-                                        <input type="tel" name="phone" class="form-control"
-                                               placeholder="+1 (786) 000-0000"
-                                               t-att-value="values.get('phone', '')"/>
-                                    </div>
-                                    <div class="col-12">
-                                        <label class="form-label fw-semibold">Product Interest</label>
-                                        <select name="product_interest" class="form-select">
-                                            <option value="">— Select a product —</option>
-                                            <option value="tubers">Roots &amp; Tubers (Cassava, Eddoes, Malanga, Yam...)</option>
-                                            <option value="coconut">Coconut</option>
-                                            <option value="sugar_cane">Sugar Cane</option>
-                                            <option value="vegetables">Vegetables &amp; Others</option>
-                                            <option value="mixed">Multiple Products</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-12">
-                                        <label class="form-label fw-semibold">Message / Inquiry *</label>
-                                        <textarea name="message" class="form-control" rows="5"
-                                                  required="required"
-                                                  placeholder="Tell us about your business, purchase volumes, destination country and any special requirements..."><t t-esc="values.get('message', '')"/></textarea>
-                                    </div>
-                                    <div class="col-12">
-                                        <button type="submit" class="btn btn-success btn-lg w-100 fw-bold">
-                                            Send Message →
-                                        </button>
-                                        <p class="text-muted small mt-2 mb-0 text-center">
-                                            We respond within 24 business hours.
-                                        </p>
+                                    <div class="col-sm-6">
+                                        <label class="crfarm-form-label">Company Name *</label>
+                                        <input type="text" name="company_name" class="crfarm-form-control"
+                                               placeholder="Tropical Imports Ltd." required="required"
+                                               t-att-value="values.get('company_name','')"/>
                                     </div>
                                 </div>
+
+                                <!-- Row 2: Email + Phone -->
+                                <div class="row g-3 mb-3">
+                                    <div class="col-sm-6">
+                                        <label class="crfarm-form-label">Business Email *</label>
+                                        <input type="email" name="email" class="crfarm-form-control"
+                                               placeholder="jane@company.com" required="required"
+                                               t-att-value="values.get('email','')"/>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <label class="crfarm-form-label">Phone / WhatsApp</label>
+                                        <input type="tel" name="phone" class="crfarm-form-control"
+                                               placeholder="+1 (305) 555-0100"
+                                               t-att-value="values.get('phone','')"/>
+                                    </div>
+                                </div>
+
+                                <!-- Row 3: Company Type + Job Title -->
+                                <div class="row g-3 mb-3">
+                                    <div class="col-sm-6">
+                                        <label class="crfarm-form-label">Company Type *</label>
+                                        <select name="company_type" class="crfarm-form-control" required="required">
+                                            <option value="">Select type...</option>
+                                            <option value="importer"
+                                                    t-att-selected="'selected' if values.get('company_type') == 'importer' else None">
+                                                Importer / Wholesaler
+                                            </option>
+                                            <option value="distributor"
+                                                    t-att-selected="'selected' if values.get('company_type') == 'distributor' else None">
+                                                Distributor
+                                            </option>
+                                            <option value="supermarket"
+                                                    t-att-selected="'selected' if values.get('company_type') == 'supermarket' else None">
+                                                Supermarket Chain
+                                            </option>
+                                            <option value="foodservice"
+                                                    t-att-selected="'selected' if values.get('company_type') == 'foodservice' else None">
+                                                Food Service / Processing
+                                            </option>
+                                            <option value="retailer"
+                                                    t-att-selected="'selected' if values.get('company_type') == 'retailer' else None">
+                                                Ethnic / Specialty Retailer
+                                            </option>
+                                            <option value="other"
+                                                    t-att-selected="'selected' if values.get('company_type') == 'other' else None">
+                                                Other
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <label class="crfarm-form-label">Your Role</label>
+                                        <select name="job_title" class="crfarm-form-control">
+                                            <option value="">Select role...</option>
+                                            <option value="buyer"
+                                                    t-att-selected="'selected' if values.get('job_title') == 'buyer' else None">
+                                                Buyer / Purchasing Manager
+                                            </option>
+                                            <option value="owner"
+                                                    t-att-selected="'selected' if values.get('job_title') == 'owner' else None">
+                                                Owner / Director
+                                            </option>
+                                            <option value="logistics"
+                                                    t-att-selected="'selected' if values.get('job_title') == 'logistics' else None">
+                                                Logistics / Operations
+                                            </option>
+                                            <option value="sales"
+                                                    t-att-selected="'selected' if values.get('job_title') == 'sales' else None">
+                                                Sales / Business Development
+                                            </option>
+                                            <option value="other"
+                                                    t-att-selected="'selected' if values.get('job_title') == 'other' else None">
+                                                Other
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- Row 4: Country + Product Interest -->
+                                <div class="row g-3 mb-3">
+                                    <div class="col-sm-6">
+                                        <label class="crfarm-form-label">Country of Import *</label>
+                                        <input type="text" name="country" class="crfarm-form-control"
+                                               placeholder="United States" required="required"
+                                               t-att-value="values.get('country','')"/>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <label class="crfarm-form-label">Product Interest</label>
+                                        <select name="product_interest" class="crfarm-form-control">
+                                            <option value="">All / Multiple products</option>
+                                            <option value="tubers"
+                                                    t-att-selected="'selected' if values.get('product_interest') == 'tubers' else None">
+                                                Roots &amp; Tubers (Cassava, Malanga, Taro…)
+                                            </option>
+                                            <option value="coconut"
+                                                    t-att-selected="'selected' if values.get('product_interest') == 'coconut' else None">
+                                                Coconut
+                                            </option>
+                                            <option value="sugar_cane"
+                                                    t-att-selected="'selected' if values.get('product_interest') == 'sugar_cane' else None">
+                                                Sugar Cane
+                                            </option>
+                                            <option value="vegetables"
+                                                    t-att-selected="'selected' if values.get('product_interest') == 'vegetables' else None">
+                                                Vegetables &amp; Others
+                                            </option>
+                                            <option value="mixed"
+                                                    t-att-selected="'selected' if values.get('product_interest') == 'mixed' else None">
+                                                Multiple Products
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- Row 5: Volume + Incoterm -->
+                                <div class="row g-3 mb-3">
+                                    <div class="col-sm-6">
+                                        <label class="crfarm-form-label">Expected Volume</label>
+                                        <select name="volume" class="crfarm-form-control">
+                                            <option value="">Select volume...</option>
+                                            <option value="samples"
+                                                    t-att-selected="'selected' if values.get('volume') == 'samples' else None">
+                                                Samples only
+                                            </option>
+                                            <option value="1_5"
+                                                    t-att-selected="'selected' if values.get('volume') == '1_5' else None">
+                                                1–5 containers / year
+                                            </option>
+                                            <option value="6_12"
+                                                    t-att-selected="'selected' if values.get('volume') == '6_12' else None">
+                                                6–12 containers / year
+                                            </option>
+                                            <option value="12_plus"
+                                                    t-att-selected="'selected' if values.get('volume') == '12_plus' else None">
+                                                13+ containers / year
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <label class="crfarm-form-label">Preferred Incoterm</label>
+                                        <select name="incoterm_pref" class="crfarm-form-control">
+                                            <option value="">No preference</option>
+                                            <option value="FOB"
+                                                    t-att-selected="'selected' if values.get('incoterm_pref') == 'FOB' else None">
+                                                FOB — Free On Board
+                                            </option>
+                                            <option value="CFR"
+                                                    t-att-selected="'selected' if values.get('incoterm_pref') == 'CFR' else None">
+                                                CFR — Cost &amp; Freight
+                                            </option>
+                                            <option value="CIF"
+                                                    t-att-selected="'selected' if values.get('incoterm_pref') == 'CIF' else None">
+                                                CIF — Cost, Insurance &amp; Freight
+                                            </option>
+                                            <option value="DAP"
+                                                    t-att-selected="'selected' if values.get('incoterm_pref') == 'DAP' else None">
+                                                DAP — Delivered at Place
+                                            </option>
+                                            <option value="EXW"
+                                                    t-att-selected="'selected' if values.get('incoterm_pref') == 'EXW' else None">
+                                                EXW — Ex Works
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- Message -->
+                                <div class="mb-4">
+                                    <label class="crfarm-form-label">Message / Requirements</label>
+                                    <textarea name="message" class="crfarm-form-control" rows="4"
+                                              placeholder="Tell us about your specific needs, destination port, packaging requirements, etc."
+                                              style="resize:vertical;"><t t-esc="values.get('message','')"/></textarea>
+                                </div>
+
+                                <button type="submit" class="crfarm-form-submit">
+                                    Send Inquiry →
+                                </button>
+                                <p class="small text-muted mt-3 mb-0">We respond within 24 business hours. By submitting this form you agree to be contacted by our export team.</p>
                             </form>
                         </div>
                     </div>
 
-                    <div class="col-lg-4">
-                        <h4 class="fw-bold mb-4" style="color:#1a5c2a;">Contact Information</h4>
-                        <div class="d-flex gap-3 mb-3">
-                            <div class="fs-4">📍</div>
-                            <div>
-                                <div class="fw-semibold">Headquarters</div>
-                                <div class="text-muted">San Carlos, Costa Rica</div>
-                            </div>
+                    <!-- INFO SIDEBAR -->
+                    <div class="col-lg-5">
+                        <div class="crfarm-info-block">
+                            <h5 class="fw-bold mb-3" style="color:var(--crfarm-primary);">🏢 Our Export Office</h5>
+                            <p class="text-muted mb-1"><strong>CR Farm Products VYM S.A.</strong></p>
+                            <p class="text-muted mb-1">San Carlos, Alajuela</p>
+                            <p class="text-muted mb-0">Costa Rica</p>
                         </div>
-                        <div class="d-flex gap-3 mb-3">
-                            <div class="fs-4">📍</div>
-                            <div>
-                                <div class="fw-semibold">US Office</div>
-                                <div class="text-muted">Miami, Florida</div>
-                            </div>
+                        <div class="crfarm-info-block">
+                            <h5 class="fw-bold mb-3" style="color:var(--crfarm-primary);">📞 Direct Contact</h5>
+                            <p class="mb-2">
+                                <a href="tel:+50688888888" style="color:var(--crfarm-primary); font-weight:600;">
+                                    +506 8888-8888
+                                </a>
+                            </p>
+                            <p class="mb-2">
+                                <a href="mailto:exports@crfarm.com" style="color:var(--crfarm-primary); font-weight:600;">
+                                    exports@crfarm.com
+                                </a>
+                            </p>
+                            <a href="https://wa.me/50688888888" target="_blank"
+                               class="crfarm-btn-primary d-inline-block mt-2">
+                                💬 WhatsApp Chat
+                            </a>
                         </div>
-                        <div class="d-flex gap-3 mb-3">
-                            <div class="fs-4">📞</div>
-                            <div>
-                                <div class="fw-semibold">Costa Rica</div>
-                                <a href="tel:+50624621338" class="text-success">(+506) 2462-1338</a>
-                            </div>
+                        <div class="crfarm-info-block">
+                            <h5 class="fw-bold mb-3" style="color:var(--crfarm-primary);">🚢 Export Port</h5>
+                            <p class="text-muted mb-1">Puerto Limón, Costa Rica</p>
+                            <p class="text-muted mb-0">Regular sailings to: Miami, New York, Rotterdam, Barcelona, Antwerp, Kingston</p>
                         </div>
-                        <div class="d-flex gap-3 mb-3">
-                            <div class="fs-4">📞</div>
-                            <div>
-                                <div class="fw-semibold">United States</div>
-                                <a href="tel:+17862474565" class="text-success">(786) 247-4565</a>
+                        <div class="crfarm-info-block">
+                            <h5 class="fw-bold mb-3" style="color:var(--crfarm-primary);">✅ Certifications</h5>
+                            <div class="d-flex gap-2 flex-wrap">
+                                <span class="badge bg-success">GLOBALG.A.P.</span>
+                                <span class="badge bg-success">Esencial Costa Rica</span>
+                                <span class="badge bg-success">PYME Costa Rica</span>
                             </div>
-                        </div>
-                        <div class="d-flex gap-3 mb-3">
-                            <div class="fs-4">💬</div>
-                            <div>
-                                <div class="fw-semibold">WhatsApp</div>
-                                <a href="https://wa.me/50663141562" target="_blank" class="text-success">(+506) 6314-1562</a>
-                            </div>
-                        </div>
-                        <div class="d-flex gap-3 mb-4">
-                            <div class="fs-4">✉️</div>
-                            <div>
-                                <div class="fw-semibold">Email</div>
-                                <a href="mailto:sales@crfarm.net" class="text-success d-block">sales@crfarm.net</a>
-                                <a href="mailto:v.vega@crfarmproducts.com" class="text-success d-block">v.vega@crfarmproducts.com</a>
-                            </div>
-                        </div>
-                        <div class="card border-success border-opacity-25 p-3" style="background:#f8fdf9;">
-                            <p class="mb-1 fw-semibold" style="color:#1a5c2a;">💬 Prefer to chat?</p>
-                            <p class="small text-muted mb-0">Use the virtual assistant in the bottom-right corner for quick questions about products and logistics.</p>
+                            <a href="/crfarm/certifications" class="small d-block mt-2"
+                               style="color:var(--crfarm-accent);">View all certifications →</a>
                         </div>
                     </div>
 
                 </div>
             </div>
         </section>
+
     </t>
 </template>
 
-
-<!-- ═══ THANK-YOU PAGE ═══ -->
+<!-- ════════════════════════════════════════════
+     CONTACT THANKS PAGE
+     ════════════════════════════════════════════ -->
 <template id="page_contact_thanks" name="CR Farm — Thank You">
     <t t-call="website.layout">
-        <t t-set="title">Message Received! | CR Farm Products</t>
+        <t t-set="title">Thank You | CR Farm Products</t>
 
-        <section class="py-5 text-center d-flex align-items-center justify-content-center" style="min-height:60vh;">
+        <section class="py-6 text-center" style="min-height:60vh; display:flex; align-items:center;">
             <div class="container">
-                <div class="display-1 mb-4">✅</div>
-                <h1 class="fw-bold mb-3" style="color:#1a5c2a;">Thank you for contacting us!</h1>
-                <p class="lead text-muted mb-2">We have received your message.</p>
-                <p class="text-muted mb-4">A CR Farm Products representative will get back to you within <strong>24 business hours</strong>.</p>
-                <p class="text-muted mb-4">For urgent matters, you can also reach us via WhatsApp at <a href="https://wa.me/50663141562" class="text-success fw-bold">(+506) 6314-1562</a>.</p>
-                <div class="d-flex justify-content-center gap-3 flex-wrap">
-                    <a href="/crfarm" class="btn btn-success px-4">Back to Home</a>
-                    <a href="/crfarm/products" class="btn btn-outline-success px-4">View Our Products</a>
+                <div style="font-size:72px; margin-bottom:24px;">✅</div>
+                <h1 class="h2 fw-bold mb-3" style="color:var(--crfarm-primary);">Inquiry Received!</h1>
+                <p class="lead text-muted mb-4">
+                    Thank you for contacting CR Farm Products.<br/>
+                    Our export team will respond within <strong>24 business hours</strong>.
+                </p>
+                <p class="text-muted mb-5">
+                    For urgent inquiries, reach us directly on WhatsApp:
+                </p>
+                <div class="d-flex gap-3 justify-content-center flex-wrap">
+                    <a href="https://wa.me/50688888888" target="_blank" class="crfarm-hero-cta-primary"
+                       style="background:var(--crfarm-primary);">
+                        💬 Open WhatsApp
+                    </a>
+                    <a href="/crfarm/products" class="crfarm-btn-outline">Browse Our Products</a>
                 </div>
             </div>
         </section>
+
     </t>
 </template>
 

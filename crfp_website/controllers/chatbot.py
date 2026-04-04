@@ -31,7 +31,7 @@ Normas de respuesta:
 - Sé profesional, amigable y conciso.
 - Responde en el mismo idioma que el usuario (español o inglés).
 - Si no sabes algo con certeza, sugiere al usuario llenar el formulario de contacto
-  en /crfarm/contacto para hablar con un ejecutivo.
+  en /crfarm/contact para hablar con un ejecutivo.
 - No inventes precios ni fechas de embarque específicas; esos detalles los proveen los ejecutivos.
 - Limita tus respuestas a 3-4 párrafos máximo.
 """

@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ═══ Website Product — List view ═══ -->
+    <record id="crfp_website_product_list" model="ir.ui.view">
+        <field name="name">crfp.website.product.list</field>
+        <field name="model">crfp.website.product</field>
+        <field name="arch" type="xml">
+            <list string="Website Products" default_order="sequence, name">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="category"/>
+                <field name="scientific_name"/>
+                <field name="production_season"/>
+                <field name="format_fresh"/>
+                <field name="format_peeled"/>
+                <field name="format_frozen"/>
+                <field name="tariff_code"/>
+                <field name="active" optional="show"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ═══ Website Product — Form view ═══ -->
+    <record id="crfp_website_product_form" model="ir.ui.view">
+        <field name="name">crfp.website.product.form</field>
+        <field name="model">crfp.website.product</field>
+        <field name="arch" type="xml">
+            <form string="Website Product">
+                <sheet>
+                    <div class="oe_button_box" name="button_box"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Product Name"/></h1>
+                    </div>
+                    <group>
+                        <group string="Classification">
+                            <field name="category"/>
+                            <field name="sequence"/>
+                            <field name="active"/>
+                        </group>
+                        <group string="Botanical">
+                            <field name="scientific_name"/>
+                            <field name="also_known_as"/>
+                            <field name="production_season"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="B2B Description" name="description">
+                            <field name="description" placeholder="Product description for international buyers..."/>
+                        </page>
+
+                        <page string="Packaging &amp; Specs" name="packaging">
+                            <group>
+                                <group string="Packaging by Market">
+                                    <field name="box_weight_eu_kg"/>
+                                    <field name="box_weight_usa_ca_kg"/>
+                                    <field name="boxes_per_pallet"/>
+                                    <field name="pallets_per_container"/>
+                                </group>
+                                <group string="Technical Specs">
+                                    <field name="size_specs"/>
+                                    <field name="tariff_code"/>
+                                </group>
+                            </group>
+                            <group string="Available Formats">
+                                <field name="format_fresh" widget="boolean_toggle"/>
+                                <field name="format_peeled" widget="boolean_toggle"/>
+                                <field name="format_frozen" widget="boolean_toggle"/>
+                                <field name="format_halved" widget="boolean_toggle"/>
+                                <field name="format_custom"/>
+                            </group>
+                        </page>
+
+                        <page string="Media &amp; Links" name="media">
+                            <group>
+                                <field name="image_url" placeholder="https://..."/>
+                                <field name="onedrive_url" placeholder="https://1drv.ms/..."/>
+                            </group>
+                        </page>
+
+                        <page string="Internal Notes" name="notes">
+                            <field name="notes" placeholder="Internal notes not shown on website..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ═══ Website Product — Search view ═══ -->
+    <record id="crfp_website_product_search" model="ir.ui.view">
+        <field name="name">crfp.website.product.search</field>
+        <field name="model">crfp.website.product</field>
+        <field name="arch" type="xml">
+            <search string="Website Products">
+                <field name="name"/>
+                <field name="scientific_name"/>
+                <field name="category"/>
+                <filter string="Roots &amp; Tubers" name="tubers"
+                        domain="[('category','=','tubers')]"/>
+                <filter string="Coconut" name="coconut"
+                        domain="[('category','=','coconut')]"/>
+                <filter string="Fresh Available" name="fresh"
+                        domain="[('format_fresh','=',True)]"/>
+                <filter string="Frozen Available" name="frozen"
+                        domain="[('format_frozen','=',True)]"/>
+                <filter string="Archived" name="inactive" domain="[('active','=',False)]"/>
+                <group by="category" string="Category"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- ═══ Action ═══ -->
+    <record id="action_crfp_website_product" model="ir.actions.act_window">
+        <field name="name">Website Products</field>
+        <field name="res_model">crfp.website.product</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Add your first website product
+            </p>
+            <p>
+                These products appear on the CR Farm corporate website catalog.
+                Each record holds the B2B technical specifications shown to international buyers.
+            </p>
+        </field>
+    </record>
+
+    <!-- ═══ Menu ═══ -->
+    <menuitem id="menu_crfp_website_products"
+              name="Website Products"
+              parent="website.menu_website_configuration"
+              action="action_crfp_website_product"
+              sequence="50"/>
+
+</odoo>

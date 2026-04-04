@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         CR Farm Products — B2B Website Product Catalog Data
+         All products exported by CR Farm Products VYM S.A.
+         OneDrive photo links provided by Vanessa Vega.
+         ═══════════════════════════════════════════════════════════ -->
+
+    <!-- 1. YUCA (CASSAVA) -->
+    <record id="website_product_yuca" model="crfp.website.product">
+        <field name="name">Yuca (Cassava)</field>
+        <field name="sequence">10</field>
+        <field name="category">tubers</field>
+        <field name="scientific_name">Manihot esculenta Crantz</field>
+        <field name="also_known_as">Cassava, Manioc, Tapioca Root</field>
+        <field name="production_season">Year-round</field>
+        <field name="description">Costa Rican sweet cassava, free of bitter compounds. Grown in the volcanic soils of San Carlos under GLOBALG.A.P. standards. Available fresh whole, peeled &amp; vacuum-packed, or IQF frozen. Preferred variety for the US Hispanic market and European specialty retail.</field>
+        <field name="box_weight_eu_kg">20.0</field>
+        <field name="box_weight_usa_ca_kg">40.0</field>
+        <field name="boxes_per_pallet">66</field>
+        <field name="pallets_per_container">20</field>
+        <field name="format_fresh">True</field>
+        <field name="format_peeled">True</field>
+        <field name="format_frozen">True</field>
+        <field name="size_specs">300 g – 1.5 kg per piece; length 20–45 cm</field>
+        <field name="tariff_code">0714.10</field>
+        <field name="image_url">https://crfarmproducts.com/wp-content/uploads/2025/02/1366_2000-1024x683.jpg</field>
+        <field name="onedrive_url">https://1drv.ms/f/s!AlcYm1pEELJDgppa2UANUD218c3slg?e=fPPmgf</field>
+    </record>
+
+    <!-- 2. ÑAMPI (EDDOES) -->
+    <record id="website_product_nampi" model="crfp.website.product">
+        <field name="name">Ñampi (Eddoes)</field>
+        <field name="sequence">20</field>
+        <field name="category">tubers</field>
+        <field name="scientific_name">Colocasia esculenta (L.) Schott</field>
+        <field name="also_known_as">Eddoes, Eddo, Japanese Taro, Dasheen</field>
+        <field name="production_season">Year-round</field>
+        <field name="description">Small, corm-type taro with creamy texture and nutty flavor. High demand in Caribbean, UK, and North American ethnic markets. Excellent shelf life compared to other taro varieties. Supplied fresh whole with soil-free processing.</field>
+        <field name="box_weight_eu_kg">10.0</field>
+        <field name="box_weight_usa_ca_kg">25.0</field>
+        <field name="boxes_per_pallet">80</field>
+        <field name="pallets_per_container">20</field>
+        <field name="format_fresh">True</field>
+        <field name="format_peeled">False</field>
+        <field name="format_frozen">False</field>
+        <field name="size_specs">40 – 120 g per corm; caliber 30–60 mm</field>
+        <field name="tariff_code">0714.40</field>
+        <field name="image_url">https://crfarmproducts.com/wp-content/uploads/2025/02/6fdd42fb-e071-4fec-a5f3-254858525da6-1024x766.webp</field>
+        <field name="onedrive_url">https://1drv.ms/f/s!AlcYm1pEELJDgpp5NWeYKiKfM9ximQ?e=7PkWj2</field>
+    </record>
+
+    <!-- 3. MALANGA LILA (PURPLE MALANGA) -->
+    <record id="website_product_malanga_lila" model="crfp.website.product">
+        <field name="name">Malanga Lila</field>
+        <field name="sequence">30</field>
+        <field name="category">tubers</field>
+        <field name="scientific_name">Xanthosoma violaceum Schott</field>
+        <field name="also_known_as">Purple Malanga, Cocoyam, Tannia</field>
+        <field name="production_season">Year-round</field>
+        <field name="description">Distinctive purple-tinged corm with earthy, slightly nutty flavor. Popular in Cuban and Caribbean cuisine. Gluten-free and high in potassium. Available fresh whole or peeled for foodservice. Strong demand in South Florida, New York, and Spain.</field>
+        <field name="box_weight_eu_kg">20.0</field>
+        <field name="box_weight_usa_ca_kg">40.0</field>
+        <field name="boxes_per_pallet">66</field>
+        <field name="pallets_per_container">20</field>
+        <field name="format_fresh">True</field>
+        <field name="format_peeled">True</field>
+        <field name="format_frozen">True</field>
+        <field name="size_specs">150 g – 600 g per corm; caliber 50–100 mm</field>
+        <field name="tariff_code">0714.40</field>
+        <field name="image_url">https://crfarmproducts.com/wp-content/uploads/2025/02/20221009_101208-scaled-1-768x1024.webp</field>
+        <field name="onedrive_url">https://1drv.ms/f/s!AlcYm1pEELJDgppz5PTzuS98rnsdXg?e=naZkur</field>
+    </record>
+
+    <!-- 4. MALANGA ISLEÑA (WHITE MALANGA) -->
+    <record id="website_product_malanga_islena" model="crfp.website.product">
+        <field name="name">Malanga Isleña (Blanca)</field>
+        <field name="sequence">40</field>
+        <field name="category">tubers</field>
+        <field name="scientific_name">Xanthosoma sagittifolium (L.) Schott</field>
+        <field name="also_known_as">White Malanga, Yautía Blanca, Tannia</field>
+        <field name="production_season">Year-round</field>
+        <field name="description">White-fleshed cocoyam with mild, starchy flavor. High demand in Caribbean, Puerto Rican, and Dominican communities across the US and Europe. Consistent caliber and clean skin. Available fresh whole or peeled vacuum-packed.</field>
+        <field name="box_weight_eu_kg">20.0</field>
+        <field name="box_weight_usa_ca_kg">40.0</field>
+        <field name="boxes_per_pallet">66</field>
+        <field name="pallets_per_container">20</field>
+        <field name="format_fresh">True</field>
+        <field name="format_peeled">True</field>
+        <field name="format_frozen">False</field>
+        <field name="size_specs">200 g – 700 g per corm; caliber 50–120 mm</field>
+        <field name="tariff_code">0714.40</field>
+        <field name="image_url">https://crfarmproducts.com/wp-content/uploads/2025/02/1366_2000-1024x683.jpg</field>
+        <field name="onedrive_url">https://1drv.ms/f/s!AlcYm1pEELJDgpp3ElBIXPFN1C-DvQ?e=EkEE2s</field>
+    </record>
+
+    <!-- 5. BIG TARO -->
+    <record id="website_product_big_taro" model="crfp.website.product">
+        <field name="name">Big Taro</field>
+        <field name="sequence">50</field>
+        <field name="category">tubers</field>
+        <field name="scientific_name">Colocasia esculenta (L.) Schott var. antiquorum</field>
+        <field name="also_known_as">Large Taro, Giant Taro, Dasheen</field>
+        <field name="production_season">Year-round</field>
+        <field name="description">Large-format taro corm with firm texture, ideal for wholesale and food processing. Preferred by Asian supermarkets and foodservice distributors in North America and Europe. Supplied fresh with consistent sizing per buyer specification.</field>
+        <field name="box_weight_eu_kg">20.0</field>
+        <field name="box_weight_usa_ca_kg">40.0</field>
+        <field name="boxes_per_pallet">60</field>
+        <field name="pallets_per_container">20</field>
+        <field name="format_fresh">True</field>
+        <field name="format_peeled">False</field>
+        <field name="format_frozen">False</field>
+        <field name="size_specs">500 g – 2.5 kg per corm; caliber 80–180 mm</field>
+        <field name="tariff_code">0714.40</field>
+        <field name="image_url">https://crfarmproducts.com/wp-content/uploads/2025/02/20221009_101208-scaled-1-768x1024.webp</field>
+        <field name="onedrive_url">https://1drv.ms/f/s!AlcYm1pEELJDgppoQGRCt1ws41Drkg?e=e2UDOO</field>
+    </record>
+
+    <!-- 6. ÑAME (YAM) -->
+    <record id="website_product_name" model="crfp.website.product">
+        <field name="name">Ñame (Yam)</field>
+        <field name="sequence">60</field>
+        <field name="category">tubers</field>
+        <field name="scientific_name">Dioscorea alata L.</field>
+        <field name="also_known_as">White Yam, Water Yam, Greater Yam</field>
+        <field name="production_season">Year-round (peak: Oct–Feb)</field>
+        <field name="description">True yam with rough brown skin and white starchy flesh. High nutritional value and long shelf life. Strong demand in West African, Caribbean, and Latin American diaspora markets in Europe and North America. Available fresh whole.</field>
+        <field name="box_weight_eu_kg">20.0</field>
+        <field name="box_weight_usa_ca_kg">40.0</field>
+        <field name="boxes_per_pallet">60</field>
+        <field name="pallets_per_container">20</field>
+        <field name="format_fresh">True</field>
+        <field name="format_peeled">False</field>
+        <field name="format_frozen">False</field>
+        <field name="size_specs">500 g – 3 kg per tuber; length 20–60 cm</field>
+        <field name="tariff_code">0714.20</field>
+        <field name="image_url">https://crfarmproducts.com/wp-content/uploads/2025/02/6fdd42fb-e071-4fec-a5f3-254858525da6-1024x766.webp</field>
+        <field name="onedrive_url">https://1drv.ms/f/s!AlcYm1pEELJDges8PzdQXFve_5wCjA?e=WUUCUa</field>
+    </record>
+
+    <!-- 7. YAMPI -->
+    <record id="website_product_yampi" model="crfp.website.product">
+        <field name="name">Yampi</field>
+        <field name="sequence">70</field>
+        <field name="category">tubers</field>
+        <field name="scientific_name">Dioscorea trifida L.f.</field>
+        <field name="also_known_as">Cush-cush Yam, Mapuey, Indian Yam</field>
+        <field name="production_season">Seasonal (Aug–Jan)</field>
+        <field name="description">Native Amerindian yam with delicate texture and superior flavor profile. Highly prized in Caribbean and gourmet markets. Smaller tubers with deep purple skin and white or purple flesh. Limited annual supply — contact us for allocation.</field>
+        <field name="box_weight_eu_kg">10.0</field>
+        <field name="box_weight_usa_ca_kg">20.0</field>
+        <field name="boxes_per_pallet">80</field>
+        <field name="pallets_per_container">20</field>
+        <field name="format_fresh">True</field>
+        <field name="format_peeled">False</field>
+        <field name="format_frozen">False</field>
+        <field name="size_specs">80 – 400 g per tuber; length 8–20 cm</field>
+        <field name="tariff_code">0714.20</field>
+        <field name="image_url">https://crfarmproducts.com/wp-content/uploads/2025/02/1366_2000-1024x683.jpg</field>
+        <field name="onedrive_url">https://1drv.ms/f/s!AlcYm1pEELJDgpwFBO3S9aM7N6WMNg?e=fv8iQl</field>
+    </record>
+
+    <!-- 8. COCONUT -->
+    <record id="website_product_coconut" model="crfp.website.product">
+        <field name="name">Coconut</field>
+        <field name="sequence">80</field>
+        <field name="category">coconut</field>
+        <field name="scientific_name">Cocos nucifera L.</field>
+        <field name="also_known_as">Fresh Coconut, Green Coconut, Mature Coconut</field>
+        <field name="production_season">Year-round</field>
+        <field name="description">Costa Rican fresh coconuts, harvested at optimal maturity. Available as mature brown coconuts for retail and food processing, or green coconuts for beverage markets. High copra content. Exported to the US, Europe, and Canada by full container loads.</field>
+        <field name="box_weight_eu_kg">0.0</field>
+        <field name="box_weight_usa_ca_kg">0.0</field>
+        <field name="boxes_per_pallet">0</field>
+        <field name="pallets_per_container">0</field>
+        <field name="format_fresh">True</field>
+        <field name="format_peeled">False</field>
+        <field name="format_frozen">False</field>
+        <field name="format_custom">Bulk / Mesh bags (10-20 units)</field>
+        <field name="size_specs">Mature: 600 g – 1.2 kg; Green: 800 g – 2 kg</field>
+        <field name="tariff_code">0801.11</field>
+        <field name="image_url">https://crfarmproducts.com/wp-content/uploads/2025/02/6fdd42fb-e071-4fec-a5f3-254858525da6-1024x766.webp</field>
+        <field name="onedrive_url">https://1drv.ms/f/s!AlcYm1pEELJDgppa2UANUD218c3slg?e=fPPmgf</field>
+    </record>
+
+</odoo>
