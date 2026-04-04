@@ -10,3 +10,5 @@ access_crfp_price_list_line_user,crfp.price.list.line.user,model_crfp_price_list
 access_crfp_price_list_line_manager,crfp.price.list.line.manager,model_crfp_price_list_line,crfp_base.group_crfp_manager,1,1,1,1
 access_crfp_field_buyer_user,crfp.field.buyer.user,model_crfp_field_buyer,base.group_user,1,0,0,0
 access_crfp_field_buyer_manager,crfp.field.buyer.manager,model_crfp_field_buyer,crfp_base.group_crfp_manager,1,1,1,1
+access_crfp_reorder_analysis_user,crfp.reorder.analysis.user,model_crfp_reorder_analysis,base.group_user,1,1,1,0
+access_crfp_reorder_analysis_manager,crfp.reorder.analysis.manager,model_crfp_reorder_analysis,crfp_base.group_crfp_manager,1,1,1,1
