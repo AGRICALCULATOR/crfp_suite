@@ -27,6 +27,8 @@
         'data/cron_data.xml',
         'data/crfp_pricing_cron.xml',
         'data/crfp_pricing_mail.xml',
+        'data/crfp_reorder_cron.xml',
+        'views/crfp_reorder_views.xml',
     ],
     'assets': {
         'web.assets_backend': [
