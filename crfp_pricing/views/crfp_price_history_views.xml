@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ── List view ── -->
+    <record id="view_crfp_price_history_tree" model="ir.ui.view">
+        <field name="name">crfp.price.history.tree</field>
+        <field name="model">crfp.price.history</field>
+        <field name="arch" type="xml">
+            <list string="Price History">
+                <field name="product_id"/>
+                <field name="week"/>
+                <field name="year"/>
+                <field name="version"/>
+                <field name="price_usd"/>
+                <field name="price_local"/>
+                <field name="currency_id"/>
+                <field name="client_id"/>
+                <field name="source" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ── Graph view ── -->
+    <record id="view_crfp_price_history_graph" model="ir.ui.view">
+        <field name="name">crfp.price.history.graph</field>
+        <field name="model">crfp.price.history</field>
+        <field name="arch" type="xml">
+            <graph string="Price Trends" type="line">
+                <field name="week" type="row"/>
+                <field name="price_usd" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- ── Pivot view ── -->
+    <record id="view_crfp_price_history_pivot" model="ir.ui.view">
+        <field name="name">crfp.price.history.pivot</field>
+        <field name="model">crfp.price.history</field>
+        <field name="arch" type="xml">
+            <pivot string="Price Analysis">
+                <field name="product_id" type="row"/>
+                <field name="year" type="col"/>
+                <field name="price_usd" type="measure"/>
+                <field name="price_local" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- ── Search view ── -->
+    <record id="view_crfp_price_history_search" model="ir.ui.view">
+        <field name="name">crfp.price.history.search</field>
+        <field name="model">crfp.price.history</field>
+        <field name="arch" type="xml">
+            <search string="Price History">
+                <field name="product_id"/>
+                <field name="year"/>
+                <field name="week"/>
+                <field name="client_id"/>
+                <filter name="filter_price_list" string="From Price List"
+                        domain="[('source','=','price_list')]"/>
+                <filter name="filter_manual" string="Manual"
+                        domain="[('source','=','manual')]"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- ── Window action ── -->
+    <record id="action_crfp_price_history" model="ir.actions.act_window">
+        <field name="name">Price Trends</field>
+        <field name="res_model">crfp.price.history</field>
+        <field name="view_mode">graph,pivot,list</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No price history yet. Activate a price list to start tracking.
+            </p>
+        </field>
+    </record>
+
+</odoo>
