@@ -1,1 +1,3 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_crfp_website_product_user,crfp.website.product.user,model_crfp_website_product,base.group_user,1,0,0,0
+access_crfp_website_product_manager,crfp.website.product.manager,model_crfp_website_product,base.group_system,1,1,1,1
