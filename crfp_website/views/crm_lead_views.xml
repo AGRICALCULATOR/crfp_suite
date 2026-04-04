@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ═══ Extend CRM Lead form — AI Classification tab ═══ -->
+    <record id="crm_lead_form_inherit_crfp" model="ir.ui.view">
+        <field name="name">crm.lead.form.crfp.website</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_lead_all_leads"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="CR Farm AI" name="crfp_ai"
+                      invisible="not crfp_from_website">
+                    <group>
+                        <group string="Lead Source">
+                            <field name="crfp_from_website"/>
+                            <field name="crfp_ai_classified" readonly="1"/>
+                        </group>
+                        <group string="AI Classification">
+                            <field name="crfp_ai_priority"/>
+                            <field name="crfp_product_interest"/>
+                            <field name="crfp_region"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="crfp_ai_summary" readonly="1" colspan="2"
+                               placeholder="AI summary will appear here after classification..."/>
+                    </group>
+                    <div class="o_form_buttons_view mt-3">
+                        <button name="action_classify_with_ai" type="object"
+                                string="Classify with AI" class="btn-primary"
+                                invisible="crfp_ai_classified"/>
+                        <button name="action_classify_with_ai" type="object"
+                                string="Re-classify with AI" class="btn-secondary ms-2"
+                                invisible="not crfp_ai_classified"/>
+                        <button name="action_reset_ai_classification" type="object"
+                                string="Reset Classification" class="btn-link ms-2"
+                                invisible="not crfp_ai_classified"/>
+                    </div>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ═══ Extend CRM Lead list — add AI columns ═══ -->
+    <record id="crm_lead_list_inherit_crfp" model="ir.ui.view">
+        <field name="name">crm.lead.list.crfp.website</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_lead_all_leads_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list" position="inside">
+                <field name="crfp_from_website" string="Website" widget="boolean_favorite" optional="show"/>
+                <field name="crfp_ai_priority" string="AI Priority" optional="show"/>
+                <field name="crfp_product_interest" string="Product (AI)" optional="show"/>
+                <field name="crfp_region" string="Region (AI)" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ═══ Search filters for AI fields ═══ -->
+    <record id="crm_lead_search_inherit_crfp" model="ir.ui.view">
+        <field name="name">crm.lead.search.crfp.website</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.view_crm_lead_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <filter string="From Website" name="filter_from_website"
+                        domain="[('crfp_from_website','=',True)]"/>
+                <filter string="Pending AI Classification" name="filter_pending_ai"
+                        domain="[('crfp_from_website','=',True),('crfp_ai_classified','=',False)]"/>
+                <filter string="AI: High Priority" name="filter_ai_high"
+                        domain="[('crfp_ai_priority','=','high')]"/>
+                <group by="crfp_ai_priority" string="AI Priority"/>
+                <group by="crfp_product_interest" string="Product Interest"/>
+                <group by="crfp_region" string="Market Region"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
