@@ -292,9 +292,6 @@ class CrfpPricingAPI(http.Controller):
             }
             env['crfp.quotation.line'].create(line_vals)
 
-        # Record price history
-        env['crfp.price.history'].record_prices(quotation)
-
         return {'id': quotation.id, 'name': quotation.name}
 
     # ─── SALE ORDER CREATION ─────────────────────────────────────
