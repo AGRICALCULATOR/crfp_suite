@@ -22,9 +22,10 @@ class CrfpPort(models.Model):
     active = fields.Boolean(default=True)
     notes = fields.Text(string='Notes')
 
-    _sql_constraints = [
-        ('code_unique', 'UNIQUE(code)', 'Port code must be unique.'),
-    ]
+    code_unique = models.Constraint(
+        'UNIQUE(code)',
+        'Port code must be unique.',
+    )
 
     def name_get(self):
         return [(r.id, f"{r.code} - {r.name} ({r.country})") for r in self]

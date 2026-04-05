@@ -16,6 +16,7 @@ class CrfpContainerType(models.Model):
     sequence = fields.Integer(default=10)
     active = fields.Boolean(default=True)
 
-    _sql_constraints = [
-        ('code_unique', 'UNIQUE(code)', 'Container type code must be unique.'),
-    ]
+    code_unique = models.Constraint(
+        'UNIQUE(code)',
+        'Container type code must be unique.',
+    )
