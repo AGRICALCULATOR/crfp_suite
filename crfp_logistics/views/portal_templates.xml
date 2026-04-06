@@ -6,12 +6,6 @@
      Base: portal.portal_layout (Odoo 19 standard portal)
      ═══════════════════════════════════════════════════════════════════════ -->
 
-<!-- ── Portal Home — shipment counter badge ── -->
-<template id="portal_home_crfarm_shipments" inherit_id="portal.portal_breadcrumbs"
-          priority="10">
-    <!-- no-op: breadcrumb override not needed -->
-</template>
-
 <!-- Add CR Farm shipments to portal home panel -->
 <template id="portal_my_home_crfarm" inherit_id="portal.portal_my_home"
           customize_show="True" name="CR Farm Shipments">
