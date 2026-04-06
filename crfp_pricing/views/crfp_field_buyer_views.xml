@@ -29,7 +29,7 @@
                     <button name="action_send_reminder" type="object"
                             string="Enviar Recordatorio" class="btn-primary"
                             icon="fa-bell"
-                            attrs="{'invisible': [('partner_id', '=', False)]}"/>
+                            invisible="not partner_id"/>
                     <button name="action_copy_link" type="object"
                             string="Copiar Link" class="btn-secondary"
                             icon="fa-clipboard"/>
