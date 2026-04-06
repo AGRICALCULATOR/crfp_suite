@@ -861,3 +861,70 @@ class CrfpShipment(models.Model):
 
         # Return the report action so user can see/download
         return report.report_action(self)
+
+    @api.model
+    def _cron_generate_alerts(self):
+        """Daily cron: generate deadline and document alerts for active shipments."""
+        today = fields.Date.context_today(self)
+        active_states = ['space_requested', 'booking_requested', 'booking_confirmed',
+                         'si_sent', 'bl_draft_received', 'loading', 'docs_final',
+                         'shipped', 'in_transit']
+        shipments = self.search([('state', 'in', active_states)])
+        Alert = self.env['crfp.shipment.alert']
+        for rec in shipments:
+            # ETD deadline alert (3 days warning)
+            if rec.etd and rec.state not in ('shipped', 'in_transit'):
+                days_to_etd = (rec.etd - today).days
+                if days_to_etd <= 3:
+                    existing = Alert.search([
+                        ('shipment_id', '=', rec.id),
+                        ('alert_type', '=', 'deadline'),
+                        ('is_resolved', '=', False),
+                        ('message', 'ilike', 'ETD'),
+                    ], limit=1)
+                    if not existing:
+                        severity = 'critical' if days_to_etd <= 0 else 'warning'
+                        Alert.create({
+                            'shipment_id': rec.id,
+                            'alert_type': 'deadline',
+                            'severity': severity,
+                            'message': 'ETD %s is in %d day(s)' % (rec.etd, days_to_etd),
+                            'auto_generated': True,
+                        })
+            # Cutoff date alert (1 day warning)
+            if rec.cutoff_date and rec.state in ('booking_confirmed', 'si_sent', 'bl_draft_received', 'loading'):
+                cutoff_day = rec.cutoff_date.date() if hasattr(rec.cutoff_date, 'date') else rec.cutoff_date
+                days_to_cutoff = (cutoff_day - today).days
+                if days_to_cutoff <= 1:
+                    existing = Alert.search([
+                        ('shipment_id', '=', rec.id),
+                        ('alert_type', '=', 'deadline'),
+                        ('is_resolved', '=', False),
+                        ('message', 'ilike', 'cutoff'),
+                    ], limit=1)
+                    if not existing:
+                        Alert.create({
+                            'shipment_id': rec.id,
+                            'alert_type': 'deadline',
+                            'severity': 'critical',
+                            'message': 'Container cutoff is in %d day(s)' % days_to_cutoff,
+                            'auto_generated': True,
+                        })
+            # Pending required documents alert
+            required_pending = rec.document_ids.filtered(
+                lambda d: d.is_required and d.state in ('pending',)
+            )
+            if required_pending and rec.state in ('docs_final', 'shipped'):
+                existing = Alert.search([
+                    ('shipment_id', '=', rec.id),
+                    ('alert_type', '=', 'document'),
+                    ('is_resolved', '=', False),
+                ], limit=1)
+                if not existing:
+                    Alert.create({
+                        'shipment_id': rec.id,
+                        'alert_type': 'document',
+                        'severity': 'warning',
+                        'message': '%d required document(s) still pending' % len(required_pending),
+                        'auto_generated': True,
+                    })
