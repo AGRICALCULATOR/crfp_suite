@@ -32,7 +32,7 @@ class CrfpIncotermMatrix(models.Model):
     inc_inland_dest = fields.Boolean(string='Inland Delivery Dest.', default=False)
     inc_duties = fields.Boolean(string='Import Duties', default=False)
 
-    code_unique = models.Constraint(
+    _code_unique = models.Constraint(
         'UNIQUE(code)',
         'Each incoterm can only have one matrix entry.',
     )
