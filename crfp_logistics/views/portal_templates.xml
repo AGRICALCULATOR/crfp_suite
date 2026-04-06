@@ -371,14 +371,5 @@
     </t>
 </template>
 
-<!-- Small CSS for portal card hover -->
-<template id="portal_assets" inherit_id="portal.assets_portal" customize_show="False">
-    <xpath expr="." position="inside">
-        <style>
-            .crfarm-portal-card { transition: transform 0.2s, box-shadow 0.2s; }
-            .crfarm-portal-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(27,67,50,0.15) !important; }
-        </style>
-    </xpath>
-</template>
 
 </odoo>

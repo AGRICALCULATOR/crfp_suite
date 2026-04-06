@@ -33,6 +33,11 @@
         'views/crfp_container_config_menus.xml',
         'views/portal_templates.xml',
     ],
+    'assets': {
+        'web.assets_web': [
+            'crfp_logistics/static/src/css/portal.css',
+        ],
+    },
     'installable': True,
     'application': True,
     'auto_install': False,
