@@ -378,7 +378,7 @@
 </template>
 
 <!-- Small CSS for portal card hover -->
-<template id="portal_assets" inherit_id="web.assets_frontend" customize_show="False">
+<template id="portal_assets" inherit_id="portal.assets_portal" customize_show="False">
     <xpath expr="." position="inside">
         <style>
             .crfarm-portal-card { transition: transform 0.2s, box-shadow 0.2s; }

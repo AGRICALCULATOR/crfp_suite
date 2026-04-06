@@ -34,7 +34,7 @@
         'views/crm_lead_views.xml',
     ],
     'assets': {
-        'web.assets_frontend': [
+        'website.assets_frontend': [
             'crfp_website/static/src/css/crfp_website.css',
             'crfp_website/static/src/css/crfp_chatbot.css',
             'crfp_website/static/src/js/crfp_website.js',
