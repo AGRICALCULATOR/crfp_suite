@@ -12,17 +12,27 @@
                         <h2>Container Configuration Wizard</h2>
                     </div>
 
-                    <group string="Step 1 — Container Type">
+                    <!-- Step 1: Container & Sales Order -->
+                    <group string="Step 1 — Container &amp; Order">
                         <group>
                             <field name="container_type_id"/>
-                            <field name="capacity_boxes" readonly="1" string="Container Capacity (boxes)"/>
+                            <field name="capacity_boxes" readonly="1"/>
                         </group>
                         <group>
                             <field name="sale_order_id" string="Link to Sales Order (optional)"/>
+                            <field name="is_mixed" widget="boolean_toggle"/>
                         </group>
                     </group>
 
-                    <group string="Step 2 — Pallet &amp; Box Setup">
+                    <!-- Auto-fill button (only visible when SO is set and mixed mode) -->
+                    <div invisible="not sale_order_id or not is_mixed" class="mb-3">
+                        <button name="action_autofill_from_so" type="object"
+                                string="Auto-fill Lines from Sales Order"
+                                class="btn-secondary"/>
+                    </div>
+
+                    <!-- Step 2a: Simple mode (single product) -->
+                    <group string="Step 2 — Pallet &amp; Box Setup" invisible="is_mixed">
                         <group>
                             <field name="pallet_config_id"
                                    help="Select to auto-fill boxes/pallet and weight per box"/>
@@ -32,13 +42,36 @@
                             <field name="num_pallets"/>
                             <field name="boxes_per_pallet"/>
                             <field name="net_weight_per_box_kg"/>
+                            <field name="gross_weight_per_box_kg"/>
                         </group>
                     </group>
 
+                    <!-- Step 2b: Mixed mode (per-product lines) -->
+                    <notebook invisible="not is_mixed">
+                        <page string="Product Lines">
+                            <field name="product_line_ids" nolabel="1">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="product_id"/>
+                                    <field name="pallet_config_id"/>
+                                    <field name="num_pallets"/>
+                                    <field name="boxes_per_pallet"/>
+                                    <field name="net_weight_per_box_kg"/>
+                                    <field name="gross_weight_per_box_kg"/>
+                                    <field name="total_boxes" readonly="1"/>
+                                    <field name="total_net_weight_kg" readonly="1"/>
+                                    <field name="total_gross_weight_kg" readonly="1"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+
+                    <!-- Step 3: Preview Totals -->
                     <group string="Step 3 — Capacity Preview">
                         <group>
                             <field name="total_boxes" readonly="1"/>
                             <field name="total_weight_kg" readonly="1"/>
+                            <field name="total_gross_weight_kg" readonly="1"/>
                         </group>
                         <group>
                             <field name="total_volume_m3" readonly="1"/>
