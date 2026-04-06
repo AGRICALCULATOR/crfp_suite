@@ -57,7 +57,7 @@
                         </div>
 
                         <!-- Products table -->
-                        <table class="table table-sm" style="font-size: 11px;">
+                        <table class="table table-sm" style="font-size: 13px;">
                             <thead>
                                 <tr style="background: #1a6b3c; color: white;">
                                     <th style="padding: 8px 10px; font-weight: 500; text-transform: uppercase; font-size: 9px; letter-spacing: 0.5px; border: none;">
@@ -92,13 +92,13 @@
                                             <td style="padding: 7px 6px; text-align: center; border-color: #e8eee9; color: #555;">
                                                 <t t-esc="'%.1f' % line.net_kg"/>
                                             </td>
-                                            <td style="padding: 7px 6px; text-align: right; border-color: #e8eee9; color: #999; font-size: 10px;">
+                                            <td style="padding: 7px 6px; text-align: right; border-color: #e8eee9; color: #999; font-size: 12px;">
                                                 $<t t-esc="'%.2f' % line.exw_price"/>
                                             </td>
-                                            <td style="padding: 7px 6px; text-align: right; border-color: #e8eee9; color: #999; font-size: 10px;">
+                                            <td style="padding: 7px 6px; text-align: right; border-color: #e8eee9; color: #999; font-size: 12px;">
                                                 $<t t-esc="'%.2f' % line.logistics_per_box"/>
                                             </td>
-                                            <td style="padding: 7px 10px; text-align: right; border-color: #e8eee9; font-weight: 700; font-size: 13px; color: #1a6b3c;">
+                                            <td style="padding: 7px 10px; text-align: right; border-color: #e8eee9; font-weight: 700; font-size: 15px; color: #1a6b3c;">
                                                 $<t t-esc="'%.2f' % line.final_price"/>
                                             </td>
                                             <td style="padding: 7px 6px; text-align: center; border-color: #e8eee9; color: #555;">
