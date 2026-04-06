@@ -87,3 +87,42 @@ class CrfpFieldBuyer(models.Model):
             'last_accessed': fields.Datetime.now(),
             'access_count': self.access_count + 1,
         })
+
+    def action_send_reminder(self):
+        """Send a price update reminder email to this field buyer."""
+        self.ensure_one()
+        if not self.partner_id or not self.partner_id.email:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': 'Sin email',
+                    'message': 'Este comprador no tiene un contacto con email configurado.',
+                    'type': 'warning',
+                    'sticky': False,
+                },
+            }
+        template = self.env.ref('crfp_pricing.email_template_field_buyer_reminder')
+        template.send_mail(self.id, force_send=True)
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': 'Recordatorio enviado',
+                'message': f'Email enviado a {self.partner_id.email}',
+                'type': 'success',
+                'sticky': False,
+            },
+        }
+
+    @api.model
+    def _cron_send_field_buyer_reminders(self):
+        """Send weekly price update reminders to all active field buyers with email."""
+        template = self.env.ref('crfp_pricing.email_template_field_buyer_reminder')
+        buyers = self.search([
+            ('active', '=', True),
+            ('partner_id', '!=', False),
+            ('partner_id.email', '!=', False),
+        ])
+        for buyer in buyers:
+            template.send_mail(buyer.id, force_send=False)

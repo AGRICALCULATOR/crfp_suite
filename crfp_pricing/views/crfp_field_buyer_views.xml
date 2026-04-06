@@ -26,8 +26,12 @@
         <field name="arch" type="xml">
             <form>
                 <header>
+                    <button name="action_send_reminder" type="object"
+                            string="Enviar Recordatorio" class="btn-primary"
+                            icon="fa-bell"
+                            attrs="{'invisible': [('partner_id', '=', False)]}"/>
                     <button name="action_copy_link" type="object"
-                            string="Copiar Link" class="btn-primary"
+                            string="Copiar Link" class="btn-secondary"
                             icon="fa-clipboard"/>
                     <button name="action_open_portal_preview" type="object"
                             string="Vista Previa" class="btn-secondary"

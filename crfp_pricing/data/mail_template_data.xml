@@ -24,5 +24,39 @@
             <field name="report_template_ids" eval="[(6, 0, [ref('crfp_pricing.action_report_crfp_quotation')])]"/>
             <field name="auto_delete" eval="False"/>
         </record>
+        <record id="email_template_field_buyer_reminder" model="mail.template">
+            <field name="name">CRFP: Recordatorio Precios de Campo</field>
+            <field name="model_id" ref="crfp_pricing.model_crfp_field_buyer"/>
+            <field name="email_from">{{ user.email or 'info@crfarmexport.com' }}</field>
+            <field name="email_to">{{ object.partner_id.email }}</field>
+            <field name="subject">Recordatorio: Actualizar precios de campo 🌿</field>
+            <field name="body_html"><![CDATA[
+<div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 520px; background: #fff; border-radius: 10px; overflow: hidden; border: 1px solid #e0e0e0;">
+    <div style="background: #1a6b3c; color: #fff; padding: 20px 24px;">
+        <h2 style="margin: 0; font-size: 18px;">CR Farm Products</h2>
+        <p style="margin: 4px 0 0; opacity: 0.85; font-size: 13px;">Actualización de precios de campo</p>
+    </div>
+    <div style="padding: 24px;">
+        <p style="margin: 0 0 16px; font-size: 15px;">Hola <strong>{{ object.name }}</strong>,</p>
+        <p style="margin: 0 0 20px; color: #444; font-size: 14px;">
+            Es momento de actualizar los precios de compra de campo para esta semana.
+            Por favor ingresá los precios actualizados lo antes posible.
+        </p>
+        <div style="text-align: center; margin: 28px 0;">
+            <a href="{{ object.portal_url }}"
+               style="background: #1a6b3c; color: #fff; padding: 14px 32px; border-radius: 8px;
+                      text-decoration: none; font-size: 15px; font-weight: 600; display: inline-block;">
+                📋 Actualizar Precios Ahora
+            </a>
+        </div>
+        <p style="font-size: 12px; color: #999; margin: 20px 0 0; text-align: center;">
+            Este link es personal — no lo compartás.<br/>
+            CR Farm Products VYM S.A.
+        </p>
+    </div>
+</div>
+]]></field>
+            <field name="auto_delete" eval="True"/>
+        </record>
     </data>
 </odoo>
