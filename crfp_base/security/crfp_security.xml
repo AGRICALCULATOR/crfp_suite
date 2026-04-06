@@ -8,4 +8,9 @@
         <field name="name">CR Farm - Manager</field>
         <field name="implied_ids" eval="[(4, ref('group_crfp_user'))]"/>
     </record>
+
+    <!-- Every logged-in user is automatically a CR Farm Manager -->
+    <record id="base.group_user" model="res.groups">
+        <field name="implied_ids" eval="[(4, ref('group_crfp_manager'))]"/>
+    </record>
 </odoo>
