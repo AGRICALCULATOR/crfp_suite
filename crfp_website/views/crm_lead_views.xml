@@ -69,9 +69,9 @@
                         domain="[('crfp_from_website','=',True),('crfp_ai_classified','=',False)]"/>
                 <filter string="AI: High Priority" name="filter_ai_high"
                         domain="[('crfp_ai_priority','=','high')]"/>
-                <group by="crfp_ai_priority" string="AI Priority"/>
-                <group by="crfp_product_interest" string="Product Interest"/>
-                <group by="crfp_region" string="Market Region"/>
+                <filter string="AI Priority" name="group_by_ai_priority" context="{'group_by': 'crfp_ai_priority'}"/>
+                <filter string="Product Interest" name="group_by_product_interest" context="{'group_by': 'crfp_product_interest'}"/>
+                <filter string="Market Region" name="group_by_region" context="{'group_by': 'crfp_region'}"/>
             </xpath>
         </field>
     </record>
