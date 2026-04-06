@@ -654,7 +654,7 @@
 
         <!-- Lightbox -->
         <div id="crfarm-lightbox">
-            <button id="crfarm-lightbox-close">&times;</button>
+            <button id="crfarm-lightbox-close">&#215;</button>
             <button id="crfarm-lightbox-prev">&#8592;</button>
             <img id="crfarm-lightbox-img" src="" alt="CR Farm Gallery"/>
             <button id="crfarm-lightbox-next">&#8594;</button>
