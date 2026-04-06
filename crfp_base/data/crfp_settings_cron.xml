@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="crfp_settings_cron_update_exchange_rate" model="ir.cron">
-        <field name="name">CR Farm: Update Exchange Rate Daily</field>
-        <field name="model_name">crfp.settings</field>
-        <field name="state">code</field>
-        <field name="code">model._cron_update_exchange_rate()</field>
-        <field name="interval_number">1</field>
-        <field name="interval_type">days</field>
-        <field name="user_id" ref="base.user_root"/>
-        <field name="active" eval="True"/>
-        <field name="nextcall">2026-04-04 02:00:00</field>
-    </record>
+    <data noupdate="1">
+        <record id="crfp_settings_cron_update_exchange_rate" model="ir.cron">
+            <field name="name">CR Farm: Update Exchange Rate Daily</field>
+            <field name="model_id" ref="model_crfp_settings"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_update_exchange_rate()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="user_id" ref="base.user_root"/>
+            <field name="active" eval="True"/>
+            <field name="nextcall">2026-04-04 02:00:00</field>
+        </record>
+    </data>
 </odoo>

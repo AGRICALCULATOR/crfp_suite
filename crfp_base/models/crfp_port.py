@@ -1,4 +1,4 @@
-from odoo import models, fields
+from odoo import models, fields, api
 
 
 class CrfpPort(models.Model):
@@ -27,5 +27,7 @@ class CrfpPort(models.Model):
         'Port code must be unique.',
     )
 
-    def name_get(self):
-        return [(r.id, f"{r.code} - {r.name} ({r.country})") for r in self]
+    @api.depends('code', 'name', 'country')
+    def _compute_display_name(self):
+        for r in self:
+            r.display_name = f"{r.code} - {r.name} ({r.country})"

@@ -42,9 +42,6 @@ class CrfpShipmentBooking(models.Model):
     contact_person = fields.Char(string='Contact Person')
     notes = fields.Text(string='Notes')
 
-    def name_get(self):
-        return [(r.id, r.booking_reference or ("Booking #%d" % r.id)) for r in self]
-
     @api.onchange('shipment_id')
     def _onchange_shipment_id(self):
         if not self.shipment_id:
