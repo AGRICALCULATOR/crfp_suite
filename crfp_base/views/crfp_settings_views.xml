@@ -70,11 +70,20 @@
         </field>
     </record>
 
-    <record id="action_crfp_settings" model="ir.actions.act_window">
+    <record id="action_crfp_settings" model="ir.actions.server">
         <field name="name">Settings</field>
-        <field name="res_model">crfp.settings</field>
-        <field name="view_mode">form</field>
-        <field name="target">current</field>
-        <field name="help">Configure CR Farm Export Suite settings.</field>
+        <field name="model_id" ref="crfp_base.model_crfp_settings"/>
+        <field name="state">code</field>
+        <field name="code">
+record = env['crfp.settings'].get_settings()
+action = {
+    'type': 'ir.actions.act_window',
+    'name': 'CR Farm Settings',
+    'res_model': 'crfp.settings',
+    'res_id': record.id,
+    'view_mode': 'form',
+    'target': 'current',
+}
+        </field>
     </record>
 </odoo>
