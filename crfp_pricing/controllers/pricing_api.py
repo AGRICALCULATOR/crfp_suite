@@ -58,6 +58,7 @@ class CrfpPricingAPI(http.Controller):
         )
 
         fixed_cost = env['crfp.fixed.cost'].get_fixed_costs()
+        settings = env['crfp.settings'].get_settings()
         fc_data = {
             'transport': fixed_cost.transport,
             'thc_origin': fixed_cost.thc_origin,
@@ -68,8 +69,8 @@ class CrfpPricingAPI(http.Controller):
             'inland_dest': fixed_cost.inland_dest,
             'insurance_pct': fixed_cost.insurance_pct,
             'duties_pct': fixed_cost.duties_pct,
-            'default_total_boxes': fixed_cost.default_total_boxes,
-            'default_exchange_rate': fixed_cost.default_exchange_rate,
+            'default_total_boxes': settings.default_total_boxes or fixed_cost.default_total_boxes,
+            'default_exchange_rate': settings.exchange_rate or fixed_cost.default_exchange_rate,
         }
 
         return {
