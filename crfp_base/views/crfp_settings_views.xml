@@ -8,27 +8,53 @@
                 <sheet>
                     <h2><field name="name"/></h2>
 
-                    <group string="Exchange Rate Configuration">
+                    <!-- Exchange Rate -->
+                    <group string="Exchange Rate">
                         <group>
                             <field name="exchange_rate"/>
                             <field name="exchange_rate_auto"/>
-                            <field name="exchange_rate_last_update"/>
+                            <field name="exchange_rate_last_update" readonly="1"/>
                         </group>
                         <group>
-                            <button name="action_update_exchange_rate"
-                                    string="Update Exchange Rate Now"
-                                    type="object"
-                                    class="oe_highlight"/>
+                            <div>
+                                <button name="action_update_exchange_rate"
+                                        string="Fetch from BCCR Now"
+                                        type="object"
+                                        class="btn-primary"/>
+                                <p class="text-muted mt-2" style="font-size:0.85em;">
+                                    Uses BCCR public API — Indicator 318 (USD sell rate).
+                                    Enable Auto-Update to refresh daily.
+                                </p>
+                            </div>
                         </group>
                     </group>
 
-                    <group string="Container &amp; Box Configuration">
+                    <!-- Container &amp; Box Defaults -->
+                    <group string="Container &amp; Box Defaults">
                         <group>
                             <field name="default_total_boxes"/>
                             <field name="default_boxes_per_pallet"/>
                         </group>
                     </group>
 
+                    <!-- Default Fixed Costs (loaded into new quotations) -->
+                    <group string="Default Fixed Costs (loaded into new quotations)">
+                        <group string="Origin">
+                            <field name="fc_transport_default"/>
+                            <field name="fc_thc_origin_default"/>
+                            <field name="fc_fumigation_default"/>
+                            <field name="fc_broker_default"/>
+                        </group>
+                        <group string="Destination">
+                            <field name="fc_thc_dest_default"/>
+                            <field name="fc_fumig_dest_default"/>
+                            <field name="fc_inland_dest_default"/>
+                            <field name="fc_insurance_pct_default"/>
+                            <field name="fc_duties_pct_default"/>
+                        </group>
+                    </group>
+
+                    <!-- Quality &amp; Monitoring -->
                     <group string="Quality &amp; Monitoring">
                         <group>
                             <field name="temperature_tolerance"/>
@@ -36,10 +62,8 @@
                         </group>
                     </group>
 
-                    <group string="Company" groups="base.group_multi_company">
-                        <group>
-                            <field name="company_id"/>
-                        </group>
+                    <group groups="base.group_multi_company">
+                        <field name="company_id"/>
                     </group>
                 </sheet>
             </form>
@@ -51,7 +75,6 @@
         <field name="res_model">crfp.settings</field>
         <field name="view_mode">form</field>
         <field name="target">current</field>
-        <field name="help">Configure CR Farm Export Suite settings including exchange rates, container defaults, and quality parameters.</field>
+        <field name="help">Configure CR Farm Export Suite settings.</field>
     </record>
 </odoo>
-

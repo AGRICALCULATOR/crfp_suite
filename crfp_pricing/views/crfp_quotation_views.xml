@@ -14,6 +14,7 @@
                 <field name="line_count"/>
                 <field name="total_amount" string="Total $/box"/>
                 <field name="sale_order_id"/>
+                <field name="price_list_id" string="Price List" optional="show"/>
                 <field name="state" widget="badge"
                        decoration-success="state == 'won'"
                        decoration-info="state in ('confirmed','sent')"
@@ -22,7 +23,7 @@
         </field>
     </record>
 
-    <!-- ═══ FORM VIEW — Commercial quotation with pallets table ═══ -->
+    <!-- ═══ FORM VIEW ═══ -->
     <record id="crfp_quotation_form" model="ir.ui.view">
         <field name="name">crfp.quotation.form</field>
         <field name="model">crfp.quotation</field>
@@ -32,6 +33,11 @@
                     <button name="action_create_sale_order" type="object"
                             string="Create Sale Order" class="btn-primary"
                             invisible="sale_order_id or state == 'lost'"/>
+                    <button name="action_publish_price_list" type="object"
+                            string="Publish to Price List" class="btn-secondary"
+                            icon="fa-list-alt"
+                            invisible="state == 'lost'"
+                            help="Save calculated prices as a Price List (personalized for client or general for portal)"/>
                     <button name="action_download_pdf" type="object"
                             string="Download PDF" class="btn-secondary"
                             icon="fa-file-pdf-o"/>
@@ -53,6 +59,11 @@
                                 class="oe_stat_button" icon="fa-ship"
                                 invisible="not sale_order_id"
                                 string="Shipment"/>
+                        <button name="action_view_price_list" type="object"
+                                class="oe_stat_button" icon="fa-list-alt"
+                                invisible="not price_list_id">
+                            <field name="price_list_id" widget="statinfo" string="Price List"/>
+                        </button>
                     </div>
                     <div class="oe_title">
                         <h1><field name="name" placeholder="e.g. VANESSA VEGA FOB Rotterdam"/></h1>
@@ -109,11 +120,11 @@
                         </page>
                         <page string="Fixed Cost Snapshot" name="costs">
                             <group>
-                                <group>
+                                <group string="Origin">
                                     <field name="fc_transport"/><field name="fc_thc_origin"/>
                                     <field name="fc_fumigation"/><field name="fc_broker"/>
                                 </group>
-                                <group>
+                                <group string="Destination">
                                     <field name="fc_thc_dest"/><field name="fc_fumig_dest"/>
                                     <field name="fc_inland_dest"/><field name="fc_insurance_pct"/>
                                     <field name="fc_duties_pct"/>
