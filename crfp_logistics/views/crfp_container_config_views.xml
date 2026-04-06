@@ -108,8 +108,8 @@
                 <filter string="Draft" name="filter_draft" domain="[('state','=','draft')]"/>
                 <filter string="Confirmed" name="filter_confirmed" domain="[('state','=','confirmed')]"/>
                 <filter string="With Sales Order" name="filter_with_so" domain="[('sale_order_id','!=',False)]"/>
-                <group by="container_type_id" string="Container Type"/>
-                <group by="state" string="Status"/>
+                <filter string="Container Type" name="group_by_container_type" context="{'group_by': 'container_type_id'}"/>
+                <filter string="Status" name="group_by_state" context="{'group_by': 'state'}"/>
             </search>
         </field>
     </record>

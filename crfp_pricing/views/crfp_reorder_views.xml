@@ -118,8 +118,8 @@
                         domain="[('activity_created','=',False),('status','in',('overdue','inactive','due_soon'))]"/>
                 <filter string="Email Not Sent" name="no_email"
                         domain="[('email_sent','=',False),('ai_email_subject','!=',False)]"/>
-                <group by="status" string="Status"/>
-                <group by="partner_id" string="Client"/>
+                <filter string="Status" name="group_by_status" context="{'group_by': 'status'}"/>
+                <filter string="Client" name="group_by_partner" context="{'group_by': 'partner_id'}"/>
             </search>
         </field>
     </record>
