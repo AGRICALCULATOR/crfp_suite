@@ -5,7 +5,7 @@
     <record id="crm_lead_form_inherit_crfp" model="ir.ui.view">
         <field name="name">crm.lead.form.crfp.website</field>
         <field name="model">crm.lead</field>
-        <field name="inherit_id" ref="crm.crm_lead_all_leads"/>
+        <field name="inherit_id" ref="crm.crm_lead_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//notebook" position="inside">
                 <page string="CR Farm AI" name="crfp_ai"
@@ -45,7 +45,7 @@
     <record id="crm_lead_list_inherit_crfp" model="ir.ui.view">
         <field name="name">crm.lead.list.crfp.website</field>
         <field name="model">crm.lead</field>
-        <field name="inherit_id" ref="crm.crm_lead_all_leads_tree"/>
+        <field name="inherit_id" ref="crm.crm_case_tree_view_leads"/>
         <field name="arch" type="xml">
             <xpath expr="//list" position="inside">
                 <field name="crfp_from_website" string="Website" widget="boolean_favorite" optional="show"/>
@@ -60,7 +60,7 @@
     <record id="crm_lead_search_inherit_crfp" model="ir.ui.view">
         <field name="name">crm.lead.search.crfp.website</field>
         <field name="model">crm.lead</field>
-        <field name="inherit_id" ref="crm.view_crm_lead_filter"/>
+        <field name="inherit_id" ref="crm.view_crm_case_leads_filter"/>
         <field name="arch" type="xml">
             <xpath expr="//search" position="inside">
                 <filter string="From Website" name="filter_from_website"
