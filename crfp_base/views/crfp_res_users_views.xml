@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        Odoo 19 removed category_id from res.groups, so CRFP groups do not
+        appear automatically in the Access Rights tab. This view adds a
+        "CR Farm Products" selection field directly on the user form via
+        a computed selection field on res.users.
+    -->
+    <record id="view_res_users_form_crfp" model="ir.ui.view">
+        <field name="name">res.users.form.crfp</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='access_rights']" position="inside">
+                <group string="CR Farm Products">
+                    <field name="crfp_role" string="CR Farm Access Level"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

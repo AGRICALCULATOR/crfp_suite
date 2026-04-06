@@ -24,6 +24,7 @@
         'views/crfp_incoterm_matrix_views.xml',
         'views/crfp_fixed_cost_views.xml',
         'views/crfp_settings_views.xml',
+        'views/crfp_res_users_views.xml',
         'views/crfp_menus.xml',
         'data/crfp_port_data.xml',
         'data/crfp_container_type_data.xml',
