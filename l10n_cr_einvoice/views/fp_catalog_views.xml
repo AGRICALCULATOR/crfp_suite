@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_fp_cabys_code_tree" model="ir.ui.view">
+        <field name="name">fp.cabys.code.tree</field>
+        <field name="model">fp.cabys.code</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_fp_cabys_code_form" model="ir.ui.view">
+        <field name="name">fp.cabys.code.form</field>
+        <field name="model">fp.cabys.code</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="code"/>
+                        <field name="name"/>
+                        <field name="active"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_fp_cabys_code" model="ir.actions.act_window">
+        <field name="name">Códigos CABYS</field>
+        <field name="res_model">fp.cabys.code</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="view_fp_economic_activity_tree" model="ir.ui.view">
+        <field name="name">fp.economic.activity.tree</field>
+        <field name="model">fp.economic.activity</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_fp_economic_activity_form" model="ir.ui.view">
+        <field name="name">fp.economic.activity.form</field>
+        <field name="model">fp.economic.activity</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="code"/>
+                        <field name="name"/>
+                        <field name="active"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_fp_economic_activity" model="ir.actions.act_window">
+        <field name="name">Actividades económicas</field>
+        <field name="res_model">fp.economic.activity</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+
+
+    <record id="view_fp_province_tree" model="ir.ui.view">
+        <field name="name">fp.province.tree</field>
+        <field name="model">fp.province</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_fp_province_form" model="ir.ui.view">
+        <field name="name">fp.province.form</field>
+        <field name="model">fp.province</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="code"/>
+                        <field name="name"/>
+                        <field name="active"/>
+                    </group>
+                    <notebook>
+                        <page string="Cantones">
+                            <field name="canton_ids" context="{'default_province_id': id}">
+                                <list editable="bottom">
+                                    <field name="code"/>
+                                    <field name="name"/>
+                                    <field name="active"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_fp_province" model="ir.actions.act_window">
+        <field name="name">Provincias</field>
+        <field name="res_model">fp.province</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="view_fp_canton_tree" model="ir.ui.view">
+        <field name="name">fp.canton.tree</field>
+        <field name="model">fp.canton</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="province_id"/>
+                <field name="code"/>
+                <field name="name"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_fp_canton_form" model="ir.ui.view">
+        <field name="name">fp.canton.form</field>
+        <field name="model">fp.canton</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="province_id"/>
+                        <field name="code"/>
+                        <field name="name"/>
+                        <field name="active"/>
+                    </group>
+                    <notebook>
+                        <page string="Distritos">
+                            <field name="district_ids" context="{'default_canton_id': id}">
+                                <list editable="bottom">
+                                    <field name="code"/>
+                                    <field name="name"/>
+                                    <field name="active"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_fp_canton" model="ir.actions.act_window">
+        <field name="name">Cantones</field>
+        <field name="res_model">fp.canton</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="view_fp_district_tree" model="ir.ui.view">
+        <field name="name">fp.district.tree</field>
+        <field name="model">fp.district</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="province_id"/>
+                <field name="canton_id"/>
+                <field name="code"/>
+                <field name="name"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_fp_district_form" model="ir.ui.view">
+        <field name="name">fp.district.form</field>
+        <field name="model">fp.district</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="province_id" readonly="1"/>
+                        <field name="canton_id"/>
+                        <field name="code"/>
+                        <field name="name"/>
+                        <field name="active"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_fp_district" model="ir.actions.act_window">
+        <field name="name">Distritos</field>
+        <field name="res_model">fp.district</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+
+
+    <record id="view_fp_other_charge_template_tree" model="ir.ui.view">
+        <field name="name">fp.other.charge.template.tree</field>
+        <field name="model">fp.other.charge.template</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="company_id"/>
+                <field name="document_type"/>
+                <field name="name"/>
+                <field name="calculation_type"/>
+                <field name="percentage" invisible="calculation_type != 'percentage'"/>
+                <field name="amount_manual" invisible="calculation_type != 'amount'"/>
+                <field name="account_id" options="{'no_create': True}"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_fp_other_charge_template_form" model="ir.ui.view">
+        <field name="name">fp.other.charge.template.form</field>
+        <field name="model">fp.other.charge.template</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="company_id"/>
+                        <field name="document_type"/>
+                        <field name="name"/>
+                        <field name="calculation_type"/>
+                        <field name="percentage" invisible="calculation_type != 'percentage'"/>
+                        <field name="amount_manual" invisible="calculation_type != 'amount'"/>
+                        <field name="account_id" options="{'no_create': True}"/>
+                        <field name="active"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_fp_other_charge_template" model="ir.actions.act_window">
+        <field name="name">Otros Cargos FE</field>
+        <field name="res_model">fp.other.charge.template</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="view_fp_client_exoneration_tree" model="ir.ui.view">
+        <field name="name">fp.client.exoneration.tree</field>
+        <field name="model">fp.client.exoneration</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="partner_id"/>
+                <field name="exoneration_number"/>
+                <field name="institution_name"/>
+                <field name="exoneration_type"/>
+                <field name="issue_date"/>
+                <field name="expiry_date"/>
+                <field name="exoneration_percentage"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_fp_client_exoneration_form" model="ir.ui.view">
+        <field name="name">fp.client.exoneration.form</field>
+        <field name="model">fp.client.exoneration</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group col="2">
+                        <field name="partner_id"/>
+                        <field name="exoneration_number"/>
+                        <field name="institution_name"/>
+                        <field name="exoneration_type"/>
+                        <field name="issue_date"/>
+                        <field name="expiry_date"/>
+                        <field name="exoneration_percentage"/>
+                        <field name="article"/>
+                        <field name="incise"/>
+                        <field name="active"/>
+                    </group>
+                    <notebook>
+                        <page string="Códigos CABYS">
+                            <field name="line_ids">
+                                <list editable="bottom">
+                                    <field name="product_id"/>
+                                    <field name="cabys_code_id"/>
+                                    <field name="exoneration_code"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_fp_client_exoneration" model="ir.actions.act_window">
+        <field name="name">Exoneraciones de Clientes</field>
+        <field name="res_model">fp.client.exoneration</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="menu_fp_catalog_root" name="Catálogos FE" parent="account.menu_finance_configuration" sequence="90" groups="account.group_account_manager"/>
+
+    <menuitem id="menu_fp_cabys_code" name="Códigos CABYS" parent="menu_fp_catalog_root" action="action_fp_cabys_code" sequence="10" groups="account.group_account_manager"/>
+
+    <menuitem id="menu_fp_economic_activity" name="Actividades económicas" parent="menu_fp_catalog_root" action="action_fp_economic_activity" sequence="20" groups="account.group_account_manager"/>
+
+    <menuitem id="menu_fp_province" name="Provincias" parent="menu_fp_catalog_root" action="action_fp_province" sequence="30" groups="account.group_account_manager"/>
+
+    <menuitem id="menu_fp_canton" name="Cantones" parent="menu_fp_catalog_root" action="action_fp_canton" sequence="40" groups="account.group_account_manager"/>
+
+    <menuitem id="menu_fp_district" name="Distritos" parent="menu_fp_catalog_root" action="action_fp_district" sequence="50" groups="account.group_account_manager"/>
+
+
+
+    <menuitem id="menu_fp_other_charge_template" name="Otros Cargos FE" parent="menu_fp_catalog_root" action="action_fp_other_charge_template" sequence="55" groups="account.group_account_manager"/>
+    <menuitem id="menu_fp_client_exoneration" name="Exoneraciones de Clientes" parent="menu_fp_catalog_root" action="action_fp_client_exoneration" sequence="60" groups="account.group_account_manager"/>
+</odoo>

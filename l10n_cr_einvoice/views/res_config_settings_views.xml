@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_fp_api" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.fp.api</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="account.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app string="Factura Electrónica CR" name="fp_api_settings" logo="/l10n_cr_einvoice/static/description/icon.svg">
+                    <block title="Conexión directa con Hacienda">
+                        <setting string="Ambiente de pruebas (Sandbox)">
+                            <field name="fp_hacienda_sandbox_mode"/>
+                            <div class="text-muted">
+                                Actívelo para usar endpoints de pruebas de Hacienda. Desactívelo para usar producción.
+                            </div>
+                        </setting>
+                        <setting string="Usuario Hacienda">
+                            <field name="fp_hacienda_username"/>
+                        </setting>
+                        <setting string="Contraseña Hacienda">
+                            <field name="fp_hacienda_password" password="True"/>
+                        </setting>
+                        <setting string="Timeout">
+                            <field name="fp_api_timeout"/>
+                        </setting>
+                        <setting string="Actividad económica por defecto">
+                            <field name="fp_economic_activity_id"/>
+                        </setting>
+                        <setting string="Certificado FE (.p12/.pfx)">
+                            <field name="fp_signing_certificate_file" filename="fp_signing_certificate_filename" widget="binary"/>
+                            <field name="fp_signing_certificate_filename" invisible="1"/>
+                        </setting>
+                        <setting string="Contraseña certificado FE">
+                            <field name="fp_signing_certificate_password" password="True"/>
+                        </setting>
+                        <setting string="Información del certificado (.p12/.pfx)">
+                            <button string="Actualizar info del certificado" name="action_fp_refresh_certificate_info" type="object" class="btn-secondary"/>
+                            <group col="2">
+                                <field name="fp_certificate_issue_date" readonly="1"/>
+                                <field name="fp_certificate_subject" readonly="1"/>
+                                <field name="fp_certificate_serial_subject" readonly="1"/>
+                                <field name="fp_certificate_expiration_date" readonly="1"/>
+                                <field name="fp_certificate_issuer" readonly="1"/>
+                                <field name="fp_certificate_serial_number" readonly="1"/>
+                                <field name="fp_certificate_version" readonly="1"/>
+                            </group>
+                        </setting>
+                        <setting string="Consultar automáticamente después de enviar">
+                            <field name="fp_auto_consult_after_send"/>
+                        </setting>
+                        <setting string="Enviar correo automáticamente cuando Hacienda acepte">
+                            <field name="fp_auto_send_email_when_accepted"/>
+                        </setting>
+                        <setting string="Código de sucursal FE">
+                            <field name="fp_branch_code"/>
+                        </setting>
+                        <setting string="Código de terminal FE">
+                            <field name="fp_terminal_code"/>
+                        </setting>
+                        <setting string="Plantilla de factura electrónica">
+                            <field name="fp_invoice_template_style"/>
+                            <div class="text-muted">
+                                Selecciona Estándar Odoo para el formato original, o una plantilla personalizada (Azul, Oscura, Clara, Esmeralda, Atardecer o Corporativa CR).
+                            </div>
+                        </setting>
+                    </block>
+                    <block title="Último consecutivo por tipo de comprobante (Hacienda 4.4)">
+                        <setting string="Factura electrónica (01) - último número">
+                            <field name="fp_consecutive_fe"/>
+                        </setting>
+                        <setting string="Tiquete electrónico (04) - último número">
+                            <field name="fp_consecutive_te"/>
+                        </setting>
+                        <setting string="Factura electrónica de compra (08) - último número">
+                            <field name="fp_consecutive_fec"/>
+                        </setting>
+                        <setting string="Nota de crédito electrónica (03) - último número">
+                            <field name="fp_consecutive_nc"/>
+                        </setting>
+                        <setting string="Nota de débito electrónica (02) - último número">
+                            <field name="fp_consecutive_nd"/>
+                        </setting>
+                        <setting string="Factura electrónica de exportación (09) - último número">
+                            <field name="fp_consecutive_others"/>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+</odoo>

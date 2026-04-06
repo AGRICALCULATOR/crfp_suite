@@ -1,0 +1,359 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* l10n_cr_einvoice
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"POT-Creation-Date: 2026-04-06 00:00+0000\n"
+"PO-Revision-Date: 2026-04-06 00:00+0000\n"
+"Last-Translator: FenixCR Solutions\n"
+"Language-Team: English\n"
+"Language: en_US\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. module: l10n_cr_einvoice
+msgid "Peso neto"
+msgstr "Net weight"
+
+#. module: l10n_cr_einvoice
+msgid "Peso bruto"
+msgstr "Gross weight"
+
+#. module: l10n_cr_einvoice
+msgid "Peso neto (kg)"
+msgstr "Net weight (kg)"
+
+#. module: l10n_cr_einvoice
+msgid "Peso bruto (kg)"
+msgstr "Gross weight (kg)"
+
+#. module: l10n_cr_einvoice
+msgid "Cantidad"
+msgstr "Quantity"
+
+#. module: l10n_cr_einvoice
+msgid "Artículo"
+msgstr "Item"
+
+#. module: l10n_cr_einvoice
+msgid "Descripción"
+msgstr "Description"
+
+#. module: l10n_cr_einvoice
+msgid "Precio Unit."
+msgstr "Unit Price"
+
+#. module: l10n_cr_einvoice
+msgid "Impuesto"
+msgstr "Tax"
+
+#. module: l10n_cr_einvoice
+msgid "Descuento"
+msgstr "Discount"
+
+#. module: l10n_cr_einvoice
+msgid "Valor Total"
+msgstr "Total Value"
+
+#. module: l10n_cr_einvoice
+msgid "Información adicional"
+msgstr "Additional information"
+
+#. module: l10n_cr_einvoice
+msgid "Detalle"
+msgstr "Detail"
+
+#. module: l10n_cr_einvoice
+msgid "Referencia"
+msgstr "Reference"
+
+#. module: l10n_cr_einvoice
+msgid "Observación"
+msgstr "Notes"
+
+#. module: l10n_cr_einvoice
+msgid "Monto en letras"
+msgstr "Amount in words"
+
+#. module: l10n_cr_einvoice
+msgid "Subtotal"
+msgstr "Subtotal"
+
+#. module: l10n_cr_einvoice
+msgid "Total gravado"
+msgstr "Taxable total"
+
+#. module: l10n_cr_einvoice
+msgid "Total exento"
+msgstr "Exempt total"
+
+#. module: l10n_cr_einvoice
+msgid "Total exonerado"
+msgstr "Exonerated total"
+
+#. module: l10n_cr_einvoice
+msgid "Total no sujeto"
+msgstr "Non-taxable total"
+
+#. module: l10n_cr_einvoice
+msgid "Total venta"
+msgstr "Sales total"
+
+#. module: l10n_cr_einvoice
+msgid "Total descuento"
+msgstr "Discount total"
+
+#. module: l10n_cr_einvoice
+msgid "Total venta neta"
+msgstr "Net sales total"
+
+#. module: l10n_cr_einvoice
+msgid "Total IVA"
+msgstr "VAT total"
+
+#. module: l10n_cr_einvoice
+msgid "Total otros cargos"
+msgstr "Other charges total"
+
+#. module: l10n_cr_einvoice
+msgid "Total comprobante"
+msgstr "Invoice total"
+
+#. module: l10n_cr_einvoice
+msgid "Receptor"
+msgstr "Customer"
+
+#. module: l10n_cr_einvoice
+msgid "Nombre:"
+msgstr "Name:"
+
+#. module: l10n_cr_einvoice
+msgid "Identificación:"
+msgstr "Identification:"
+
+#. module: l10n_cr_einvoice
+msgid "Correo:"
+msgstr "Email:"
+
+#. module: l10n_cr_einvoice
+msgid "Teléfono:"
+msgstr "Phone:"
+
+#. module: l10n_cr_einvoice
+msgid "Dirección:"
+msgstr "Address:"
+
+#. module: l10n_cr_einvoice
+msgid "Factura Electrónica"
+msgstr "Electronic Invoice"
+
+#. module: l10n_cr_einvoice
+msgid "Tiquete Electrónico"
+msgstr "Electronic Ticket"
+
+#. module: l10n_cr_einvoice
+msgid "Factura Electrónica de Exportación"
+msgstr "Electronic Export Invoice"
+
+#. module: l10n_cr_einvoice
+msgid "Factura Electrónica de Compra"
+msgstr "Electronic Purchase Invoice"
+
+#. module: l10n_cr_einvoice
+msgid "Nota de Crédito Electrónica"
+msgstr "Electronic Credit Note"
+
+#. module: l10n_cr_einvoice
+msgid "Nota de Débito Electrónica"
+msgstr "Electronic Debit Note"
+
+#. module: l10n_cr_einvoice
+msgid "Datos del emisor"
+msgstr "Issuer details"
+
+
+#. module: l10n_cr_einvoice
+msgid "Datos del emisor:"
+msgstr "Issuer details:"
+
+
+#. module: l10n_cr_einvoice
+msgid "Identificación"
+msgstr "Identification"
+
+
+#. module: l10n_cr_einvoice
+msgid "Teléfono"
+msgstr "Phone"
+
+
+#. module: l10n_cr_einvoice
+msgid "Correo electrónico"
+msgstr "Email"
+
+
+#. module: l10n_cr_einvoice
+msgid "Dirección emisor:"
+msgstr "Issuer address:"
+
+
+#. module: l10n_cr_einvoice
+msgid "Clave Comprobante:"
+msgstr "Electronic key:"
+
+
+#. module: l10n_cr_einvoice
+msgid "Fecha de Emisión:"
+msgstr "Issue date:"
+
+
+#. module: l10n_cr_einvoice
+msgid "Fecha de Vencimiento:"
+msgstr "Due date:"
+
+
+#. module: l10n_cr_einvoice
+msgid "Condición de Venta:"
+msgstr "Sale condition:"
+
+
+#. module: l10n_cr_einvoice
+msgid "Medio de Pago:"
+msgstr "Payment method:"
+
+
+#. module: l10n_cr_einvoice
+msgid "Moneda Aplicable:"
+msgstr "Currency:"
+
+
+#. module: l10n_cr_einvoice
+msgid "Tipo Cambio:"
+msgstr "Exchange rate:"
+
+
+#. module: l10n_cr_einvoice
+msgid "Datos del receptor:"
+msgstr "Receiver details:"
+
+
+#. module: l10n_cr_einvoice
+msgid "Correo Electrónico:"
+msgstr "Email:"
+
+
+#. module: l10n_cr_einvoice
+msgid "UM"
+msgstr "UoM"
+
+
+#. module: l10n_cr_einvoice
+msgid "# interno"
+msgstr "Internal #"
+
+
+#. module: l10n_cr_einvoice
+msgid "Subtotal por tarifas"
+msgstr "Subtotal by tax rates"
+
+
+#. module: l10n_cr_einvoice
+msgid "Tarifa"
+msgstr "Rate"
+
+
+#. module: l10n_cr_einvoice
+msgid "Importe"
+msgstr "Amount"
+
+
+#. module: l10n_cr_einvoice
+msgid "Recibo Conforme:"
+msgstr "Received in conformity:"
+
+
+#. module: l10n_cr_einvoice
+msgid "Firma: _____________________   Cédula: _____________________"
+msgstr "Signature: _____________________   ID: _____________________"
+
+
+#. module: l10n_cr_einvoice
+msgid "Emitida conforme la resolución de Facturación Electrónica de Costa Rica. Versión del documento 4.4."
+msgstr "Issued under Costa Rica Electronic Invoicing regulation. Document version 4.4."
+
+
+#. module: l10n_cr_einvoice
+msgid "Resumen del documento"
+msgstr "Document summary"
+
+
+#. module: l10n_cr_einvoice
+msgid "Tipo:"
+msgstr "Type:"
+
+
+#. module: l10n_cr_einvoice
+msgid "Clave comprobante:"
+msgstr "Electronic key:"
+
+
+#. module: l10n_cr_einvoice
+msgid "Consecutivo:"
+msgstr "Consecutive number:"
+
+
+#. module: l10n_cr_einvoice
+msgid "Fecha de emisión:"
+msgstr "Issue date:"
+
+
+#. module: l10n_cr_einvoice
+msgid "Fecha de vencimiento:"
+msgstr "Due date:"
+
+
+#. module: l10n_cr_einvoice
+msgid "Condición de venta:"
+msgstr "Sale condition:"
+
+
+#. module: l10n_cr_einvoice
+msgid "Medio de pago:"
+msgstr "Payment method:"
+
+
+#. module: l10n_cr_einvoice
+msgid "Moneda:"
+msgstr "Currency:"
+
+
+#. module: l10n_cr_einvoice
+msgid "Tipo de cambio:"
+msgstr "Exchange rate:"
+
+
+#. module: l10n_cr_einvoice
+msgid "CABYS"
+msgstr "CABYS"
+
+
+#. module: l10n_cr_einvoice
+msgid "Emitida conforme la resolución de Facturación Electrónica de Costa Rica (v4.4)."
+msgstr "Issued under Costa Rica Electronic Invoicing regulation (v4.4)."
+
+
+#. module: l10n_cr_einvoice
+msgid "Factura"
+msgstr "Invoice"
+
+
+#. module: l10n_cr_einvoice
+msgid "Firma:"
+msgstr "Signature:"
+
+#. module: l10n_cr_einvoice
+msgid "Cédula:"
+msgstr "ID:"

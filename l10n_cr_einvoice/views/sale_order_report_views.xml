@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_saleorder_document_fp_weights" inherit_id="sale.report_saleorder_document">
+        <xpath expr="//th[@name='th_quantity']" position="after">
+            <th name="th_fp_net_weight" class="text-end text-nowrap">Peso neto (kg)</th>
+            <th name="th_fp_gross_weight" class="text-end text-nowrap">Peso bruto (kg)</th>
+        </xpath>
+        <xpath expr="//td[@name='td_product_quantity']" position="after">
+            <td name="td_fp_net_weight" class="text-end text-nowrap">
+                <span t-esc="'%.3f' % (line.fp_net_weight or 0.0)"/>
+            </td>
+            <td name="td_fp_gross_weight" class="text-end text-nowrap">
+                <span t-esc="'%.3f' % (line.fp_gross_weight or 0.0)"/>
+            </td>
+        </xpath>
+    </template>
+</odoo>

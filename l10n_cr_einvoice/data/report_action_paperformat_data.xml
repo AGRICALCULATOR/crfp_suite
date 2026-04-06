@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <function model="ir.actions.report" name="_fp_assign_invoice_paperformat"/>
+</odoo>

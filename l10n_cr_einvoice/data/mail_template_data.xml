@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="email_template_edi_invoice_cr" model="mail.template">
+        <field name="name">Factura Electrónica CR: Envío automático</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="subject">{{ object.company_id.name }} {{ object._fp_get_email_document_label() }} (Ref {{ object._fp_get_email_reference() }})</field>
+        <field name="email_from">{{ (object.invoice_user_id.email_formatted or object.company_id.email_formatted or user.email_formatted) }}</field>
+        <field name="partner_to">{{ object.partner_id.id }}</field>
+        <field name="lang">{{ object.partner_id.lang }}</field>
+        <field name="auto_delete" eval="True"/>
+        <field name="body_html" type="html">
+            <div style="margin: 0px; padding: 0px;">
+                <p style="margin: 0px; padding: 0px; font-size: 13px;">
+                    Estimado/a
+                    <t t-if="object.partner_id.parent_id">
+                        <t t-out="object.partner_id.name or ''">Brandon Freeman</t>
+                        (
+                        <t t-out="object.partner_id.parent_id.name or ''">Azure Interior</t>
+                        )
+                    </t>
+                    <t t-else="">
+                        <t t-out="object.partner_id.name or ''">Brandon Freeman</t>
+                    </t>
+                    <br/><br/>
+                    Aquí encontrará su
+                    <t t-out="(object._fp_get_email_document_label() or '').lower()">factura electrónica</t>
+                    <strong>
+                        <t t-out="object._fp_get_email_reference_for_body()">00100001010000000001</t>
+                    </strong>
+                    <t t-if="object.ref">
+                        (con referencia: <t t-out="object.ref or ''">SUB003</t>)
+                    </t>
+                    por un importe de
+                    <strong>
+                        <t t-out="format_amount(object.amount_total, object.currency_id)">143.750,00 €</t>
+                    </strong>
+                    de <t t-out="object.company_id.name or ''">YourCompany</t>.
+                    <t t-if="object.invoice_user_id.signature">
+                        <br/><br/>
+                        <t t-out="object.invoice_user_id.signature or ''">--<br/>Mitchell Admin</t>
+                    </t>
+                    <br/><br/>
+                </p>
+            </div>
+        </field>
+    </record>
+</odoo>

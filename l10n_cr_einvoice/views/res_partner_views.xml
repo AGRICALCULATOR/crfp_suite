@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_partner_form_fp_identification" model="ir.ui.view">
+        <field name="name">res.partner.form.fp.identification</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='vat']" position="before">
+                <label for="vat" string="Identificación?"/>
+            </xpath>
+
+            <xpath expr="//field[@name='vat']" position="attributes">
+                <attribute name="string">Identificación?</attribute>
+                <attribute name="placeholder">Identificación?</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='vat']" position="after">
+                <group col="2" colspan="2" class="w-100">
+                    <field name="fp_identification_type" string="Tipo de identificación"/>
+                    <field name="fp_economic_activity_id" string="Actividad económica"/>
+                    <field name="fp_use_exonerations"/>
+                    <button name="action_fp_fetch_hacienda_data" string="Consultar Hacienda" type="object" class="oe_highlight"/>
+                </group>
+            </xpath>
+
+            <xpath expr="//field[@name='state_id']" position="attributes">
+                <attribute name="string">Provincia</attribute>
+                <attribute name="invisible">fp_is_costa_rica</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='city']" position="attributes">
+                <attribute name="string">Cantón (texto)</attribute>
+                <attribute name="placeholder">Cantón</attribute>
+                <attribute name="class">o_address_city</attribute>
+                <attribute name="invisible">fp_is_costa_rica</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='street']" position="attributes">
+                <attribute name="string">OtrasSeñas</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='zip']" position="after">
+                <div class="d-flex flex-wrap gap-2 w-100" invisible="not fp_is_costa_rica">
+                    <div class="o_address_state flex-fill" style="min-width: 6rem;">
+                        <label for="fp_province_id" string="Provincia" class="o_form_label"/>
+                        <field name="fp_province_id" string="Provincia" options="{'no_create': True}"/>
+                    </div>
+                    <div class="o_address_city flex-fill" style="min-width: 6rem;">
+                        <label for="fp_canton_id" string="Cantón" class="o_form_label"/>
+                        <field name="fp_canton_id" string="Cantón" options="{'no_create': True}"/>
+                    </div>
+                    <div class="o_address_city flex-fill" style="min-width: 6rem;">
+                        <label for="fp_district_id" string="Distrito" class="o_form_label"/>
+                        <field name="fp_district_id" string="Distrito" options="{'no_create': True}"/>
+                    </div>
+                    <div class="o_address_zip flex-fill" style="min-width: 6rem;">
+                        <label for="fp_neighborhood_code" string="Barrio" class="o_form_label"/>
+                        <field name="fp_neighborhood_code" string="Barrio" placeholder="Barrio"/>
+                    </div>
+                </div>
+            </xpath>
+
+            <xpath expr="//notebook" position="inside">
+                <page string="Exoneraciones" invisible="not fp_use_exonerations">
+                    <field name="fp_exoneration_ids" context="{'default_partner_id': id}">
+                        <list editable="bottom">
+                            <field name="exoneration_number"/>
+                            <field name="institution_name"/>
+                            <field name="exoneration_type"/>
+                            <field name="issue_date"/>
+                            <field name="expiry_date"/>
+                            <field name="exoneration_percentage"/>
+                            <field name="active"/>
+                        </list>
+                        <form>
+                            <sheet>
+                                <group col="2">
+                                    <field name="partner_id" readonly="1"/>
+                                    <field name="exoneration_number"/>
+                                    <field name="institution_name"/>
+                                    <field name="exoneration_type"/>
+                                    <field name="issue_date"/>
+                                    <field name="expiry_date"/>
+                                    <field name="exoneration_percentage"/>
+                                    <field name="article"/>
+                                    <field name="incise"/>
+                                    <field name="active"/>
+                                </group>
+                                <notebook>
+                                    <page string="Códigos CABYS">
+                                        <field name="line_ids">
+                                            <list editable="bottom">
+                                                <field name="product_id"/>
+                                                <field name="cabys_code_id"/>
+                                                <field name="exoneration_code"/>
+                                            </list>
+                                        </field>
+                                    </page>
+                                </notebook>
+                            </sheet>
+                        </form>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,16 @@
+from . import fp_catalogs
+from . import fp_exoneration
+from . import account_journal
+from . import account_move
+from . import account_tax
+from . import product_template
+from . import res_company
+from . import res_config_settings
+from . import res_partner
+from . import uom_uom
+from . import account_payment_term
+from . import account_move_other_charge
+
+from . import account_move_line
+from . import sale_order_line
+from . import ir_actions_report

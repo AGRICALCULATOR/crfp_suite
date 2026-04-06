@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_order_form_fp_weight_fields" model="ir.ui.view">
+        <field name="name">sale.order.form.fp.weight.fields</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='order_line']/*[self::tree or self::list]//field[@name='product_uom_qty']" position="after">
+                <field name="fp_net_weight" optional="hide"/>
+                <field name="fp_gross_weight" optional="hide"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/form//field[@name='product_uom_qty']" position="after">
+                <field name="fp_net_weight"/>
+                <field name="fp_gross_weight"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
