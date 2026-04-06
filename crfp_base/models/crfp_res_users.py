@@ -17,9 +17,9 @@ class ResUsers(models.Model):
         manager_group = self.env.ref('crfp_base.group_crfp_manager', raise_if_not_found=False)
         user_group = self.env.ref('crfp_base.group_crfp_user', raise_if_not_found=False)
         for user in self:
-            if manager_group and manager_group in user.groups_id:
+            if manager_group and user in manager_group.sudo().users:
                 user.crfp_role = 'manager'
-            elif user_group and user_group in user.groups_id:
+            elif user_group and user in user_group.sudo().users:
                 user.crfp_role = 'user'
             else:
                 user.crfp_role = False
@@ -30,6 +30,12 @@ class ResUsers(models.Model):
         for user in self:
             role = user.crfp_role
             if manager_group:
-                user.groups_id = [(4, manager_group.id)] if role == 'manager' else [(3, manager_group.id)]
+                if role == 'manager':
+                    manager_group.sudo().users = [(4, user.id)]
+                else:
+                    manager_group.sudo().users = [(3, user.id)]
             if user_group:
-                user.groups_id = [(4, user_group.id)] if role in ('user', 'manager') else [(3, user_group.id)]
+                if role in ('user', 'manager'):
+                    user_group.sudo().users = [(4, user.id)]
+                else:
+                    user_group.sudo().users = [(3, user.id)]
