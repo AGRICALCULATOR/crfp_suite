@@ -1,17 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-
-    <!-- Hourly cron: classify website leads that haven't been processed by AI yet -->
-    <record id="cron_classify_website_leads" model="ir.cron">
-        <field name="name">CR Farm: AI Lead Classification</field>
-        <field name="model_id" ref="crm.model_crm_lead"/>
-        <field name="state">code</field>
-        <field name="code">model._cron_classify_unclassified_leads()</field>
-        <field name="interval_number">1</field>
-        <field name="interval_type">hours</field>
-        <field name="numbercall">-1</field>
-        <field name="active">True</field>
-        <field name="priority">10</field>
-    </record>
-
+    <data noupdate="1">
+        <!-- Hourly cron: classify website leads that haven't been processed by AI yet -->
+        <record id="cron_classify_website_leads" model="ir.cron">
+            <field name="name">CR Farm: AI Lead Classification</field>
+            <field name="model_id" ref="crm.model_crm_lead"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_classify_unclassified_leads()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">hours</field>
+            <field name="active">True</field>
+        </record>
+    </data>
 </odoo>
