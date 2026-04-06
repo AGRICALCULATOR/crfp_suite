@@ -19,7 +19,7 @@ class CrfpDocumentType(models.Model):
     sequence = fields.Integer(default=10)
     active = fields.Boolean(default=True)
 
-    code_unique = models.Constraint(
+    _code_unique = models.Constraint(
         'UNIQUE(code)',
         'Document type code must be unique.',
     )

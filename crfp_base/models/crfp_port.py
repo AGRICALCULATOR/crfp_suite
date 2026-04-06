@@ -22,7 +22,7 @@ class CrfpPort(models.Model):
     active = fields.Boolean(default=True)
     notes = fields.Text(string='Notes')
 
-    code_unique = models.Constraint(
+    _code_unique = models.Constraint(
         'UNIQUE(code)',
         'Port code must be unique.',
     )
