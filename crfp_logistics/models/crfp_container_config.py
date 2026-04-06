@@ -35,6 +35,21 @@ class CrfpContainerConfig(models.Model):
         required=True,
         ondelete='restrict',
     )
+    capacity_boxes = fields.Integer(
+        string='Container Capacity (boxes)',
+        related='container_type_id.capacity_boxes',
+        store=False,
+        help='Standard box capacity of the selected container type',
+    )
+
+    # ── Mode: single-product vs. mixed ──
+    is_mixed = fields.Boolean(
+        string='Mixed Products',
+        default=False,
+        help='Enable to configure multiple products with different packaging in one container',
+    )
+
+    # ── Simple mode fields (single product) ──
     pallet_config_id = fields.Many2one(
         'crfp.pallet.config',
         string='Pallet Configuration',
@@ -46,8 +61,6 @@ class CrfpContainerConfig(models.Model):
         string='Box Type',
         ondelete='set null',
     )
-
-    # ── Pallet & box inputs ──
     num_pallets = fields.Integer(
         string='Number of Pallets',
         default=20,
@@ -63,8 +76,20 @@ class CrfpContainerConfig(models.Model):
         digits=(12, 3),
         help='Net weight in kg of each box (auto-filled from Pallet Configuration)',
     )
+    gross_weight_per_box_kg = fields.Float(
+        string='Gross Weight / Box (kg)',
+        digits=(12, 3),
+        help='Gross weight per box (net product + box tare). Used in logistics documents.',
+    )
 
-    # ── Computed totals ──
+    # ── Mixed mode: per-product lines ──
+    product_line_ids = fields.One2many(
+        'crfp.container.config.line',
+        'config_id',
+        string='Product Lines',
+    )
+
+    # ── Computed totals (both modes) ──
     total_boxes = fields.Integer(
         string='Total Boxes',
         compute='_compute_totals',
@@ -76,18 +101,19 @@ class CrfpContainerConfig(models.Model):
         store=True,
         digits=(12, 2),
     )
+    total_gross_weight_kg = fields.Float(
+        string='Total Gross Weight (kg)',
+        compute='_compute_totals',
+        store=True,
+        digits=(12, 2),
+        help='Total gross weight for logistics documents',
+    )
     total_volume_m3 = fields.Float(
         string='Est. Volume (m³)',
         compute='_compute_totals',
         store=True,
         digits=(12, 3),
         help='Estimated volume based on standard box dimensions (0.048 m³/box)',
-    )
-    capacity_boxes = fields.Integer(
-        string='Container Capacity (boxes)',
-        related='container_type_id.capacity_boxes',
-        store=False,
-        help='Standard box capacity of the selected container type',
     )
     fill_rate_pct = fields.Float(
         string='Fill Rate (%)',
@@ -116,21 +142,31 @@ class CrfpContainerConfig(models.Model):
                 parts.append(str(rec.date))
             rec.name = ' / '.join(parts) if parts else 'Container Config'
 
-    @api.depends('num_pallets', 'boxes_per_pallet', 'net_weight_per_box_kg',
-                 'container_type_id.capacity_boxes')
+    @api.depends(
+        'is_mixed',
+        'num_pallets', 'boxes_per_pallet', 'net_weight_per_box_kg',
+        'gross_weight_per_box_kg', 'container_type_id.capacity_boxes',
+        'product_line_ids.total_boxes',
+        'product_line_ids.total_net_weight_kg',
+        'product_line_ids.total_gross_weight_kg',
+    )
     def _compute_totals(self):
-        # Standard export box: ~0.048 m³ (60×40×20 cm)
-        BOX_VOLUME_M3 = 0.048
+        BOX_VOLUME_M3 = 0.048  # standard export box ~60×40×20 cm
         for rec in self:
-            total_boxes = (rec.num_pallets or 0) * (rec.boxes_per_pallet or 0)
+            if rec.is_mixed:
+                total_boxes = sum(rec.product_line_ids.mapped('total_boxes'))
+                total_net = sum(rec.product_line_ids.mapped('total_net_weight_kg'))
+                total_gross = sum(rec.product_line_ids.mapped('total_gross_weight_kg'))
+            else:
+                total_boxes = (rec.num_pallets or 0) * (rec.boxes_per_pallet or 0)
+                total_net = total_boxes * (rec.net_weight_per_box_kg or 0.0)
+                total_gross = total_boxes * (rec.gross_weight_per_box_kg or 0.0)
             rec.total_boxes = total_boxes
-            rec.total_weight_kg = total_boxes * (rec.net_weight_per_box_kg or 0.0)
+            rec.total_weight_kg = total_net
+            rec.total_gross_weight_kg = total_gross
             rec.total_volume_m3 = total_boxes * BOX_VOLUME_M3
             capacity = rec.container_type_id.capacity_boxes if rec.container_type_id else 0
-            if capacity and total_boxes:
-                rec.fill_rate_pct = (total_boxes / capacity) * 100.0
-            else:
-                rec.fill_rate_pct = 0.0
+            rec.fill_rate_pct = (total_boxes / capacity * 100.0) if capacity and total_boxes else 0.0
 
     # ─────────────────────────────────────────────────────────────────────────
     # Onchange
@@ -138,7 +174,6 @@ class CrfpContainerConfig(models.Model):
 
     @api.onchange('pallet_config_id')
     def _onchange_pallet_config_id(self):
-        """Auto-fill boxes_per_pallet and net_weight_per_box_kg from pallet config."""
         if self.pallet_config_id:
             self.boxes_per_pallet = self.pallet_config_id.boxes_per_pallet
             self.net_weight_per_box_kg = self.pallet_config_id.weight_kg
