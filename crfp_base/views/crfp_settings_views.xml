@@ -70,7 +70,16 @@
         </field>
     </record>
 
-    <record id="action_crfp_settings" model="ir.actions.server">
+    <!-- Keep original act_window (already in DB) -->
+    <record id="action_crfp_settings" model="ir.actions.act_window">
+        <field name="name">Settings</field>
+        <field name="res_model">crfp.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+    </record>
+
+    <!-- Server action that opens the singleton record directly -->
+    <record id="action_open_crfp_settings" model="ir.actions.server">
         <field name="name">Settings</field>
         <field name="model_id" ref="crfp_base.model_crfp_settings"/>
         <field name="state">code</field>
