@@ -11,156 +11,119 @@
         <field name="binding_type">report</field>
     </record>
 
-    <!-- QWeb template -->
+    <!-- QWeb template — matches Odoo 19 standard document style -->
     <template id="report_crfp_quotation">
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="o">
-                <div class="page" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #333; padding: 0; margin: 0;">
+                <t t-call="web.external_layout">
+                    <div class="page">
 
-                    <!-- ══════ GREEN TOP BAR — compact ══════ -->
-                    <div style="background: #1a4d2e; padding: 14px 24px; margin: -20px -20px 0 -20px;">
-                        <table style="width: 100%;">
-                            <tr>
-                                <td style="vertical-align: middle;">
-                                    <p style="margin: 0; font-size: 20px; font-weight: 700; color: white; letter-spacing: 0.5px;">
-                                        CR FARM PRODUCTS
-                                    </p>
-                                    <p style="margin: 2px 0 0; font-size: 9px; color: rgba(255,255,255,0.55); letter-spacing: 2px; text-transform: uppercase;">
-                                        Fresh Tropical Produce - Costa Rica
-                                    </p>
-                                </td>
-                                <td style="text-align: right; vertical-align: middle;">
-                                    <p style="margin: 0; font-size: 16px; font-weight: 300; color: rgba(255,255,255,0.85); letter-spacing: 2px; text-transform: uppercase;">
-                                        Price List
-                                    </p>
-                                    <p style="margin: 2px 0 0; font-size: 9px; color: rgba(255,255,255,0.45);">
-                                        <t t-esc="o.create_date.strftime('%B %d, %Y') if o.create_date else ''"/>
-                                    </p>
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
-                    <div style="height: 2px; background: linear-gradient(90deg, #2d7a4a, #8bc34a, #2d7a4a); margin: 0 -20px;"/>
+                        <!-- Title row -->
+                        <div class="row mt-4 mb-4">
+                            <div class="col-7">
+                                <t t-if="o.partner_id">
+                                    <div t-field="o.partner_id"
+                                         t-options='{"widget": "contact", "fields": ["name", "address", "vat"], "no_marker": true}'/>
+                                </t>
+                            </div>
+                            <div class="col-5 text-right">
+                                <h2 style="color: #1a6b3c; font-weight: 700;">
+                                    Price List — <span t-esc="o.name"/>
+                                </h2>
+                            </div>
+                        </div>
 
-                    <!-- ══════ CLIENT + DETAILS — compact ══════ -->
-                    <div style="padding: 10px 0 8px;">
-                        <table style="width: 100%; font-size: 10px;">
-                            <tr>
-                                <td style="width: 50%; vertical-align: top; padding-right: 20px;">
-                                    <p style="margin: 0 0 4px; font-size: 7px; color: #aaa; text-transform: uppercase; letter-spacing: 2px; font-weight: 600;">
-                                        Prepared for
-                                    </p>
-                                    <p style="margin: 0; font-size: 14px; font-weight: 700; color: #1a4d2e;">
-                                        <t t-esc="o.partner_id.name or '-'"/>
-                                    </p>
-                                    <p style="margin: 2px 0 0; color: #888; font-size: 9px;" t-if="o.partner_id.email">
-                                        <t t-esc="o.partner_id.email"/>
-                                    </p>
-                                </td>
-                                <td style="width: 50%; vertical-align: top;">
-                                    <table style="width: 100%; font-size: 9px; border-collapse: collapse;">
-                                        <tr>
-                                            <td style="padding: 2px 8px; color: #999;">Ref</td>
-                                            <td style="padding: 2px 0; font-weight: 600;" t-esc="o.name"/>
-                                        </tr>
-                                        <tr>
-                                            <td style="padding: 2px 8px; color: #999;">Incoterm</td>
-                                            <td style="padding: 2px 0;">
-                                                <span style="background: #1a4d2e; color: white; padding: 1px 10px; border-radius: 10px; font-weight: 700; font-size: 9px;" t-esc="o.incoterm"/>
+                        <!-- Details row -->
+                        <div class="row mb-4" style="font-size: 12px;">
+                            <div class="col-3">
+                                <strong style="color: #1a6b3c;">Date</strong><br/>
+                                <span t-esc="o.create_date.strftime('%m/%d/%Y') if o.create_date else ''"/>
+                            </div>
+                            <div class="col-3">
+                                <strong style="color: #1a6b3c;">Incoterm</strong><br/>
+                                <span t-esc="o.incoterm or '—'"/>
+                                <t t-if="o.port_id">
+                                    <br/><span style="color: #666;" t-esc="o.port_id.name"/>
+                                </t>
+                            </div>
+                            <div class="col-3" t-if="o.etd">
+                                <strong style="color: #1a6b3c;">ETD</strong><br/>
+                                <span t-esc="o.etd"/>
+                            </div>
+                            <div class="col-3" t-if="o.eta">
+                                <strong style="color: #1a6b3c;">ETA</strong><br/>
+                                <span t-esc="o.eta"/>
+                            </div>
+                        </div>
+
+                        <!-- Products table -->
+                        <table class="table table-sm" style="font-size: 11px;">
+                            <thead>
+                                <tr style="background: #1a6b3c; color: white;">
+                                    <th style="padding: 8px 10px; font-weight: 500; text-transform: uppercase; font-size: 9px; letter-spacing: 0.5px; border: none;">
+                                        Product
+                                    </th>
+                                    <th style="padding: 8px 6px; text-align: center; font-weight: 500; text-transform: uppercase; font-size: 9px; letter-spacing: 0.5px; border: none;">
+                                        Net Kg
+                                    </th>
+                                    <th style="padding: 8px 6px; text-align: right; font-weight: 400; text-transform: uppercase; font-size: 9px; letter-spacing: 0.5px; border: none; opacity: 0.75;">
+                                        EXW
+                                    </th>
+                                    <th style="padding: 8px 6px; text-align: right; font-weight: 400; text-transform: uppercase; font-size: 9px; letter-spacing: 0.5px; border: none; opacity: 0.75;">
+                                        Logistics
+                                    </th>
+                                    <th style="padding: 8px 10px; text-align: right; font-weight: 700; font-size: 10px; border: none;">
+                                        Price / Box
+                                    </th>
+                                    <th style="padding: 8px 6px; text-align: center; font-weight: 500; text-transform: uppercase; font-size: 9px; letter-spacing: 0.5px; border: none;">
+                                        Box/Plt
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-set="row_idx" t-value="0"/>
+                                <t t-foreach="o.line_ids" t-as="line">
+                                    <t t-if="line.include_in_pdf">
+                                        <t t-set="row_idx" t-value="row_idx + 1"/>
+                                        <tr t-attf-style="background: #{row_idx % 2 == 0 and '#f5f8f6' or 'white'};">
+                                            <td style="padding: 7px 10px; border-color: #e8eee9; font-weight: 600;">
+                                                <t t-esc="line.crfp_product_id.name"/>
+                                            </td>
+                                            <td style="padding: 7px 6px; text-align: center; border-color: #e8eee9; color: #555;">
+                                                <t t-esc="'%.1f' % line.net_kg"/>
+                                            </td>
+                                            <td style="padding: 7px 6px; text-align: right; border-color: #e8eee9; color: #999; font-size: 10px;">
+                                                $<t t-esc="'%.2f' % line.exw_price"/>
+                                            </td>
+                                            <td style="padding: 7px 6px; text-align: right; border-color: #e8eee9; color: #999; font-size: 10px;">
+                                                $<t t-esc="'%.2f' % line.logistics_per_box"/>
+                                            </td>
+                                            <td style="padding: 7px 10px; text-align: right; border-color: #e8eee9; font-weight: 700; font-size: 13px; color: #1a6b3c;">
+                                                $<t t-esc="'%.2f' % line.final_price"/>
+                                            </td>
+                                            <td style="padding: 7px 6px; text-align: center; border-color: #e8eee9; color: #555;">
+                                                <t t-esc="line.boxes_per_pallet"/>
                                             </td>
                                         </tr>
-                                        <tr>
-                                            <td style="padding: 2px 8px; color: #999;">Destination</td>
-                                            <td style="padding: 2px 0; font-weight: 600;" t-esc="o.port_id.name or '-'"/>
-                                        </tr>
-                                        <tr t-if="o.vessel_name">
-                                            <td style="padding: 2px 8px; color: #999;">Vessel</td>
-                                            <td style="padding: 2px 0;" t-esc="o.vessel_name"/>
-                                        </tr>
-                                        <tr t-if="o.etd">
-                                            <td style="padding: 2px 8px; color: #999;">ETD</td>
-                                            <td style="padding: 2px 0;" t-esc="o.etd"/>
-                                        </tr>
-                                        <tr t-if="o.eta">
-                                            <td style="padding: 2px 8px; color: #999;">ETA</td>
-                                            <td style="padding: 2px 0;" t-esc="o.eta"/>
-                                        </tr>
-                                    </table>
-                                </td>
-                            </tr>
+                                    </t>
+                                </t>
+                            </tbody>
                         </table>
+
+                        <!-- Footer note -->
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <p style="font-size: 9px; color: #aaa; margin: 0;">
+                                    Prices in USD ·
+                                    <strong style="color: #777;"><t t-esc="o.incoterm"/></strong>
+                                    <t t-if="o.port_id"> <t t-esc="o.port_id.name"/></t>
+                                    · Valid 7 days · Subject to availability
+                                </p>
+                            </div>
+                        </div>
+
                     </div>
-
-                    <!-- ══════ PRODUCTS TABLE — tight rows ══════ -->
-                    <table style="width: 100%; border-collapse: collapse; font-size: 10px; margin-bottom: 10px;">
-                        <thead>
-                            <tr>
-                                <th style="padding: 7px 10px; text-align: left; background: #1a4d2e; color: white; font-weight: 500; font-size: 8px; letter-spacing: 0.8px; text-transform: uppercase;">
-                                    Product
-                                </th>
-                                <th style="padding: 7px 6px; text-align: center; background: #1a4d2e; color: white; font-weight: 500; font-size: 8px; letter-spacing: 0.8px; text-transform: uppercase;">
-                                    Net Kg
-                                </th>
-                                <th style="padding: 7px 6px; text-align: right; background: #1a4d2e; color: rgba(255,255,255,0.65); font-weight: 400; font-size: 8px; letter-spacing: 0.8px; text-transform: uppercase;">
-                                    EXW
-                                </th>
-                                <th style="padding: 7px 6px; text-align: right; background: #1a4d2e; color: rgba(255,255,255,0.65); font-weight: 400; font-size: 8px; letter-spacing: 0.8px; text-transform: uppercase;">
-                                    Logistics
-                                </th>
-                                <th style="padding: 7px 10px; text-align: right; background: #1a4d2e; color: white; font-weight: 600; font-size: 9px; letter-spacing: 0.5px;">
-                                    PRICE / BOX
-                                </th>
-                                <th style="padding: 7px 6px; text-align: center; background: #1a4d2e; color: white; font-weight: 500; font-size: 8px; letter-spacing: 0.8px; text-transform: uppercase;">
-                                    Box/Plt
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <t t-set="row_idx" t-value="0"/>
-                            <t t-foreach="o.line_ids" t-as="line">
-                              <t t-if="line.include_in_pdf">
-                                <t t-set="row_idx" t-value="row_idx + 1"/>
-                                <tr t-attf-style="#{row_idx % 2 == 0 and 'background: #f4f7f5;' or 'background: white;'}">
-                                    <td style="padding: 6px 10px; border-bottom: 1px solid #eaefeb; font-weight: 600; font-size: 10px;">
-                                        <t t-esc="line.crfp_product_id.name"/>
-                                    </td>
-                                    <td style="padding: 6px; text-align: center; border-bottom: 1px solid #eaefeb; color: #666;">
-                                        <t t-esc="'%.1f' % line.net_kg"/>
-                                    </td>
-                                    <td style="padding: 6px; text-align: right; border-bottom: 1px solid #eaefeb; color: #aaa; font-size: 9px;">
-                                        $<t t-esc="'%.2f' % line.exw_price"/>
-                                    </td>
-                                    <td style="padding: 6px; text-align: right; border-bottom: 1px solid #eaefeb; color: #aaa; font-size: 9px;">
-                                        $<t t-esc="'%.2f' % line.logistics_per_box"/>
-                                    </td>
-                                    <td style="padding: 6px 10px; text-align: right; border-bottom: 1px solid #eaefeb; font-weight: 700; font-size: 12px; color: #1a4d2e;">
-                                        $<t t-esc="'%.2f' % line.final_price"/>
-                                    </td>
-                                    <td style="padding: 6px; text-align: center; border-bottom: 1px solid #eaefeb; color: #666;">
-                                        <t t-esc="line.boxes_per_pallet"/>
-                                    </td>
-                                </tr>
-                              </t>
-                            </t>
-                        </tbody>
-                    </table>
-
-                    <!-- ══════ FOOTER — minimal ══════ -->
-                    <div style="border-top: 1px solid #1a4d2e; padding-top: 8px;">
-                        <table style="width: 100%; font-size: 8px; color: #aaa;">
-                            <tr>
-                                <td style="line-height: 1.5;">
-                                    Prices in USD - <strong style="color: #777;"><t t-esc="o.incoterm"/></strong> <t t-esc="o.port_id.name or ''"/>
-                                    | Valid 7 days | Subject to availability
-                                </td>
-                                <td style="text-align: right; line-height: 1.5;">
-                                    CR Farm Products VYM S.A.
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
-
-                </div>
+                </t>
             </t>
         </t>
     </template>
