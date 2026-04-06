@@ -1,126 +1,176 @@
-from odoo import models, fields, api
-from datetime import datetime
 import logging
+import requests
+import xml.etree.ElementTree as ET
+from datetime import date
+from odoo import models, fields, api
+from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
+
+# BCCR public API — indicator 318 = USD sell rate (tipo de cambio venta)
+_BCCR_URL = (
+    'https://gee.bccr.fi.cr/Indicadores/Suscripciones/WS/'
+    'wsindicadoreseconomicos.asmx/ObtenerIndicadoresEconomicosXML'
+)
+_BCCR_INDICATOR = '318'
 
 
 class CrfpSettings(models.Model):
     _name = 'crfp.settings'
     _description = 'CR Farm Export Settings'
 
-    name = fields.Char(
-        string='Name',
-        default='CR Farm Settings',
-        required=True
-    )
+    name = fields.Char(string='Name', default='CR Farm Settings', required=True)
     company_id = fields.Many2one(
-        'res.company',
-        string='Company',
-        default=lambda self: self.env.company,
-        required=True
+        'res.company', string='Company',
+        default=lambda self: self.env.company, required=True,
     )
 
-    # Exchange Rate Configuration
+    # ── Exchange Rate ──────────────────────────────────────────────────────────
     exchange_rate = fields.Float(
-        string='Exchange Rate (CRC/USD)',
-        default=503.0,
-        digits=(12, 2),
-        help='Costa Rican Colon to US Dollar exchange rate'
+        string='Exchange Rate (CRC/USD)', default=503.0, digits=(12, 2),
+        help='Costa Rican Colon to US Dollar exchange rate (sell rate)',
     )
     exchange_rate_auto = fields.Boolean(
-        string='Auto-Update Exchange Rate',
-        default=False,
-        help='Automatically update exchange rate from BCCR API'
+        string='Auto-Update from BCCR', default=False,
+        help='Automatically fetch the exchange rate from BCCR every day',
     )
     exchange_rate_last_update = fields.Datetime(
-        string='Last Exchange Rate Update',
-        readonly=True,
-        help='Timestamp of last successful exchange rate update'
+        string='Last Update', readonly=True,
     )
 
-    # Container and Box Configuration
+    # ── Container & Box Defaults ───────────────────────────────────────────────
     default_total_boxes = fields.Integer(
-        string='Default Boxes per Container',
-        default=1386,
-        help='Default number of boxes in a full container'
+        string='Default Boxes per Container', default=1386,
+        help='Default number of boxes in a full container (used in calculator)',
     )
     default_boxes_per_pallet = fields.Integer(
-        string='Default Boxes per Pallet',
-        default=66,
-        help='Standard number of boxes per pallet'
+        string='Default Boxes per Pallet', default=66,
     )
 
-    # Temperature Monitoring
+    # ── Default Fixed Costs (snapshot defaults for new quotations) ─────────────
+    fc_transport_default = fields.Float(
+        string='Transport (USD)', default=600.0, digits=(12, 2),
+        help='Default inland transport cost loaded into new quotations',
+    )
+    fc_thc_origin_default = fields.Float(
+        string='THC Origin (USD)', default=380.0, digits=(12, 2),
+        help='Terminal handling charge at origin',
+    )
+    fc_fumigation_default = fields.Float(
+        string='Fumigation Origin (USD)', default=180.0, digits=(12, 2),
+    )
+    fc_broker_default = fields.Float(
+        string='Broker / Customs (USD)', default=150.0, digits=(12, 2),
+    )
+    fc_thc_dest_default = fields.Float(
+        string='THC Destination (USD)', default=0.0, digits=(12, 2),
+    )
+    fc_fumig_dest_default = fields.Float(
+        string='Fumigation Destination (USD)', default=0.0, digits=(12, 2),
+    )
+    fc_inland_dest_default = fields.Float(
+        string='Inland Destination (USD)', default=0.0, digits=(12, 2),
+    )
+    fc_insurance_pct_default = fields.Float(
+        string='Insurance (%)', default=0.30, digits=(12, 2),
+        help='Insurance as percentage of FOB value',
+    )
+    fc_duties_pct_default = fields.Float(
+        string='Duties (%)', default=0.0, digits=(12, 2),
+    )
+
+    # ── Quality / Monitoring ───────────────────────────────────────────────────
     temperature_tolerance = fields.Float(
-        string='Temperature Tolerance (C)',
-        default=2.0,
-        digits=(12, 1),
-        help='Temperature tolerance in Celsius for reefer container alerts'
+        string='Temperature Tolerance (°C)', default=2.0, digits=(12, 1),
+        help='Reefer temperature tolerance for alerts',
+    )
+    price_validity_days = fields.Integer(
+        string='Price Validity (Days)', default=7,
     )
 
-    # Quotation Configuration
-    price_validity_days = fields.Integer(
-        string='Price Validity (Days)',
-        default=7,
-        help='Number of days a quotation price is valid'
-    )
+    # ─────────────────────────────────────────────────────────────────────────
+    # Singleton accessor
+    # ─────────────────────────────────────────────────────────────────────────
 
     @api.model
     def get_settings(self, company_id=None):
-        """
-        Return the settings record for the given company (or current).
-        Creates a new record if none exists.
-        """
+        """Return the settings record for the current company; create if missing."""
         domain = [('company_id', '=', company_id or self.env.company.id)]
         record = self.search(domain, limit=1)
         if not record:
-            record = self.create({
-                'company_id': company_id or self.env.company.id,
-            })
+            record = self.create({'company_id': company_id or self.env.company.id})
         return record
 
+    # ─────────────────────────────────────────────────────────────────────────
+    # BCCR Exchange Rate
+    # ─────────────────────────────────────────────────────────────────────────
+
     def action_update_exchange_rate(self):
-        """
-        Attempt to fetch and update the exchange rate from BCCR API.
-        BCCR (Banco Central de Costa Rica) provides live exchange rates.
-
-        Note: Actual API implementation pending configuration.
-        Currently logs a placeholder message.
-        """
+        """Fetch today's USD sell rate from the BCCR public API and store it."""
         self.ensure_one()
-
+        today_str = date.today().strftime('%d/%m/%Y')
+        params = {
+            'Indicador': _BCCR_INDICATOR,
+            'FechaInicio': today_str,
+            'FechaFinal': today_str,
+            'Nombre': 'CRFARM',
+            'SubNiveles': 'N',
+            'CorreoElectronico': '',
+            'Token': '',
+        }
         try:
-            # TODO: Implement actual BCCR API call
-            # BCCR API endpoint: https://gee.bccr.fi.cr/indicadoreseconomicos/
-            # Indicator code for sell rate (venta) is 318
-
-            _logger.warning(
-                "Exchange rate update requested for %s but BCCR API integration "
-                "is not yet configured. Please implement the API call.",
-                self.name
+            resp = requests.get(_BCCR_URL, params=params, timeout=10)
+            resp.raise_for_status()
+            rate = self._parse_bccr_response(resp.text)
+        except requests.RequestException as e:
+            _logger.error('BCCR API request failed: %s', e)
+            raise UserError(
+                f'Could not connect to BCCR API: {e}\n'
+                'The exchange rate was NOT updated. Please try again or enter it manually.'
             )
 
+        if not rate:
+            raise UserError(
+                'BCCR returned no exchange rate for today. '
+                'The market may be closed. Please update manually.'
+            )
+
+        self.write({
+            'exchange_rate': rate,
+            'exchange_rate_last_update': fields.Datetime.now(),
+        })
+        _logger.info('BCCR exchange rate updated to %.2f CRC/USD', rate)
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': 'Exchange Rate Updated',
+                'message': f'New rate: {rate:.2f} CRC/USD (BCCR sell rate)',
+                'type': 'success',
+                'sticky': False,
+            },
+        }
+
+    @staticmethod
+    def _parse_bccr_response(xml_text):
+        """Parse BCCR XML response and return the float rate, or None."""
+        try:
+            root = ET.fromstring(xml_text)
+            # The value lives in NUM_VALOR inside any nested element
+            for elem in root.iter('NUM_VALOR'):
+                text = (elem.text or '').strip()
+                if text:
+                    return float(text.replace(',', '.'))
         except Exception as e:
-            _logger.error(
-                "Error updating exchange rate for %s: %s",
-                self.name,
-                str(e)
-            )
-            raise
+            _logger.warning('Could not parse BCCR response: %s', e)
+        return None
 
     def _cron_update_exchange_rate(self):
-        """
-        Scheduled cron job to update exchange rates if auto-update is enabled.
-        Called daily by scheduled action.
-        """
-        settings_records = self.search([('exchange_rate_auto', '=', True)])
-        for record in settings_records:
+        """Daily cron: update exchange rate for all settings with auto-update enabled."""
+        for record in self.search([('exchange_rate_auto', '=', True)]):
             try:
                 record.action_update_exchange_rate()
             except Exception as e:
                 _logger.error(
-                    "Cron job failed to update exchange rate for %s: %s",
-                    record.name,
-                    str(e)
+                    'Cron failed to update exchange rate for %s: %s', record.name, e
                 )

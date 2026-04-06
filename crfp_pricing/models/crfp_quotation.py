@@ -27,9 +27,11 @@ class CrfpQuotation(models.Model):
         ('directo', 'Direct'),
     ], string='Client Type', default='distribuidor')
 
-    # Global parameters
-    exchange_rate = fields.Float(string='Exchange Rate (CRC/USD)',
-                                 default=503.0, digits=(12, 2), required=True)
+    # Global parameters — defaults loaded from crfp.settings on creation
+    exchange_rate = fields.Float(
+        string='Exchange Rate (CRC/USD)', digits=(12, 2), required=True,
+        help='Exchange rate at time of quotation (snapshot)',
+    )
     incoterm = fields.Selection([
         ('EXW', 'EXW'), ('FCA', 'FCA'), ('FOB', 'FOB'),
         ('CFR', 'CFR'), ('CIF', 'CIF'), ('CPT', 'CPT'),
@@ -40,7 +42,7 @@ class CrfpQuotation(models.Model):
     freight_quote_id = fields.Many2one('crfp.freight.quote', string='Active Freight Quote')
     port_id = fields.Many2one('crfp.port', string='Destination Port')
     container_type_id = fields.Many2one('crfp.container.type', string='Container Type')
-    total_boxes = fields.Integer(string='Total Boxes in Container', default=1386)
+    total_boxes = fields.Integer(string='Total Boxes in Container')
 
     # Shipment info
     etd = fields.Date(string='ETD')
@@ -48,16 +50,16 @@ class CrfpQuotation(models.Model):
     vessel_name = fields.Char(string='Vessel / Voyage')
     shipping_company = fields.Char(string='Shipping Company')
 
-    # Fixed cost snapshot
-    fc_transport = fields.Float(default=600.0)
-    fc_thc_origin = fields.Float(default=380.0)
-    fc_fumigation = fields.Float(default=180.0)
-    fc_broker = fields.Float(default=150.0)
-    fc_thc_dest = fields.Float(default=0.0)
-    fc_fumig_dest = fields.Float(default=0.0)
-    fc_inland_dest = fields.Float(default=0.0)
-    fc_insurance_pct = fields.Float(default=0.30)
-    fc_duties_pct = fields.Float(default=0.0)
+    # Fixed cost snapshot — editable per quotation, defaults loaded from crfp.settings
+    fc_transport = fields.Float(string='Transport (USD)', digits=(12, 2))
+    fc_thc_origin = fields.Float(string='THC Origin (USD)', digits=(12, 2))
+    fc_fumigation = fields.Float(string='Fumigation Origin (USD)', digits=(12, 2))
+    fc_broker = fields.Float(string='Broker / Customs (USD)', digits=(12, 2))
+    fc_thc_dest = fields.Float(string='THC Destination (USD)', digits=(12, 2))
+    fc_fumig_dest = fields.Float(string='Fumigation Destination (USD)', digits=(12, 2))
+    fc_inland_dest = fields.Float(string='Inland Destination (USD)', digits=(12, 2))
+    fc_insurance_pct = fields.Float(string='Insurance (%)', digits=(12, 2))
+    fc_duties_pct = fields.Float(string='Duties (%)', digits=(12, 2))
 
     # Lines
     line_ids = fields.One2many('crfp.quotation.line', 'quotation_id', string='Product Lines')
@@ -65,12 +67,49 @@ class CrfpQuotation(models.Model):
     # Sale order link
     sale_order_id = fields.Many2one('sale.order', string='Sale Order', readonly=True, copy=False)
 
+    # Price list link (set when published to portal)
+    price_list_id = fields.Many2one(
+        'crfp.price.list', string='Published Price List',
+        readonly=True, copy=False,
+        help='Price list generated from this quotation for the wholesaler portal',
+    )
+
     # Computed
     line_count = fields.Integer(compute='_compute_line_count')
     total_amount = fields.Float(compute='_compute_totals', string='Total $/box')
     total_pallets = fields.Integer(compute='_compute_totals', string='Total Pallets')
     total_boxes_sum = fields.Integer(compute='_compute_totals', string='Total Boxes')
     total_order_amount = fields.Float(compute='_compute_totals', string='Total Order Amount')
+
+    # ─────────────────────────────────────────────────────────────────────────
+    # Defaults — read from crfp.settings so no hardcodes in Python
+    # ─────────────────────────────────────────────────────────────────────────
+
+    @api.model
+    def default_get(self, fields_list):
+        defaults = super().default_get(fields_list)
+        settings = self.env['crfp.settings'].get_settings()
+        mapping = {
+            'exchange_rate': settings.exchange_rate,
+            'total_boxes': settings.default_total_boxes,
+            'fc_transport': settings.fc_transport_default,
+            'fc_thc_origin': settings.fc_thc_origin_default,
+            'fc_fumigation': settings.fc_fumigation_default,
+            'fc_broker': settings.fc_broker_default,
+            'fc_thc_dest': settings.fc_thc_dest_default,
+            'fc_fumig_dest': settings.fc_fumig_dest_default,
+            'fc_inland_dest': settings.fc_inland_dest_default,
+            'fc_insurance_pct': settings.fc_insurance_pct_default,
+            'fc_duties_pct': settings.fc_duties_pct_default,
+        }
+        for field, value in mapping.items():
+            if field in fields_list:
+                defaults[field] = value
+        return defaults
+
+    # ─────────────────────────────────────────────────────────────────────────
+    # Computed
+    # ─────────────────────────────────────────────────────────────────────────
 
     @api.depends('line_ids')
     def _compute_line_count(self):
@@ -87,7 +126,9 @@ class CrfpQuotation(models.Model):
             rec.total_boxes_sum = sum(l.total_boxes for l in included)
             rec.total_order_amount = sum(l.line_total for l in included)
 
-    # ── Actions ──
+    # ─────────────────────────────────────────────────────────────────────────
+    # Actions
+    # ─────────────────────────────────────────────────────────────────────────
 
     def action_create_sale_order(self):
         """Create a sale.order from this quotation."""
@@ -99,7 +140,6 @@ class CrfpQuotation(models.Model):
         for line in self.line_ids.filtered('include_in_pdf'):
             if line.pallets <= 0:
                 continue
-            # Use line-level SKU first, fallback to base product link
             product = line.product_id or line.crfp_product_id.product_id
             if not product:
                 raise UserError(
@@ -147,16 +187,77 @@ class CrfpQuotation(models.Model):
             if so_line and abs(so_line.price_unit - line.final_price) > 0.01:
                 so_line.write({'price_unit': line.final_price})
 
-        # Store the quotation reference on the SO (for logistics auto-fill)
         try:
             so.write({'crfp_quotation_id': self.id})
         except Exception:
-            pass  # Field may not exist if crfp_logistics not installed
+            pass  # crfp_logistics may not be installed
         self.write({'sale_order_id': so.id, 'state': 'won'})
         return {
             'type': 'ir.actions.act_window',
             'res_model': 'sale.order',
             'res_id': so.id,
+            'view_mode': 'form',
+            'target': 'current',
+        }
+
+    def action_publish_price_list(self):
+        """
+        Generate a crfp.price.list from the calculated prices in this quotation.
+
+        - If a client is set: creates a personalized list (Scenario A).
+        - If no client: creates a general list by country (Scenario B / portal).
+        The calculator is the single source of truth for prices.
+        """
+        self.ensure_one()
+        lines_to_publish = self.line_ids.filtered(
+            lambda l: l.include_in_pdf and l.crfp_product_id and l.final_price > 0
+        )
+        if not lines_to_publish:
+            raise UserError(
+                'No product lines with a calculated price. '
+                'Please complete the calculator before publishing.'
+            )
+
+        today = fields.Date.today()
+        iso = today.isocalendar()
+        week_num = iso[1]
+        year = iso[0]
+
+        # Auto-increment version if a list already exists for same client/week/year
+        existing = self.env['crfp.price.list'].search([
+            ('client_id', '=', self.partner_id.id if self.partner_id else False),
+            ('week_number', '=', week_num),
+            ('year', '=', year),
+        ], order='version desc', limit=1)
+        version = (existing.version + 1) if existing else 1
+
+        usd = self.env['res.currency'].search([('name', '=', 'USD')], limit=1)
+
+        price_list_lines = [(0, 0, {
+            'product_id': line.crfp_product_id.id,
+            'price': line.final_price,
+            'currency_id': usd.id,
+        }) for line in lines_to_publish]
+
+        country_id = (
+            self.partner_id.country_id.id
+            if self.partner_id and self.partner_id.country_id else False
+        )
+
+        price_list = self.env['crfp.price.list'].create({
+            'week_number': week_num,
+            'year': year,
+            'version': version,
+            'client_id': self.partner_id.id if self.partner_id else False,
+            'country_id': country_id,
+            'line_ids': price_list_lines,
+        })
+        self.write({'price_list_id': price_list.id})
+
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'crfp.price.list',
+            'res_id': price_list.id,
             'view_mode': 'form',
             'target': 'current',
         }
@@ -179,7 +280,20 @@ class CrfpQuotation(models.Model):
                     'target': 'current',
                 }
         except Exception:
-            pass  # crfp_logistics not installed
+            pass
+
+    def action_view_price_list(self):
+        """Open the published price list linked to this quotation."""
+        self.ensure_one()
+        if not self.price_list_id:
+            return
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'crfp.price.list',
+            'res_id': self.price_list_id.id,
+            'view_mode': 'form',
+            'target': 'current',
+        }
 
     def action_view_sale_order(self):
         """Open the linked Sale Order."""
@@ -205,11 +319,9 @@ class CrfpQuotation(models.Model):
         if not self.partner_id:
             raise UserError('Please select a client before sending an email.')
 
-        # Generate the PDF
         report = self.env.ref('crfp_pricing.action_report_crfp_quotation')
         pdf_content, _ = report._render_qweb_pdf(report.report_name, self.ids)
 
-        # Create attachment
         attachment = self.env['ir.attachment'].create({
             'name': f'CRFP-Quotation-{self.name}.pdf',
             'type': 'binary',
@@ -219,7 +331,6 @@ class CrfpQuotation(models.Model):
             'mimetype': 'application/pdf',
         })
 
-        # Build email body
         port_name = self.port_id.name if self.port_id else '—'
         body = (
             f'<p>Dear {self.partner_id.name or "Customer"},</p>'
@@ -227,10 +338,9 @@ class CrfpQuotation(models.Model):
             f'<strong>{self.name}</strong>.</p>'
             f'<p>Incoterm: {self.incoterm}<br/>'
             f'Destination: {port_name}</p>'
-            f'<p>Prices are valid for 7 days. Please let us know if you '
-            f'have any questions or would like to confirm an order.</p>'
-            f'<p>Best regards,<br/>'
-            f'<strong>CR Farm Products VYM S.A</strong></p>'
+            f'<p>Prices are valid for {self.env["crfp.settings"].get_settings().price_validity_days} days. '
+            f'Please let us know if you have any questions or would like to confirm an order.</p>'
+            f'<p>Best regards,<br/><strong>CR Farm Products VYM S.A</strong></p>'
         )
 
         return {
