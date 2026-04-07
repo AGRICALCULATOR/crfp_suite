@@ -216,22 +216,35 @@ class CrfpShipment(models.Model):
                         vals.setdefault('carrier_partner_id', quotation.freight_quote_id.carrier_partner_id.id)
                     if quotation.freight_quote_id and quotation.freight_quote_id.all_in_freight:
                         vals.setdefault('freight_cost', quotation.freight_quote_id.all_in_freight)
+
         records = super().create(vals_list)
-        # Auto-create lines, documents, checklist for shipments created with SO
+
         for rec in records:
             if rec.sale_order_id and not rec.line_ids:
                 quotation = rec.crfp_quotation_id
-                rec._create_lines_from_so_and_quotation(quotation)
-                rec._auto_load_documents()
-                rec._auto_load_checklist()
-                rec._generate_commodity_description()
-                # Auto-create container if type is set
+
+                # Create container FIRST so lines can reference it
                 if rec.container_type_id and not rec.container_ids:
                     self.env['crfp.shipment.container'].create({
                         'shipment_id': rec.id,
                         'container_type_id': rec.container_type_id.id,
                         'temperature_set': rec.temperature_set or 0,
                     })
+
+                # Now create lines (they will find the container via self.container_ids[:1])
+                rec._create_lines_from_so_and_quotation(quotation)
+                rec._auto_load_documents()
+                rec._auto_load_checklist()
+                rec._generate_commodity_description()
+
+            elif rec.container_type_id and not rec.container_ids:
+                # Shipment without SO but with container type
+                self.env['crfp.shipment.container'].create({
+                    'shipment_id': rec.id,
+                    'container_type_id': rec.container_type_id.id,
+                    'temperature_set': rec.temperature_set or 0,
+                })
+
         return records
 
     def write(self, vals):

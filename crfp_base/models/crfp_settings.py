@@ -89,6 +89,24 @@ class CrfpSettings(models.Model):
     )
 
     # ─────────────────────────────────────────────────────────────────────────
+    # Singleton constraint — one settings record per company
+    # ─────────────────────────────────────────────────────────────────────────
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        """Enforce singleton: only one settings record per company."""
+        for vals in vals_list:
+            company_id = vals.get('company_id', self.env.company.id)
+            existing = self.search([('company_id', '=', company_id)], limit=1)
+            if existing:
+                raise UserError(
+                    'A settings record already exists for this company (ID=%d). '
+                    'Please edit the existing record instead of creating a new one.'
+                    % existing.id
+                )
+        return super().create(vals_list)
+
+    # ─────────────────────────────────────────────────────────────────────────
     # Singleton accessor
     # ─────────────────────────────────────────────────────────────────────────
 
