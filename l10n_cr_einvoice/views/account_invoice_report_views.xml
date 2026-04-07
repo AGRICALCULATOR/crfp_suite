@@ -49,7 +49,7 @@
                             --fp-cr-surface-soft: #f3f5f7;
                             --fp-cr-page-fill: #eef0f2;
                             color: #111;
-                            font-size: 13px;
+                            font-size: 11px;
                             -webkit-print-color-adjust: exact;
                             print-color-adjust: exact;
                         }
@@ -58,16 +58,16 @@
                             box-shadow: none !important;
                             outline: none !important;
                         }
-                        .fp-cr-top-bar { height: 24px; margin-bottom: 8px; background: linear-gradient(90deg, #10b7a5 0%, #1160aa 82%); }
+                        .fp-cr-top-bar { height: 14px; margin-bottom: 4px; background: linear-gradient(90deg, #10b7a5 0%, #1160aa 82%); }
                         .fp-cr-row {
                             width: 100%;
-                            margin-bottom: 6px;
+                            margin-bottom: 3px;
                             border: 0 !important;
                             border-collapse: separate !important;
                             border-spacing: 0 !important;
                         }
                         .fp-cr-row tr, .fp-cr-row td { vertical-align: top; border: 0 !important; }
-                        .fp-cr-head-title { background: #0d4f9b; color: #fff; padding: 8px 10px; font-weight: 700; font-size: 14px; text-transform: uppercase; }
+                        .fp-cr-head-title { background: #0d4f9b; color: #fff; padding: 5px 8px; font-weight: 700; font-size: 12px; text-transform: uppercase; }
                         .fp-cr-head-meta {
                             width: 100%;
                             border: 1px solid var(--fp-cr-border-color);
@@ -77,18 +77,18 @@
                             background-color: var(--fp-cr-page-fill);
                         }
                         .fp-cr-head-meta td {
-                            padding: 2px 10px;
+                            padding: 1px 8px;
                             border: 0 !important;
                             background: var(--fp-cr-page-fill);
                             background-color: var(--fp-cr-page-fill);
                         }
-                        .fp-cr-box { border: 2px solid #00a9eb !important; margin-top: 6px; }
+                        .fp-cr-box { border: 2px solid #00a9eb !important; margin-top: 3px; }
                         .fp-cr-box-title { background: #0d4f9b; color: #fff; padding: 4px 8px; font-weight: 700; text-transform: uppercase; }
-                        .fp-cr-box-body { padding: 6px 8px; background-color: var(--fp-cr-page-fill); border: 0; }
+                        .fp-cr-box-body { padding: 3px 6px; background-color: var(--fp-cr-page-fill); border: 0; }
                         .fp-cr-label { font-weight: 700; }
                         .fp-cr-table {
                             width: 100%;
-                            font-size: 12px;
+                            font-size: 10px;
                             border: 0;
                             border-collapse: separate !important;
                             border-spacing: 0 !important;
@@ -99,7 +99,7 @@
                             border: 0;
                             border-right: 2px solid #00a9eb !important;
                             border-bottom: 2px solid #00a9eb !important;
-                            padding: 5px 6px;
+                            padding: 2px 3px;
                             background-clip: padding-box;
                         }
                         .fp-cr-table tr:first-child > th,
@@ -111,7 +111,7 @@
                         .fp-cr-table td.text-end { text-align: right; }
                         .fp-cr-grid-2 {
                             width: 100%;
-                            margin-top: 8px;
+                            margin-top: 4px;
                             border: 0;
                             border-collapse: separate !important;
                             border-spacing: 0 !important;
@@ -132,7 +132,7 @@
                             border: 0;
                             border-right: 2px solid #00a9eb !important;
                             border-bottom: 2px solid #00a9eb !important;
-                            padding: 4px 6px;
+                            padding: 2px 4px;
                             background-clip: padding-box;
                         }
                         .fp-cr-small-table tr:first-child > th,
@@ -156,8 +156,8 @@
                             padding: 0;
                             border: 0 !important;
                         }
-                        .fp-cr-sign { border: 2px solid var(--fp-cr-border-color); margin-top: 8px; padding: 8px; min-height: 70px; }
-                        .fp-cr-footer { margin-top: 10px; background: #0d4f9b; color: #fff; padding: 8px 10px; font-size: 12px; }
+                        .fp-cr-sign { border: 2px solid var(--fp-cr-border-color); margin-top: 4px; padding: 4px 8px; min-height: 40px; }
+                        .fp-cr-footer { margin-top: 5px; background: #0d4f9b; color: #fff; padding: 4px 8px; font-size: 10px; }
                         .fp-cr-qr img { max-width: 140px; max-height: 140px; }
                     </style>
 
@@ -196,25 +196,39 @@
                             </tr>
                         </table>
 
+                        <t t-set="fp_consignee" t-value="o.partner_shipping_id if o.partner_shipping_id and o.partner_shipping_id.id != o.partner_id.id else False"/>
+                        <t t-set="fp_consignee_address" t-value="', '.join(filter(None, [fp_consignee.street, fp_consignee.city, fp_consignee.state_id.name if fp_consignee.state_id else False, fp_consignee.country_id.name if fp_consignee.country_id else False])) if fp_consignee else ''"/>
+
                         <div class="fp-cr-box" style="border: 2px solid #00a9eb !important;">
                             <div class="fp-cr-box-body" t-att-style="fp_pdf_fill_style">
                                 <table class="fp-cr-receiver-table">
                                     <tr>
+                                        <!-- BUYER -->
                                         <td t-att-style="fp_pdf_fill_style + ' padding-right: 8px;'">
-                                            <div><span class="fp-cr-label">Datos del receptor:</span> <span t-esc="fp_receiver_partner.name or ''"/></div>
-                                            <div t-if="o.fp_document_type != 'TE' or fp_receiver_address"><span class="fp-cr-label">Dirección:</span> <span t-esc="fp_receiver_address"/></div>
-                                            <div t-if="o.fp_document_type != 'TE' or fp_receiver_partner.email"><span class="fp-cr-label">Correo Electrónico:</span> <span t-esc="fp_receiver_partner.email or ''"/></div>
-                                        </td>
-                                        <td t-att-style="fp_pdf_fill_style + ' padding-left: 8px;'">
+                                            <div><span class="fp-cr-label">Datos del receptor / Buyer:</span> <span t-esc="fp_receiver_partner.name or ''"/></div>
                                             <div><span class="fp-cr-label">Identificación:</span> <span t-esc="fp_receiver_partner.vat or ''"/></div>
+                                            <div t-if="o.fp_document_type != 'TE' or fp_receiver_address"><span class="fp-cr-label">Dirección:</span> <span t-esc="fp_receiver_address"/></div>
+                                            <div t-if="o.fp_document_type != 'TE' or fp_receiver_partner.email"><span class="fp-cr-label">Correo:</span> <span t-esc="fp_receiver_partner.email or ''"/></div>
                                             <div t-if="o.fp_document_type != 'TE' or fp_receiver_phone"><span class="fp-cr-label">Teléfono:</span> <span t-esc="fp_receiver_phone"/></div>
+                                        </td>
+                                        <!-- CONSIGNEE (shipping address if different) -->
+                                        <td t-if="fp_consignee" t-att-style="fp_pdf_fill_style + ' padding-left: 8px; border-left: 2px solid #00a9eb !important;'">
+                                            <div><span class="fp-cr-label">Consignatario / Consignee:</span> <span t-esc="fp_consignee.name or ''"/></div>
+                                            <div t-if="fp_consignee_address"><span class="fp-cr-label">Dirección / Address:</span> <span t-esc="fp_consignee_address"/></div>
+                                            <div t-if="fp_consignee.email"><span class="fp-cr-label">Correo / Email:</span> <span t-esc="fp_consignee.email or ''"/></div>
+                                            <div t-if="fp_consignee.phone"><span class="fp-cr-label">Teléfono / Phone:</span> <span t-esc="fp_consignee.phone or ''"/></div>
+                                            <div t-if="fp_consignee.country_id"><span class="fp-cr-label">País / Country:</span> <span t-esc="fp_consignee.country_id.name or ''"/></div>
+                                        </td>
+                                        <!-- Fallback when no separate consignee -->
+                                        <td t-if="not fp_consignee" t-att-style="fp_pdf_fill_style + ' padding-left: 8px;'">
+                                            <div><span class="fp-cr-label">País / Country:</span> <span t-esc="fp_receiver_partner.country_id.name if fp_receiver_partner.country_id else ''"/></div>
                                         </td>
                                     </tr>
                                 </table>
                             </div>
                         </div>
 
-                        <table class="fp-cr-table" style="margin-top:8px;">
+                        <table class="fp-cr-table" style="margin-top:4px;">
                             <thead>
                                 <tr>
                                     <th style="width:7%;">Cantidad</th>
@@ -233,8 +247,8 @@
                                 <t t-foreach="fp_product_lines" t-as="line">
                                     <tr>
                                         <td class="text-end" t-esc="line.quantity"/>
-                                        <td class="text-end" t-esc="'%.3f' % (line.fp_net_weight or 0.0)"/>
-                                        <td class="text-end" t-esc="'%.3f' % (line.fp_gross_weight or 0.0)"/>
+                                        <td class="text-end" t-esc="'%.3f' % (line.fp_net_weight or line.peso_neto or 0.0)"/>
+                                        <td class="text-end" t-esc="'%.3f' % (line.fp_gross_weight or line.peso_total or 0.0)"/>
                                         <td t-esc="line.product_id.fp_cabys_code or '-'"/>
                                         <td><span t-field="line.name"/></td>
                                         <td class="text-end" t-esc="line.product_uom_id.name if line.product_uom_id else '-'"/>
@@ -495,8 +509,8 @@
                                         <td t-esc="line.product_id.fp_cabys_code or '-'"/>
                                         <td><span t-field="line.name"/></td>
                                         <td class="text-end" t-esc="line.quantity"/>
-                                        <td class="text-end" t-esc="'%.3f' % (line.fp_net_weight or 0.0)"/>
-                                        <td class="text-end" t-esc="'%.3f' % (line.fp_gross_weight or 0.0)"/>
+                                        <td class="text-end" t-esc="'%.3f' % (line.fp_net_weight or line.peso_neto or 0.0)"/>
+                                        <td class="text-end" t-esc="'%.3f' % (line.fp_gross_weight or line.peso_total or 0.0)"/>
                                         <td class="text-end"><span t-field="line.price_unit" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
                                         <td class="text-end"><span t-esc="line.price_total - line.price_subtotal" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
                                         <td class="text-end"><span t-field="line.price_subtotal" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
