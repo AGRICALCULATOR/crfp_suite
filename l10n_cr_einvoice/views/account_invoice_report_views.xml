@@ -4,21 +4,21 @@
          CR Farm — Invoice PDF customizations (Factura Electrónica CR)
          Inherits the STANDARD Odoo invoice template.
          Adds: Consecutivo, Clave, weight columns, sale condition,
-               payment method, currency rate, shipment info.
+               payment method, currency rate.
          ============================================================ -->
 
-    <!-- ═══ 1. Consecutivo + Clave — before the informations bar ═══ -->
+    <!-- ═══ 1. Consecutivo + Clave — after the informations bar ═══ -->
     <template id="report_invoice_fp_consecutivo"
               inherit_id="account.report_invoice_document"
               priority="50">
-        <xpath expr="//div[@id='informations']" position="before">
+        <xpath expr="//div[@id='informations']" position="after">
             <div t-if="o._fields.get('fp_consecutive_number') and o.fp_consecutive_number"
-                 class="row mb-2" style="font-size: 12px;">
+                 class="row mb-1" style="font-size: 9px; color: #555;">
                 <div class="col-auto">
                     <strong>Consecutivo:</strong>
                     <span t-field="o.fp_consecutive_number"/>
                 </div>
-                <div class="col" style="word-break: break-all; font-size: 10px; color: #555;">
+                <div class="col" style="word-break: break-all;">
                     <strong>Clave:</strong>
                     <span t-field="o.fp_external_id"/>
                 </div>
@@ -30,27 +30,24 @@
     <template id="report_invoice_fp_extra_info"
               inherit_id="account.report_invoice_document"
               priority="50">
-        <!-- Add Sale Condition after Incoterm (or after last existing col) -->
         <xpath expr="//div[@id='informations']" position="inside">
             <div class="col"
                  t-if="o._fields.get('fp_sale_condition') and o.fp_sale_condition"
                  name="fp_sale_condition">
-                <strong>Condición Venta</strong>
+                <strong>Cond. Venta</strong>
                 <div t-field="o.fp_sale_condition"/>
             </div>
             <div class="col"
                  t-if="o._fields.get('fp_payment_method') and o.fp_payment_method"
                  name="fp_payment_method">
-                <strong>Medio de Pago</strong>
+                <strong>Medio Pago</strong>
                 <div t-field="o.fp_payment_method"/>
             </div>
-            <div class="col" name="fp_currency_rate">
-                <strong>Moneda</strong>
+            <div class="col" name="fp_currency_rate"
+                 t-if="o._fields.get('invoice_currency_rate') and o.invoice_currency_rate and o.invoice_currency_rate != 1.0">
+                <strong>T. Cambio</strong>
                 <div>
-                    <span t-field="o.currency_id"/>
-                    <t t-if="o._fields.get('invoice_currency_rate') and o.invoice_currency_rate and o.invoice_currency_rate != 1.0">
-                        <br/>(&#8353; <span t-esc="'%.2f' % o.invoice_currency_rate"/>)
-                    </t>
+                    <span t-field="o.currency_id"/> (&#8353; <span t-esc="'%.2f' % o.invoice_currency_rate"/>)
                 </div>
             </div>
         </xpath>
@@ -61,8 +58,8 @@
               inherit_id="account.report_invoice_document"
               priority="50">
         <xpath expr="//table[@name='invoice_line_table']//th[@name='th_subtotal']" position="before">
-            <th name="th_net_weight" class="text-end text-nowrap"><span>Net Weight (kg)</span></th>
-            <th name="th_gross_weight" class="text-end text-nowrap"><span>Gross Weight (kg)</span></th>
+            <th name="th_net_weight" class="text-end"><span>Net Wt (kg)</span></th>
+            <th name="th_gross_weight" class="text-end"><span>Gross Wt (kg)</span></th>
         </xpath>
     </template>
 
@@ -79,34 +76,6 @@
                 <span t-if="line.display_type == 'product' or not line.display_type"
                       t-esc="'%.1f' % (line.fp_gross_weight if line._fields.get('fp_gross_weight') else (line.peso_total if line._fields.get('peso_total') else 0.0))"/>
             </td>
-        </xpath>
-    </template>
-
-    <!-- ═══ 5. Amount in words — after totals ═══ -->
-    <template id="report_invoice_fp_amount_words"
-              inherit_id="account.report_invoice_document"
-              priority="50">
-        <xpath expr="//div[@id='total']" position="after">
-            <div t-if="o._fields.get('amount_total_words') and o.amount_total_words"
-                 class="row mb-2" style="font-size: 10px; font-style: italic; color: #555;">
-                <div class="col">
-                    <strong>Importe total con letra:</strong><br/>
-                    <span t-field="o.amount_total_words"/>
-                </div>
-            </div>
-        </xpath>
-    </template>
-
-    <!-- ═══ 6. CR electronic invoice footer note ═══ -->
-    <template id="report_invoice_fp_footer_note"
-              inherit_id="account.report_invoice_document"
-              priority="50">
-        <xpath expr="//div[@id='payment_term']" position="after">
-            <div t-if="o._fields.get('fp_consecutive_number') and o.fp_consecutive_number"
-                 class="text-center mt-3" style="font-size: 9px; color: #888;">
-                Emitida conforme la resolución de Facturación Electrónica, MH-DGT-RES-0027-2024
-                del 19 de noviembre de 2024 de la DGTD. Versión XML 4.4
-            </div>
         </xpath>
     </template>
 
