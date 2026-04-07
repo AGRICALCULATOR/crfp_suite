@@ -163,11 +163,13 @@ class CrfpShipment(models.Model):
         """Raise UserError if any blocking checklist items are not done for the transition."""
         self.ensure_one()
         # Map: target state -> checklist categories that must be clear
+        # Blocking disabled temporarily while flow is being refined.
+        # TODO: Re-enable with correct blocking logic once workflow is finalized.
         blocking_map = {
-            'booking_requested': ['booking'],
-            'si_sent': ['logistics', 'documentation'],
-            'docs_final': ['documentation', 'logistics'],
-            'shipped': ['documentation', 'commercial'],
+            # 'booking_requested': ['booking'],
+            # 'si_sent': ['logistics', 'documentation'],
+            # 'docs_final': ['documentation', 'logistics'],
+            # 'shipped': ['documentation', 'commercial'],
         }
         categories = blocking_map.get(target_state)
         if not categories:
@@ -231,6 +233,13 @@ class CrfpShipment(models.Model):
                         'temperature_set': rec.temperature_set or 0,
                     })
         return records
+
+    def write(self, vals):
+        res = super().write(vals)
+        # When ETA changes, propagate to linked invoices automatically
+        if 'eta' in vals:
+            self._push_weights_and_dates_to_invoice()
+        return res
 
     @api.onchange('sale_order_id')
     def _onchange_sale_order_id(self):
@@ -514,6 +523,8 @@ class CrfpShipment(models.Model):
         for rec in self:
             rec.write({'state': 'loading'})
             rec._update_document_states('loading')
+            # Early push of weights/dates so invoice reflects planned weights
+            rec._push_weights_and_dates_to_invoice()
 
     def action_docs_final(self):
         for rec in self:
@@ -525,25 +536,40 @@ class CrfpShipment(models.Model):
                         raise UserError('All lines must have actual boxes > 0. Check "%s".' % pname)
             rec.write({'state': 'docs_final'})
             rec._update_document_states('docs_final')
-            rec._push_weights_to_invoice()
+            rec._push_weights_and_dates_to_invoice()
 
     def _push_weights_to_invoice(self):
+        """Legacy wrapper — calls the improved version."""
+        self._push_weights_and_dates_to_invoice()
+
+    def _push_weights_and_dates_to_invoice(self):
         """Copy actual net/gross weights from shipment lines to linked invoice lines.
 
         Also propagates ETA → delivery_date on the invoice header.
         Matching: crfp.shipment.line.sale_order_line_id → account.move.line.sale_line_ids
         If no actual weight is recorded yet, uses planned weight as fallback.
-        Applies to both proforma and commercial invoice.
+
+        Finds invoices via:
+        1. Direct link (commercial_invoice_id / proforma_invoice_id)
+        2. Sale order chain (sale_order_id → invoices)
         """
         for rec in self:
+            # Collect all related invoices
             invoices = (rec.commercial_invoice_id | rec.proforma_invoice_id).filtered(bool)
+            # Also find invoices via the sale order chain
+            if rec.sale_order_id:
+                so_invoices = rec.sale_order_id.invoice_ids.filtered(
+                    lambda inv: inv.state != 'cancel'
+                )
+                invoices = invoices | so_invoices
             if not invoices:
                 continue
             # Propagate ETA → delivery_date on the invoice header
             if rec.eta:
                 for inv in invoices:
-                    if 'delivery_date' in inv._fields and not inv.delivery_date:
+                    if 'delivery_date' in inv._fields:
                         inv.write({'delivery_date': rec.eta})
+            # Push weights from shipment lines to matching invoice lines
             for sline in rec.line_ids:
                 if not sline.sale_order_line_id:
                     continue
@@ -554,20 +580,23 @@ class CrfpShipment(models.Model):
                 for inv in invoices:
                     for iline in inv.invoice_line_ids:
                         if sline.sale_order_line_id in iline.sale_line_ids:
-                            iline.write({
-                                'fp_net_weight': net_w,
-                                'fp_gross_weight': gross_w,
-                            })
+                            vals = {}
+                            if 'fp_net_weight' in iline._fields:
+                                vals['fp_net_weight'] = net_w
+                            if 'fp_gross_weight' in iline._fields:
+                                vals['fp_gross_weight'] = gross_w
+                            if vals:
+                                iline.write(vals)
 
     def action_push_weights_to_invoice(self):
         """Manual button: push weights to invoice from shipment lines."""
-        self._push_weights_to_invoice()
+        self._push_weights_and_dates_to_invoice()
         return {
             'type': 'ir.actions.client',
             'tag': 'display_notification',
             'params': {
-                'title': 'Weights Updated',
-                'message': 'Net and gross weights have been pushed to the linked invoice(s).',
+                'title': 'Weights & Dates Updated',
+                'message': 'Weights and delivery date have been pushed to the linked invoice(s).',
                 'type': 'success',
                 'sticky': False,
             },
@@ -580,6 +609,7 @@ class CrfpShipment(models.Model):
                 raise UserError('Link the Commercial Invoice before shipping.')
             rec.write({'state': 'shipped', 'atd': fields.Datetime.now()})
             rec._update_document_states('shipped')
+            rec._push_weights_and_dates_to_invoice()
 
     def action_in_transit(self):
         for rec in self:
