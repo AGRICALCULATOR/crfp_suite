@@ -2,43 +2,31 @@
 <odoo>
     <!-- ============================================================
          CR Farm — Invoice PDF customizations (Factura Electrónica CR)
-         Inherits the STANDARD Odoo invoice template.
-         Adds: Clave as title, Consecutivo, Tariff code column,
-               weight columns, sale condition, payment method,
-               weight totals summary.
+         Inherits the STANDARD Odoo invoice template (Folder layout).
+         Adds: Clave as title, Tariff code column, weight columns,
+               sale condition, payment method, shipment info section,
+               weight totals, electronic invoice footer.
          ============================================================ -->
 
     <!-- ═══ 1. Document title: "Invoice/Factura No: [clave]" ═══ -->
     <template id="report_invoice_fp_title"
               inherit_id="account.report_invoice_document"
               priority="50">
+        <!-- Hide default title when we have an electronic key -->
         <xpath expr="//t[@t-set='layout_document_title']" position="attributes">
             <attribute name="t-if">not o._fields.get('fp_external_id') or not o.fp_external_id</attribute>
         </xpath>
+        <!-- Insert our custom title right after -->
         <xpath expr="//t[@t-set='layout_document_title']" position="after">
-            <t t-if="o._fields.get('fp_external_id') and o.fp_external_id"
-               t-set="layout_document_title">
-                Invoice/Factura No: <t t-out="o.fp_external_id"/>
+            <t t-if="o._fields.get('fp_external_id') and o.fp_external_id">
+                <t t-set="layout_document_title">
+                    Invoice/Factura No: <t t-out="o.fp_external_id"/>
+                </t>
             </t>
         </xpath>
     </template>
 
-    <!-- ═══ 2. Consecutivo — small text after informations bar ═══ -->
-    <template id="report_invoice_fp_consecutivo"
-              inherit_id="account.report_invoice_document"
-              priority="50">
-        <xpath expr="//div[@id='informations']" position="after">
-            <div t-if="o._fields.get('fp_consecutive_number') and o.fp_consecutive_number"
-                 class="row mb-1" style="font-size: 9px; color: #555;">
-                <div class="col-auto">
-                    <strong>Consecutivo:</strong>
-                    <span t-field="o.fp_consecutive_number"/>
-                </div>
-            </div>
-        </xpath>
-    </template>
-
-    <!-- ═══ 3. Extra info fields in the meta bar ═══ -->
+    <!-- ═══ 2. Extra info fields in the meta bar ═══ -->
     <template id="report_invoice_fp_extra_info"
               inherit_id="account.report_invoice_document"
               priority="50">
@@ -59,13 +47,14 @@
                  t-if="o._fields.get('invoice_currency_rate') and o.invoice_currency_rate and o.invoice_currency_rate != 1.0">
                 <strong>T. Cambio</strong>
                 <div>
-                    <span t-field="o.currency_id"/> (&#8353; <span t-esc="'%.2f' % o.invoice_currency_rate"/>)
+                    <span t-field="o.currency_id"/>
+                    (&#8353; <span t-esc="'%.2f' % o.invoice_currency_rate"/>)
                 </div>
             </div>
         </xpath>
     </template>
 
-    <!-- ═══ 4. Tariff code (CABYS) column — header ═══ -->
+    <!-- ═══ 3. Tariff code (CABYS) column — header ═══ -->
     <template id="report_invoice_fp_cabys_th"
               inherit_id="account.report_invoice_document"
               priority="50">
@@ -74,7 +63,7 @@
         </xpath>
     </template>
 
-    <!-- ═══ 5. Tariff code (CABYS) column — body cell ═══ -->
+    <!-- ═══ 4. Tariff code (CABYS) column — body cell ═══ -->
     <template id="report_invoice_fp_cabys_td"
               inherit_id="account.report_invoice_document"
               priority="50">
@@ -86,7 +75,7 @@
         </xpath>
     </template>
 
-    <!-- ═══ 6. Weight columns — header ═══ -->
+    <!-- ═══ 5. Weight columns — header ═══ -->
     <template id="report_invoice_fp_weight_th"
               inherit_id="account.report_invoice_document"
               priority="50">
@@ -96,7 +85,7 @@
         </xpath>
     </template>
 
-    <!-- ═══ 7. Weight columns — body cells ═══ -->
+    <!-- ═══ 6. Weight columns — body cells ═══ -->
     <template id="report_invoice_fp_weight_td"
               inherit_id="account.report_invoice_document"
               priority="50">
@@ -112,17 +101,85 @@
         </xpath>
     </template>
 
-    <!-- ═══ 8. Weight totals summary — before payment/totals ═══ -->
-    <template id="report_invoice_fp_weight_totals"
+    <!-- ═══ 7. Weight totals + Shipment info — before payment section ═══ -->
+    <template id="report_invoice_fp_shipment_section"
               inherit_id="account.report_invoice_document"
               priority="50">
         <xpath expr="//div[@id='total']" position="before">
-            <t t-set="fp_total_net" t-value="sum(l.fp_net_weight or (l.peso_neto if l._fields.get('peso_neto') else 0.0) for l in o.invoice_line_ids.filtered(lambda x: x.display_type in (False, 'product')))"/>
-            <t t-set="fp_total_gross" t-value="sum(l.fp_gross_weight or (l.peso_total if l._fields.get('peso_total') else 0.0) for l in o.invoice_line_ids.filtered(lambda x: x.display_type in (False, 'product')))"/>
+            <!-- Weight totals -->
+            <t t-set="fp_product_lines" t-value="o.invoice_line_ids.filtered(lambda x: x.display_type in (False, 'product'))"/>
+            <t t-set="fp_total_net" t-value="sum(l.fp_net_weight or 0.0 for l in fp_product_lines)"/>
+            <t t-set="fp_total_gross" t-value="sum(l.fp_gross_weight or 0.0 for l in fp_product_lines)"/>
             <div t-if="fp_total_net or fp_total_gross" class="mb-2" style="font-size: 11px;">
                 <strong>Total Net Weight:</strong> <span t-esc="'%.2f' % fp_total_net"/> kg
                 <br/>
                 <strong>Total Gross Weight:</strong> <span t-esc="'%.2f' % fp_total_gross"/> kg
+            </div>
+
+            <!-- Shipment info (auto-filled from crfp_logistics) -->
+            <t t-set="fp_ship" t-value="o.crfp_shipment_id if o._fields.get('crfp_shipment_id') else False"/>
+            <div t-if="fp_ship" class="mb-3" style="font-size: 10px; line-height: 1.6;">
+                <div t-if="fp_ship.port_origin_id">
+                    Shipment place: <span t-esc="fp_ship.port_origin_id.name"/>
+                </div>
+                <div t-if="fp_ship.port_origin_id and fp_ship.port_origin_id.country_id">
+                    Origin Country: <span t-esc="fp_ship.port_origin_id.country_id.name"/>
+                </div>
+                <div t-if="fp_ship.port_destination_id and fp_ship.port_destination_id.country_id">
+                    Arrival country: <span t-esc="fp_ship.port_destination_id.country_id.name"/>
+                </div>
+                <div t-if="fp_ship.port_destination_id">
+                    Arrival Port: <span t-esc="fp_ship.port_destination_id.name"/>
+                </div>
+                <div t-if="fp_ship.etd">
+                    Departure: <span t-field="fp_ship.etd"/>
+                </div>
+                <div t-if="fp_ship.eta">
+                    Arrival: <span t-field="fp_ship.eta"/>
+                </div>
+                <div t-if="fp_ship.shipping_company or fp_ship.carrier_partner_id">
+                    Shipping Company: <span t-esc="fp_ship.shipping_company or (fp_ship.carrier_partner_id.name if fp_ship.carrier_partner_id else '')"/>
+                </div>
+                <div t-if="fp_ship.vessel_name">
+                    Vessel and Voyage: <span t-esc="fp_ship.vessel_name"/>
+                    <t t-if="fp_ship.voyage_number"> <span t-esc="fp_ship.voyage_number"/></t>
+                </div>
+                <t t-if="fp_ship.container_ids">
+                    <t t-foreach="fp_ship.container_ids" t-as="cnt">
+                        <div t-if="cnt.container_number">
+                            Container: <span t-esc="cnt.container_number"/>
+                        </div>
+                        <div t-if="cnt.seal_number">
+                            Seal / Marchamo: <span t-esc="cnt.seal_number"/>
+                        </div>
+                    </t>
+                </t>
+                <t t-if="fp_ship.booking_id">
+                    <div t-if="fp_ship.booking_id.booking_reference">
+                        Booking Number: <span t-esc="fp_ship.booking_id.booking_reference"/>
+                    </div>
+                    <div t-if="fp_ship.booking_id.bl_number">
+                        Bill of Lading: <span t-esc="fp_ship.booking_id.bl_number"/>
+                    </div>
+                </t>
+            </div>
+
+            <!-- Fallback: show narration if no shipment linked -->
+            <div t-if="not fp_ship and o.narration" class="mb-3" style="font-size: 10px;">
+                <div t-field="o.narration"/>
+            </div>
+        </xpath>
+    </template>
+
+    <!-- ═══ 8. CR electronic invoice footer ═══ -->
+    <template id="report_invoice_fp_footer_note"
+              inherit_id="account.report_invoice_document"
+              priority="50">
+        <xpath expr="//div[@id='payment_term']" position="after">
+            <div t-if="o._fields.get('fp_consecutive_number') and o.fp_consecutive_number"
+                 class="text-center mt-2" style="font-size: 9px; color: #888;">
+                Emitida conforme la resolución de Facturación Electrónica, MH-DGT-RES-0027-2024
+                del 19 de noviembre de 2024 de la DGTD. Versión XML 4.4
             </div>
         </xpath>
     </template>

@@ -15,3 +15,4 @@ from . import crfp_container_config
 from . import crfp_container_config_line
 from . import crfp_shipment_portal
 from . import sale_order
+from . import account_move

@@ -11,7 +11,7 @@
     'author': 'CR Farm Products VYM S.A.',
     'website': 'https://crfarm.erpcr.net',
     'license': 'LGPL-3',
-    'depends': ['crfp_base', 'crfp_pricing', 'sale_management', 'mail', 'portal'],
+    'depends': ['crfp_base', 'crfp_pricing', 'sale_management', 'account', 'mail', 'portal'],
     'data': [
         'security/crfp_logistics_security.xml',
         'security/ir.model.access.csv',
