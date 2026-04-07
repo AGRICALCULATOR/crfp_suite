@@ -186,6 +186,10 @@
                                             <tr><td t-att-style="fp_pdf_fill_style"><span class="fp-cr-label">Clave Comprobante:</span> <span t-field="o.fp_external_id"/></td></tr>
                                             <tr><td t-att-style="fp_pdf_fill_style"><span class="fp-cr-label">Fecha de Emisión:</span> <span t-field="o.invoice_date"/></td></tr>
                                             <tr><td t-att-style="fp_pdf_fill_style"><span class="fp-cr-label">Fecha de Vencimiento:</span> <span t-field="o.invoice_date_due"/></td></tr>
+                                            <tr t-if="o.delivery_date"><td t-att-style="fp_pdf_fill_style"><span class="fp-cr-label">Fecha de Entrega:</span> <span t-field="o.delivery_date"/></td></tr>
+                                            <tr t-if="o.invoice_origin"><td t-att-style="fp_pdf_fill_style"><span class="fp-cr-label">Source / Orden:</span> <span t-esc="o.invoice_origin"/></td></tr>
+                                            <tr t-if="o.invoice_incoterm_id"><td t-att-style="fp_pdf_fill_style"><span class="fp-cr-label">Incoterm:</span> <span t-esc="o.invoice_incoterm_id.name"/></td></tr>
+                                            <tr t-if="o.ref"><td t-att-style="fp_pdf_fill_style"><span class="fp-cr-label">Referencia:</span> <span t-esc="o.ref"/></td></tr>
                                             <tr><td t-att-style="fp_pdf_fill_style"><span class="fp-cr-label">Condición de Venta:</span> <span t-field="o.fp_sale_condition"/></td></tr>
                                             <tr><td t-att-style="fp_pdf_fill_style"><span class="fp-cr-label">Medio de Pago:</span> <span t-field="o.fp_payment_method"/></td></tr>
                                             <tr><td t-att-style="fp_pdf_fill_style"><span class="fp-cr-label">Moneda Aplicable:</span> <span t-field="o.currency_id"/></td></tr>
