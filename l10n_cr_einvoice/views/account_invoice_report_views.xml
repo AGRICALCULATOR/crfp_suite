@@ -140,14 +140,14 @@
                     <div t-if="fp_ship.port_origin_id">
                         <strong>Origin Port:</strong> <span t-esc="fp_ship.port_origin_id.name"/>
                     </div>
-                    <div t-if="fp_ship.port_origin_id and fp_ship.port_origin_id.country_id">
-                        <strong>Origin Country:</strong> <span t-esc="fp_ship.port_origin_id.country_id.name"/>
+                    <div t-if="fp_ship.port_origin_id and fp_ship.port_origin_id.country">
+                        <strong>Origin Country:</strong> <span t-esc="fp_ship.port_origin_id.country"/>
                     </div>
                     <div t-if="fp_ship.port_destination_id">
                         <strong>Destination Port:</strong> <span t-esc="fp_ship.port_destination_id.name"/>
                     </div>
-                    <div t-if="fp_ship.port_destination_id and fp_ship.port_destination_id.country_id">
-                        <strong>Destination Country:</strong> <span t-esc="fp_ship.port_destination_id.country_id.name"/>
+                    <div t-if="fp_ship.port_destination_id and fp_ship.port_destination_id.country">
+                        <strong>Destination Country:</strong> <span t-esc="fp_ship.port_destination_id.country"/>
                     </div>
                     <div t-if="fp_ship.etd">
                         <strong>ETD:</strong> <span t-field="fp_ship.etd"/>
