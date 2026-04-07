@@ -79,8 +79,7 @@
                         <page string="Media &amp; Links" name="media">
                             <group string="Product Photo (shown on website)">
                                 <field name="image_1920" widget="image" nolabel="1"
-                                       options="{'size': [400, 400]}"
-                                       attrs="{'style': 'max-width:400px;'}"/>
+                                       options="{'size': [400, 400]}"/>
                             </group>
                             <group>
                                 <group string="Fallback / External">

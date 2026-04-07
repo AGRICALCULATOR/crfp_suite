@@ -530,6 +530,7 @@ class CrfpShipment(models.Model):
     def _push_weights_to_invoice(self):
         """Copy actual net/gross weights from shipment lines to linked invoice lines.
 
+        Also propagates ETA → delivery_date on the invoice header.
         Matching: crfp.shipment.line.sale_order_line_id → account.move.line.sale_line_ids
         If no actual weight is recorded yet, uses planned weight as fallback.
         Applies to both proforma and commercial invoice.
@@ -538,6 +539,11 @@ class CrfpShipment(models.Model):
             invoices = (rec.commercial_invoice_id | rec.proforma_invoice_id).filtered(bool)
             if not invoices:
                 continue
+            # Propagate ETA → delivery_date on the invoice header
+            if rec.eta:
+                for inv in invoices:
+                    if 'delivery_date' in inv._fields and not inv.delivery_date:
+                        inv.write({'delivery_date': rec.eta})
             for sline in rec.line_ids:
                 if not sline.sale_order_line_id:
                     continue
