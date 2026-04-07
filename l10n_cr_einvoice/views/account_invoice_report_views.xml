@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Router: always use the CR Farm custom template for ALL invoices/proformas -->
     <template id="report_invoice_document_fp_template_router" inherit_id="account.report_invoice_document">
         <xpath expr="//t[@t-call='web.external_layout']" position="before">
             <t
-                t-if="o.company_id.fp_invoice_template_style and o.company_id.fp_invoice_template_style != 'standard'"
                 t-call="l10n_cr_einvoice.report_invoice_document_fp_custom"
                 t-lang="o.partner_id.lang or o.commercial_partner_id.lang or env.user.lang"
             />
         </xpath>
         <xpath expr="//t[@t-call='web.external_layout']" position="attributes">
-            <attribute name="t-if">not (o.company_id.fp_invoice_template_style and o.company_id.fp_invoice_template_style != 'standard')</attribute>
+            <attribute name="t-if">False</attribute>
         </xpath>
     </template>
 
     <template id="report_invoice_document_fp_custom">
         <t t-call="web.html_container">
-            <t t-set="fp_template_style" t-value="o.company_id.fp_invoice_template_style"/>
+            <t t-set="fp_template_style" t-value="o.company_id.fp_invoice_template_style or 'modern_prohygiene'"/>
             <t
                 t-set="fp_document_types"
                 t-value="o._fp_get_selection_map('fp_document_type')"

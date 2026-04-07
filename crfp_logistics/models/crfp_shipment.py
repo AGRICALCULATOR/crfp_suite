@@ -525,6 +525,47 @@ class CrfpShipment(models.Model):
                         raise UserError('All lines must have actual boxes > 0. Check "%s".' % pname)
             rec.write({'state': 'docs_final'})
             rec._update_document_states('docs_final')
+            rec._push_weights_to_invoice()
+
+    def _push_weights_to_invoice(self):
+        """Copy actual net/gross weights from shipment lines to linked invoice lines.
+
+        Matching: crfp.shipment.line.sale_order_line_id → account.move.line.sale_line_ids
+        If no actual weight is recorded yet, uses planned weight as fallback.
+        Applies to both proforma and commercial invoice.
+        """
+        for rec in self:
+            invoices = (rec.commercial_invoice_id | rec.proforma_invoice_id).filtered(bool)
+            if not invoices:
+                continue
+            for sline in rec.line_ids:
+                if not sline.sale_order_line_id:
+                    continue
+                net_w = sline.net_weight_actual or sline.net_weight_planned or 0.0
+                gross_w = sline.gross_weight_actual or sline.gross_weight_planned or 0.0
+                if not net_w and not gross_w:
+                    continue
+                for inv in invoices:
+                    for iline in inv.invoice_line_ids:
+                        if sline.sale_order_line_id in iline.sale_line_ids:
+                            iline.write({
+                                'fp_net_weight': net_w,
+                                'fp_gross_weight': gross_w,
+                            })
+
+    def action_push_weights_to_invoice(self):
+        """Manual button: push weights to invoice from shipment lines."""
+        self._push_weights_to_invoice()
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': 'Weights Updated',
+                'message': 'Net and gross weights have been pushed to the linked invoice(s).',
+                'type': 'success',
+                'sticky': False,
+            },
+        }
 
     def action_ship(self):
         for rec in self:

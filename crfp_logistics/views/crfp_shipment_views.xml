@@ -81,6 +81,10 @@
                     <button name="action_docs_final" type="object"
                             string="Documents Final"
                             invisible="state != 'loading'"/>
+                    <button name="action_push_weights_to_invoice" type="object"
+                            string="⚖ Push Weights to Invoice" icon="fa-balance-scale"
+                            class="btn-secondary"
+                            invisible="state not in ('docs_final','shipped','in_transit','arrived','delivered','closed')"/>
                     <button name="action_ship" type="object"
                             string="Mark Shipped"
                             class="btn-primary" invisible="state != 'docs_final'"/>
