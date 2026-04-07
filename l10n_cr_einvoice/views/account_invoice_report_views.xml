@@ -3,22 +3,28 @@
     <!-- ============================================================
          CR Farm — Invoice PDF customizations (Factura Electrónica CR)
          Inherits the STANDARD Odoo invoice template (Folder layout).
-         Adds: Clave as title, Tariff code column, weight columns,
-               sale condition, payment method, shipment info section,
-               weight totals, electronic invoice footer.
+         Matches the commercial export invoice format (Invoice 682 ref).
+
+         Sections:
+         1. Title: Clave Hacienda or standard invoice name
+         2. Header info: Delivery Date, Incoterm,
+            Condición Venta, Medio Pago, Currency/Rate
+         3-4. CABYS tariff code column
+         5-6. Weight columns (Net/Gross kg)
+         7. Shipment info from crfp_logistics + amount in words +
+            payment footer for FE invoices
+         8. CR electronic invoice footer
          ============================================================ -->
 
-    <!-- ═══ 1. Document title: replace with "Invoice/Factura No: [clave]" ═══ -->
+    <!-- ═══ 1. Document title ═══ -->
     <template id="report_invoice_fp_title"
               inherit_id="account.report_invoice_document"
               priority="50">
-        <!-- When we have an electronic key, replace the invoice name span -->
         <xpath expr="//t[@t-set='layout_document_title']//span[@t-field='o.name']" position="replace">
             <span t-if="o._fields.get('fp_external_id') and o.fp_external_id"
                   t-esc="o.fp_external_id"/>
             <span t-else="" t-field="o.name"/>
         </xpath>
-        <!-- Replace the "Invoice" text with "Invoice/Factura No:" when we have clave -->
         <xpath expr="//t[@t-set='layout_document_title']//t[@name='invoice_title']" position="replace">
             <t name="invoice_title">
                 <t t-if="o._fields.get('fp_external_id') and o.fp_external_id">Invoice/Factura No:</t>
@@ -27,45 +33,60 @@
         </xpath>
     </template>
 
-    <!-- ═══ 2. Extra info fields: Consecutivo, Cond. Venta, Medio Pago, T. Cambio ═══ -->
+    <!-- ═══ 2. Header extra info ═══ -->
     <template id="report_invoice_fp_extra_info"
               inherit_id="account.report_invoice_document"
               priority="50">
         <xpath expr="//div[@id='informations']" position="inside">
-            <!-- Consecutivo Hacienda -->
+            <!-- Resolve shipment once for header fields -->
+            <t t-set="fp_ship_hdr" t-value="o.crfp_shipment_id if o._fields.get('crfp_shipment_id') else False"/>
+
+            <!-- Delivery Date (from shipment ETA) -->
             <div class="col"
-                 t-if="o._fields.get('fp_consecutive_number') and o.fp_consecutive_number"
-                 name="fp_consecutive">
-                <strong>Consecutivo:</strong>
-                <div t-esc="o.fp_consecutive_number"/>
+                 t-if="fp_ship_hdr and fp_ship_hdr.eta"
+                 name="fp_delivery_date">
+                <strong>Delivery Date</strong>
+                <div t-field="fp_ship_hdr.eta"/>
+            </div>
+            <!-- Incoterm + destination port -->
+            <div class="col"
+                 t-if="fp_ship_hdr and fp_ship_hdr.incoterm"
+                 name="fp_incoterm">
+                <strong>Incoterm</strong>
+                <div>
+                    <span t-esc="fp_ship_hdr.incoterm"/>
+                    <t t-if="fp_ship_hdr.port_destination_id">
+                        <br/><span t-esc="fp_ship_hdr.port_destination_id.name"/>
+                    </t>
+                </div>
             </div>
             <!-- Condición de Venta -->
             <div class="col"
                  t-if="o._fields.get('fp_sale_condition') and o.fp_sale_condition"
                  name="fp_sale_condition">
-                <strong>Cond. Venta:</strong>
+                <strong>Condition Sale:</strong>
                 <div t-field="o.fp_sale_condition"/>
             </div>
             <!-- Medio de Pago -->
             <div class="col"
                  t-if="o._fields.get('fp_payment_method') and o.fp_payment_method"
                  name="fp_payment_method">
-                <strong>Medio Pago:</strong>
+                <strong>Payment Way:</strong>
                 <div t-field="o.fp_payment_method"/>
             </div>
-            <!-- Tipo de Cambio -->
+            <!-- Currency + Tipo de Cambio (only when rate exists and != 1) -->
             <div class="col" name="fp_currency_rate"
                  t-if="o._fields.get('invoice_currency_rate') and o.invoice_currency_rate and o.invoice_currency_rate != 1.0">
-                <strong>T. Cambio:</strong>
+                <strong>Currency:</strong>
                 <div>
                     <span t-field="o.currency_id"/>
-                    (&#8353; <span t-esc="'%.2f' % o.invoice_currency_rate"/>)
+                    <br/>(&#8353; <span t-esc="'%.2f' % o.invoice_currency_rate"/>)
                 </div>
             </div>
         </xpath>
     </template>
 
-    <!-- ═══ 3. Tariff code (CABYS) column — header ═══ -->
+    <!-- ═══ 3. CABYS column — header ═══ -->
     <template id="report_invoice_fp_cabys_th"
               inherit_id="account.report_invoice_document"
               priority="50">
@@ -74,7 +95,7 @@
         </xpath>
     </template>
 
-    <!-- ═══ 4. Tariff code (CABYS) column — body cell ═══ -->
+    <!-- ═══ 4. CABYS column — body cell ═══ -->
     <template id="report_invoice_fp_cabys_td"
               inherit_id="account.report_invoice_document"
               priority="50">
@@ -91,8 +112,12 @@
               inherit_id="account.report_invoice_document"
               priority="50">
         <xpath expr="//table[@name='invoice_line_table']//th[@name='th_subtotal']" position="before">
-            <th name="th_net_weight" class="text-end" style="font-size:10px;"><span>Net Wt (kg)</span></th>
-            <th name="th_gross_weight" class="text-end" style="font-size:10px;"><span>Gross Wt (kg)</span></th>
+            <th name="th_net_weight" class="text-end" style="font-size:10px;">
+                <span>Net weight<br/>(kg)</span>
+            </th>
+            <th name="th_gross_weight" class="text-end" style="font-size:10px;">
+                <span>Gross weight<br/>(kg)</span>
+            </th>
         </xpath>
     </template>
 
@@ -103,66 +128,70 @@
         <xpath expr="//table[@name='invoice_line_table']//td[@name='td_subtotal']" position="before">
             <td name="td_net_weight" class="text-end" style="font-size:9px;">
                 <span t-if="line.display_type == 'product' or not line.display_type"
-                      t-esc="'%.2f' % (line.fp_net_weight if line._fields.get('fp_net_weight') else 0.0)"/>
+                      t-esc="'{:,.1f}'.format(line.fp_net_weight if line._fields.get('fp_net_weight') else 0.0)"/>
             </td>
             <td name="td_gross_weight" class="text-end" style="font-size:9px;">
                 <span t-if="line.display_type == 'product' or not line.display_type"
-                      t-esc="'%.2f' % (line.fp_gross_weight if line._fields.get('fp_gross_weight') else 0.0)"/>
+                      t-esc="'{:,.1f}'.format(line.fp_gross_weight if line._fields.get('fp_gross_weight') else 0.0)"/>
             </td>
         </xpath>
     </template>
 
-    <!-- ═══ 7. Weight totals + Shipment info section — before totals ═══ -->
+    <!-- ═══ 7. Shipment info + Amount in words + FE payment footer ═══ -->
     <template id="report_invoice_fp_shipment_section"
               inherit_id="account.report_invoice_document"
               priority="50">
-        <xpath expr="//div[@id='total']" position="before">
-            <!-- Weight totals row -->
-            <t t-set="fp_product_lines" t-value="o.invoice_line_ids.filtered(lambda x: x.display_type in (False, 'product'))"/>
-            <t t-set="fp_total_net" t-value="sum(l.fp_net_weight or 0.0 for l in fp_product_lines) if fp_product_lines and fp_product_lines[0:1]._fields.get('fp_net_weight') else 0.0"/>
-            <t t-set="fp_total_gross" t-value="sum(l.fp_gross_weight or 0.0 for l in fp_product_lines) if fp_product_lines and fp_product_lines[0:1]._fields.get('fp_gross_weight') else 0.0"/>
 
-            <div t-if="fp_total_net or fp_total_gross" class="row mb-2" style="font-size:11px;">
-                <div class="col-12">
-                    <strong>Total Net Weight:</strong> <span t-esc="'%.2f' % fp_total_net"/> kg
-                    <span class="ms-3"/>
-                    <strong>Total Gross Weight:</strong> <span t-esc="'%.2f' % fp_total_gross"/> kg
-                </div>
+        <!-- ── After totals: amount in words, shipment info, FE payment ── -->
+        <xpath expr="//div[@id='total']" position="after">
+
+            <!-- Total amount in words -->
+            <div t-if="o._fields.get('fp_amount_in_words') and o.fp_amount_in_words"
+                 class="text-end mb-2" style="font-size:9px;">
+                <strong>Total amount in words:</strong><br/>
+                <span t-esc="o.fp_amount_in_words"/>
             </div>
 
-            <!-- Shipment info (auto-filled from crfp_logistics) -->
+            <!-- ── Shipment info (auto-filled from crfp_logistics) ── -->
             <t t-set="fp_ship" t-value="o.crfp_shipment_id if o._fields.get('crfp_shipment_id') else False"/>
-            <div t-if="fp_ship" class="row mb-3 mt-2" style="font-size:10px; border-top:1px solid #ddd; padding-top:8px;">
-                <div class="col-12">
-                    <strong style="font-size:11px;">Shipment Information</strong>
-                </div>
-                <div class="col-6" style="line-height:1.8;">
+            <!-- Only show section if shipment has at least one displayable field -->
+            <t t-set="fp_ship_has_data" t-value="fp_ship and (fp_ship.port_origin_id or fp_ship.port_destination_id or fp_ship.etd or fp_ship.eta or fp_ship.vessel_name or fp_ship.shipping_company or fp_ship.carrier_partner_id or fp_ship.container_ids or fp_ship.booking_id or fp_ship.gps_device_id)"/>
+
+            <div t-if="fp_ship_has_data" class="row mb-3 mt-2"
+                 style="font-size:10px; border-top:1px solid #ccc; padding-top:8px;">
+                <div class="col-6" style="line-height:1.9;">
                     <div t-if="fp_ship.port_origin_id">
-                        <strong>Origin Port:</strong> <span t-esc="fp_ship.port_origin_id.name"/>
+                        <strong>Shipment place:</strong>
+                        <span t-esc="(fp_ship.port_origin_id.name + ', ' + fp_ship.port_origin_id.country).upper()"/>
                     </div>
                     <div t-if="fp_ship.port_origin_id and fp_ship.port_origin_id.country">
-                        <strong>Origin Country:</strong> <span t-esc="fp_ship.port_origin_id.country"/>
-                    </div>
-                    <div t-if="fp_ship.port_destination_id">
-                        <strong>Destination Port:</strong> <span t-esc="fp_ship.port_destination_id.name"/>
+                        <strong>Origin Country:</strong>
+                        <span t-esc="fp_ship.port_origin_id.country.upper()"/>
                     </div>
                     <div t-if="fp_ship.port_destination_id and fp_ship.port_destination_id.country">
-                        <strong>Destination Country:</strong> <span t-esc="fp_ship.port_destination_id.country"/>
+                        <strong>Arrival country:</strong>
+                        <span t-esc="fp_ship.port_destination_id.country"/>
+                    </div>
+                    <div t-if="fp_ship.port_destination_id">
+                        <strong>Arrival Port:</strong>
+                        <span t-esc="fp_ship.port_destination_id.name.upper()"/>
                     </div>
                     <div t-if="fp_ship.etd">
-                        <strong>ETD:</strong> <span t-field="fp_ship.etd"/>
+                        <strong>Departure:</strong>
+                        <span t-field="fp_ship.etd" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/>
                     </div>
                     <div t-if="fp_ship.eta">
-                        <strong>ETA:</strong> <span t-field="fp_ship.eta"/>
+                        <strong>Arrival:</strong>
+                        <span t-field="fp_ship.eta" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/>
                     </div>
                 </div>
-                <div class="col-6" style="line-height:1.8;">
+                <div class="col-6" style="line-height:1.9;">
                     <div t-if="fp_ship.shipping_company or fp_ship.carrier_partner_id">
-                        <strong>Shipping Co:</strong>
+                        <strong>Shipping Company:</strong>
                         <span t-esc="fp_ship.shipping_company or (fp_ship.carrier_partner_id.name if fp_ship.carrier_partner_id else '')"/>
                     </div>
                     <div t-if="fp_ship.vessel_name">
-                        <strong>Vessel/Voyage:</strong>
+                        <strong>Vessel and Voyage:</strong>
                         <span t-esc="fp_ship.vessel_name"/>
                         <t t-if="fp_ship.voyage_number"> / <span t-esc="fp_ship.voyage_number"/></t>
                     </div>
@@ -172,28 +201,56 @@
                                 <strong>Container:</strong> <span t-esc="cnt.container_number"/>
                             </div>
                             <div t-if="cnt.seal_number">
-                                <strong>Seal/Marchamo:</strong> <span t-esc="cnt.seal_number"/>
+                                <strong>Seal / Marchamo:</strong> <span t-esc="cnt.seal_number"/>
                             </div>
                         </t>
                     </t>
                     <t t-if="fp_ship.booking_id">
                         <div t-if="fp_ship.booking_id.booking_reference">
-                            <strong>Booking #:</strong> <span t-esc="fp_ship.booking_id.booking_reference"/>
+                            <strong>Booking Number:</strong>
+                            <span t-esc="fp_ship.booking_id.booking_reference"/>
                         </div>
                         <div t-if="fp_ship.booking_id.bl_number">
-                            <strong>Bill of Lading:</strong> <span t-esc="fp_ship.booking_id.bl_number"/>
+                            <strong>Bill of Lading:</strong>
+                            <span t-esc="fp_ship.booking_id.bl_number"/>
                         </div>
                     </t>
-                    <div t-if="fp_ship.incoterm">
-                        <strong>Incoterm:</strong> <span t-esc="fp_ship.incoterm"/>
+                    <div t-if="fp_ship.gps_device_id">
+                        <strong>Tracker:</strong>
+                        <span t-esc="fp_ship.gps_device_id"/>
                     </div>
                 </div>
             </div>
 
-            <!-- Fallback: show narration if no shipment linked -->
-            <div t-if="not fp_ship and o.narration" class="mb-3" style="font-size:10px;">
+            <!-- Fallback: show notes if no shipment linked -->
+            <div t-if="not fp_ship_has_data and o.narration" class="mb-3" style="font-size:10px;">
                 <div t-field="o.narration"/>
             </div>
+
+            <!-- ── FE Payment Communication (only for electronic invoices) ── -->
+            <t t-if="o._fields.get('fp_consecutive_number') and o.fp_consecutive_number">
+                <div class="mb-2 mt-2" style="font-size:10px;">
+                    <div>
+                        <strong>Payment Communication: </strong>
+                        <strong t-esc="o.fp_consecutive_number"/>
+                    </div>
+                    <t t-set="fp_bank" t-value="o.company_id.partner_id.bank_ids[:1]"/>
+                    <div t-if="fp_bank">
+                        <span>on this account: </span>
+                        <strong t-esc="fp_bank.acc_number"/>
+                        <t t-if="fp_bank.bank_id">
+                            - <strong t-esc="fp_bank.bank_id.name"/>
+                        </t>
+                    </div>
+                </div>
+            </t>
+
+            <!-- CANT. ART(S) -->
+            <div class="mb-3" style="font-size:10px;">
+                <strong>CANT. ART(S): </strong>
+                <span t-esc="len(o.invoice_line_ids.filtered(lambda x: x.display_type in (False, 'product')))"/>
+            </div>
+
         </xpath>
     </template>
 
@@ -204,8 +261,8 @@
         <xpath expr="//div[@id='payment_term']" position="after">
             <div t-if="o._fields.get('fp_consecutive_number') and o.fp_consecutive_number"
                  class="text-center mt-2" style="font-size:9px; color:#888;">
-                Emitida conforme la resolución de Facturación Electrónica, MH-DGT-RES-0027-2024
-                del 19 de noviembre de 2024 de la DGTD. Versión XML 4.4
+                Emitida conforme lo establecido en la resolución de Facturación Electrónica,
+                MH-DGT-RES-0027-2024 del 19 de noviembre de 2024 de la DGTD. Versión XML 4.4
             </div>
         </xpath>
     </template>

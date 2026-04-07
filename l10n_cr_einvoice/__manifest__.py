@@ -9,7 +9,7 @@
     "images": ["static/description/Gemini_Generated_Image_hs6p77hs6p77hs6p.png"],
     "depends": ["account", "product", "sale_management", "uom"],
     "external_dependencies": {
-        "python": ["requests", "lxml", "cryptography"],
+        "python": ["requests", "lxml", "cryptography", "num2words"],
     },
     "data": [
         "security/ir.model.access.csv",

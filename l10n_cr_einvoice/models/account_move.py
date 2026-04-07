@@ -812,6 +812,47 @@ class AccountMove(models.Model):
         default=False,
     )
 
+    fp_amount_in_words = fields.Char(
+        string="Total in Words",
+        compute="_compute_fp_amount_in_words",
+    )
+
+    @api.depends("amount_total", "currency_id")
+    def _compute_fp_amount_in_words(self):
+        try:
+            from num2words import num2words as _num2words
+        except ImportError:
+            for move in self:
+                move.fp_amount_in_words = ""
+            return
+        for move in self:
+            if not move.amount_total:
+                move.fp_amount_in_words = ""
+                continue
+            currency = move.currency_id
+            amount = move.amount_total
+            integer_part = int(amount)
+            cents = round((amount - integer_part) * 100)
+            if currency and currency.name == "USD":
+                main_label = "Dollars"
+                cents_label = "Cents"
+            elif currency and currency.name == "CRC":
+                main_label = "Colones"
+                cents_label = "Céntimos"
+            elif currency and currency.name == "EUR":
+                main_label = "Euros"
+                cents_label = "Cents"
+            else:
+                main_label = currency.name if currency else ""
+                cents_label = "cents"
+            try:
+                words = _num2words(integer_part, lang="en").title()
+                move.fp_amount_in_words = (
+                    f"{words} {main_label} and {cents:02d} {cents_label}"
+                )
+            except Exception:
+                move.fp_amount_in_words = ""
+
     @api.depends("fp_other_charge_line_ids.amount")
     def _compute_fp_total_other_charges(self):
         for move in self:
