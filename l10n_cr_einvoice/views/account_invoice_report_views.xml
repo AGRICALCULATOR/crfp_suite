@@ -3,11 +3,27 @@
     <!-- ============================================================
          CR Farm — Invoice PDF customizations (Factura Electrónica CR)
          Inherits the STANDARD Odoo invoice template.
-         Adds: Consecutivo, Clave, weight columns, sale condition,
-               payment method, currency rate.
+         Adds: Clave as title, Consecutivo, Tariff code column,
+               weight columns, sale condition, payment method,
+               weight totals summary.
          ============================================================ -->
 
-    <!-- ═══ 1. Consecutivo + Clave — after the informations bar ═══ -->
+    <!-- ═══ 1. Document title: "Invoice/Factura No: [clave]" ═══ -->
+    <template id="report_invoice_fp_title"
+              inherit_id="account.report_invoice_document"
+              priority="50">
+        <xpath expr="//t[@t-set='layout_document_title']" position="attributes">
+            <attribute name="t-if">not o._fields.get('fp_external_id') or not o.fp_external_id</attribute>
+        </xpath>
+        <xpath expr="//t[@t-set='layout_document_title']" position="after">
+            <t t-if="o._fields.get('fp_external_id') and o.fp_external_id"
+               t-set="layout_document_title">
+                Invoice/Factura No: <t t-out="o.fp_external_id"/>
+            </t>
+        </xpath>
+    </template>
+
+    <!-- ═══ 2. Consecutivo — small text after informations bar ═══ -->
     <template id="report_invoice_fp_consecutivo"
               inherit_id="account.report_invoice_document"
               priority="50">
@@ -18,15 +34,11 @@
                     <strong>Consecutivo:</strong>
                     <span t-field="o.fp_consecutive_number"/>
                 </div>
-                <div class="col" style="word-break: break-all;">
-                    <strong>Clave:</strong>
-                    <span t-field="o.fp_external_id"/>
-                </div>
             </div>
         </xpath>
     </template>
 
-    <!-- ═══ 2. Extra info fields in the horizontal meta bar ═══ -->
+    <!-- ═══ 3. Extra info fields in the meta bar ═══ -->
     <template id="report_invoice_fp_extra_info"
               inherit_id="account.report_invoice_document"
               priority="50">
@@ -53,17 +65,38 @@
         </xpath>
     </template>
 
-    <!-- ═══ 3. Weight columns — table header ═══ -->
+    <!-- ═══ 4. Tariff code (CABYS) column — header ═══ -->
+    <template id="report_invoice_fp_cabys_th"
+              inherit_id="account.report_invoice_document"
+              priority="50">
+        <xpath expr="//table[@name='invoice_line_table']//th[@name='th_quantity']" position="before">
+            <th name="th_tariff_code" class="text-start"><span>Tariff code</span></th>
+        </xpath>
+    </template>
+
+    <!-- ═══ 5. Tariff code (CABYS) column — body cell ═══ -->
+    <template id="report_invoice_fp_cabys_td"
+              inherit_id="account.report_invoice_document"
+              priority="50">
+        <xpath expr="//table[@name='invoice_line_table']//td[@name='td_quantity']" position="before">
+            <td name="td_tariff_code" class="text-start">
+                <span t-if="(line.display_type == 'product' or not line.display_type) and line.product_id"
+                      t-esc="line.product_id.fp_cabys_code or ''"/>
+            </td>
+        </xpath>
+    </template>
+
+    <!-- ═══ 6. Weight columns — header ═══ -->
     <template id="report_invoice_fp_weight_th"
               inherit_id="account.report_invoice_document"
               priority="50">
         <xpath expr="//table[@name='invoice_line_table']//th[@name='th_subtotal']" position="before">
-            <th name="th_net_weight" class="text-end"><span>Net Wt (kg)</span></th>
-            <th name="th_gross_weight" class="text-end"><span>Gross Wt (kg)</span></th>
+            <th name="th_net_weight" class="text-end"><span>Net weight (kg)</span></th>
+            <th name="th_gross_weight" class="text-end"><span>Gross weight (kg)</span></th>
         </xpath>
     </template>
 
-    <!-- ═══ 4. Weight columns — table body cells ═══ -->
+    <!-- ═══ 7. Weight columns — body cells ═══ -->
     <template id="report_invoice_fp_weight_td"
               inherit_id="account.report_invoice_document"
               priority="50">
@@ -76,6 +109,21 @@
                 <span t-if="line.display_type == 'product' or not line.display_type"
                       t-esc="'%.1f' % (line.fp_gross_weight if line._fields.get('fp_gross_weight') else (line.peso_total if line._fields.get('peso_total') else 0.0))"/>
             </td>
+        </xpath>
+    </template>
+
+    <!-- ═══ 8. Weight totals summary — before payment/totals ═══ -->
+    <template id="report_invoice_fp_weight_totals"
+              inherit_id="account.report_invoice_document"
+              priority="50">
+        <xpath expr="//div[@id='total']" position="before">
+            <t t-set="fp_total_net" t-value="sum(l.fp_net_weight or (l.peso_neto if l._fields.get('peso_neto') else 0.0) for l in o.invoice_line_ids.filtered(lambda x: x.display_type in (False, 'product')))"/>
+            <t t-set="fp_total_gross" t-value="sum(l.fp_gross_weight or (l.peso_total if l._fields.get('peso_total') else 0.0) for l in o.invoice_line_ids.filtered(lambda x: x.display_type in (False, 'product')))"/>
+            <div t-if="fp_total_net or fp_total_gross" class="mb-2" style="font-size: 11px;">
+                <strong>Total Net Weight:</strong> <span t-esc="'%.2f' % fp_total_net"/> kg
+                <br/>
+                <strong>Total Gross Weight:</strong> <span t-esc="'%.2f' % fp_total_gross"/> kg
+            </div>
         </xpath>
     </template>
 
