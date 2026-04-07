@@ -10,7 +10,7 @@
                 <title>CR Farm Products — Costa Rica Agricultural Exports</title>
                 <meta name="description" content="Premium tropical root vegetables, coconuts and sugar cane exported fresh from Costa Rica to North America, Europe and the Caribbean. GLOBALG.A.P. certified."/>
             </t>
-            <div id="wrap" class="o_website_crfarm">
+            <div id="wrap" class="o_website_crfarm oe_structure">
 
                 <!-- ── HERO ── -->
                 <section class="crfarm-hero d-flex align-items-center">
@@ -109,7 +109,10 @@
                             <t t-foreach="products" t-as="p">
                                 <div class="col-md-6 col-lg-3 crfarm-reveal crfarm-catalog-item" t-att-data-category="p.category">
                                     <div class="crfarm-product-card h-100">
-                                        <t t-if="p.image_url">
+                                        <t t-if="p.image_1920">
+                                            <img t-att-src="'/web/image/crfp.website.product/%d/image_1920' % p.id" t-att-alt="p.name" class="crfarm-product-img" loading="lazy"/>
+                                        </t>
+                                        <t t-elif="p.image_url">
                                             <img t-att-src="p.image_url" t-att-alt="p.name" class="crfarm-product-img" loading="lazy"/>
                                         </t>
                                         <t t-else="">
@@ -326,7 +329,7 @@
                 <title>About Us — CR Farm Products</title>
                 <meta name="description" content="CR Farm Products was founded in 2005 by four brothers in San Carlos, Costa Rica. Learn about our history, mission, and commitment to quality agricultural exports."/>
             </t>
-            <div id="wrap" class="o_website_crfarm">
+            <div id="wrap" class="o_website_crfarm oe_structure">
 
                 <section class="crfarm-hero" style="min-height:280px;">
                     <div class="container py-5">
@@ -471,7 +474,7 @@
                 <title>Product Catalog — CR Farm Products</title>
                 <meta name="description" content="Browse our full catalog of 19 premium Costa Rican agricultural products: yuca, malanga, eddoes, ginger, coconut, sugar cane, sweet potato, and more."/>
             </t>
-            <div id="wrap" class="o_website_crfarm">
+            <div id="wrap" class="o_website_crfarm oe_structure">
 
                 <section class="crfarm-hero" style="min-height:240px;">
                     <div class="container py-5">
@@ -497,7 +500,10 @@
                             <t t-foreach="products" t-as="p">
                                 <div class="col-md-6 col-lg-4 crfarm-reveal crfarm-catalog-item" t-att-data-category="p.category">
                                     <div class="crfarm-product-card h-100">
-                                        <t t-if="p.image_url">
+                                        <t t-if="p.image_1920">
+                                            <img t-att-src="'/web/image/crfp.website.product/%d/image_1920' % p.id" t-att-alt="p.name" class="crfarm-product-img" loading="lazy"/>
+                                        </t>
+                                        <t t-elif="p.image_url">
                                             <img t-att-src="p.image_url" t-att-alt="p.name" class="crfarm-product-img" loading="lazy"/>
                                         </t>
                                         <t t-else="">
@@ -590,7 +596,7 @@
             <t t-set="head">
                 <title t-esc="product.name + ' — CR Farm Products'"/>
             </t>
-            <div id="wrap" class="o_website_crfarm">
+            <div id="wrap" class="o_website_crfarm oe_structure">
 
                 <section class="py-5">
                     <div class="container">
@@ -602,7 +608,11 @@
 
                         <div class="row g-5">
                             <div class="col-lg-5">
-                                <t t-if="product.image_url">
+                                <t t-if="product.image_1920">
+                                    <img t-att-src="'/web/image/crfp.website.product/%d/image_1920' % product.id" t-att-alt="product.name"
+                                         style="width:100%; border-radius:20px; object-fit:cover; max-height:420px;"/>
+                                </t>
+                                <t t-elif="product.image_url">
                                     <img t-att-src="product.image_url" t-att-alt="product.name"
                                          style="width:100%; border-radius:20px; object-fit:cover; max-height:420px;"/>
                                 </t>
@@ -731,7 +741,7 @@
                 <title>Certifications — CR Farm Products</title>
                 <meta name="description" content="CR Farm Products holds GLOBALG.A.P., Esencial Costa Rica, and PYME certifications, ensuring international food safety, sustainability, and quality standards."/>
             </t>
-            <div id="wrap" class="o_website_crfarm">
+            <div id="wrap" class="o_website_crfarm oe_structure">
 
                 <section class="crfarm-hero" style="min-height:260px;">
                     <div class="container py-5">
@@ -849,7 +859,7 @@
                 <title>Gallery — CR Farm Products</title>
                 <meta name="description" content="Photos of CR Farm Products' farming operations, harvests, packaging, and agricultural facilities in San Carlos, Costa Rica."/>
             </t>
-            <div id="wrap" class="o_website_crfarm">
+            <div id="wrap" class="o_website_crfarm oe_structure">
 
                 <section class="crfarm-hero" style="min-height:220px;">
                     <div class="container py-5">
@@ -936,7 +946,7 @@
                 <title>Contact Us — CR Farm Products</title>
                 <meta name="description" content="Contact CR Farm Products to request a quote, ask about our products, or discuss your import needs. B2B inquiries welcome."/>
             </t>
-            <div id="wrap" class="o_website_crfarm">
+            <div id="wrap" class="o_website_crfarm oe_structure">
 
                 <section class="crfarm-hero" style="min-height:220px;">
                     <div class="container py-5">

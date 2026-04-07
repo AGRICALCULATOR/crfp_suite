@@ -62,9 +62,13 @@ class CrfpWebsiteProduct(models.Model):
                               help='Harmonized System tariff code for customs')
 
     # ── Media ──
+    image_1920 = fields.Image(
+        string='Product Photo',
+        help='Upload hero photo for this product (shown on website catalog)',
+        max_width=1920, max_height=1920)
     image_url = fields.Char(
-        string='Product Image URL',
-        help='Direct URL to product hero photo (publicly accessible)')
+        string='Product Image URL (legacy)',
+        help='External URL to product photo — used only when no image is uploaded above')
     onedrive_url = fields.Char(
         string='OneDrive Photo Gallery',
         help='Link to OneDrive folder with high-res product photos for buyers')

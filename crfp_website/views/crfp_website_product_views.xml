@@ -8,6 +8,7 @@
         <field name="arch" type="xml">
             <list string="Website Products" default_order="sequence, name">
                 <field name="sequence" widget="handle"/>
+                <field name="image_1920" widget="image" options="{'size': [38, 38]}" string=" "/>
                 <field name="name"/>
                 <field name="category"/>
                 <field name="scientific_name"/>
@@ -29,6 +30,8 @@
             <form string="Website Product">
                 <sheet>
                     <div class="oe_button_box" name="button_box"/>
+                    <field name="image_1920" widget="image" class="oe_avatar"
+                           options="{'preview_image': 'image_1920', 'size': [128, 128]}"/>
                     <div class="oe_title">
                         <label for="name"/>
                         <h1><field name="name" placeholder="Product Name"/></h1>
@@ -74,9 +77,18 @@
                         </page>
 
                         <page string="Media &amp; Links" name="media">
+                            <group string="Product Photo (shown on website)">
+                                <field name="image_1920" widget="image" nolabel="1"
+                                       options="{'size': [400, 400]}"
+                                       attrs="{'style': 'max-width:400px;'}"/>
+                            </group>
                             <group>
-                                <field name="image_url" placeholder="https://..."/>
-                                <field name="onedrive_url" placeholder="https://1drv.ms/..."/>
+                                <group string="Fallback / External">
+                                    <field name="image_url" placeholder="https://... (only if no photo uploaded above)"/>
+                                </group>
+                                <group string="Photo Gallery">
+                                    <field name="onedrive_url" placeholder="https://1drv.ms/..."/>
+                                </group>
                             </group>
                         </page>
 
