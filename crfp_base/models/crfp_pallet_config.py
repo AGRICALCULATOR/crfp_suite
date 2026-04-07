@@ -18,13 +18,11 @@ class CrfpPalletConfig(models.Model):
     active = fields.Boolean(default=True)
     notes = fields.Text(string='Notes')
 
-    def name_get(self):
-        result = []
+    @api.depends('product_keyword', 'weight_kg', 'boxes_per_pallet')
+    def _compute_display_name(self):
         for rec in self:
-            name = '%s \u2014 %gkg \u2014 %d boxes' % (
+            rec.display_name = '%s \u2014 %gkg \u2014 %d boxes' % (
                 rec.product_keyword or 'N/A',
                 rec.weight_kg or 0,
                 rec.boxes_per_pallet or 0,
             )
-            result.append((rec.id, name))
-        return result
