@@ -265,7 +265,24 @@
         </xpath>
     </template>
 
-    <!-- ═══ 10. CR electronic invoice footer ═══ -->
+    <!-- ═══ 10. Hide standard Odoo "amount in words" (we have our own) ═══ -->
+    <template id="report_invoice_fp_hide_std_amount_words"
+              inherit_id="account.report_invoice_document"
+              priority="99">
+        <!-- Hide Odoo's standard amount_to_text / amount in words div -->
+        <xpath expr="//span[@t-field='o.amount_total_words']" position="replace">
+            <span/>
+        </xpath>
+    </template>
+
+    <!-- ═══ 11. Hide standard Odoo incoterm line (we show it in header) ═══ -->
+    <template id="report_invoice_fp_hide_std_incoterm"
+              inherit_id="account.report_invoice_document"
+              priority="99">
+        <xpath expr="//p[@t-if='o.incoterm_location']" position="replace"/>
+    </template>
+
+    <!-- ═══ 12. CR electronic invoice footer ═══ -->
     <template id="report_invoice_fp_footer_note"
               inherit_id="account.report_invoice_document"
               priority="50">
