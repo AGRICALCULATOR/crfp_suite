@@ -164,7 +164,7 @@ class CrfpShipment(models.Model):
         self.ensure_one()
         # Map: target state -> checklist categories that must be clear
         blocking_map = {
-            'booking_requested': ['logistics'],
+            'booking_requested': ['booking'],
             'si_sent': ['logistics', 'documentation'],
             'docs_final': ['documentation', 'logistics'],
             'shipped': ['documentation', 'commercial'],
@@ -356,7 +356,7 @@ class CrfpShipment(models.Model):
         self.ensure_one()
         CL = self.env['crfp.shipment.checklist']
         tasks = [
-            (10, 'logistics', 'Confirm carrier and booking details', True),
+            (10, 'booking', 'Confirm carrier and booking details', True),
             (20, 'documentation', 'Prepare and send Shipping Instructions', True),
             (30, 'documentation', 'Obtain phytosanitary certificate', True),
             (40, 'documentation', 'Obtain certificate of origin', True),

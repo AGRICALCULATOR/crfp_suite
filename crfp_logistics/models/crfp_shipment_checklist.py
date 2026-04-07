@@ -18,6 +18,7 @@ class CrfpShipmentChecklist(models.Model):
     date_done = fields.Date(string='Completed Date')
     responsible_id = fields.Many2one('res.users', string='Responsible')
     category = fields.Selection([
+        ('booking', 'Booking'),
         ('commercial', 'Commercial'),
         ('documentation', 'Documentation'),
         ('logistics', 'Logistics'),
