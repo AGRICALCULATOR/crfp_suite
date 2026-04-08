@@ -31,6 +31,7 @@
         'data/crfp_box_type_data.xml',
         'data/crfp_pallet_data.xml',
         'data/crfp_incoterm_matrix_data.xml',
+        'data/crfp_settings_data.xml',
         'data/crfp_settings_cron.xml',
     ],
     'installable': True,
