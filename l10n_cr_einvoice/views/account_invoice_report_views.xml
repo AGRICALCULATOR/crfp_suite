@@ -19,7 +19,7 @@
 
     <!-- ═══ 1. Title: Consecutive + Numeric Key below title ═══ -->
     <template id="report_invoice_fp_title"
-              inherit_id="account.report_invoice_document"
+              inherit_id="account_accountant.report_invoice_document"
               priority="50">
         <xpath expr="//t[@t-set='layout_document_title']//span[@t-field='o.name']" position="replace">
             <span t-field="o.name"/>
@@ -28,7 +28,7 @@
 
     <!-- ═══ 2. Consecutive + Clave below document title ═══ -->
     <template id="report_invoice_fp_consecutive_block"
-              inherit_id="account.report_invoice_document"
+              inherit_id="account_accountant.report_invoice_document"
               priority="50">
         <xpath expr="//div[@id='informations']" position="before">
             <div t-if="o._fields.get('fp_consecutive_number') and o.fp_consecutive_number"
@@ -46,7 +46,7 @@
 
     <!-- ═══ 3. Header info row: Delivery Date, Incoterm, Cond, Pay, Currency ═══ -->
     <template id="report_invoice_fp_extra_info"
-              inherit_id="account.report_invoice_document"
+              inherit_id="account_accountant.report_invoice_document"
               priority="50">
         <xpath expr="//div[@id='informations']" position="inside">
             <t t-set="fp_ship_hdr" t-value="o.crfp_shipment_id if o._fields.get('crfp_shipment_id') else False"/>
@@ -92,7 +92,7 @@
 
     <!-- ═══ 4. CABYS column — header ═══ -->
     <template id="report_invoice_fp_cabys_th"
-              inherit_id="account.report_invoice_document"
+              inherit_id="account_accountant.report_invoice_document"
               priority="50">
         <xpath expr="//table[@name='invoice_line_table']//th[@name='th_quantity']" position="before">
             <th name="th_tariff_code" class="text-start" style="font-size:9px;"><span>CABYS</span></th>
@@ -101,7 +101,7 @@
 
     <!-- ═══ 5. CABYS column — body cell ═══ -->
     <template id="report_invoice_fp_cabys_td"
-              inherit_id="account.report_invoice_document"
+              inherit_id="account_accountant.report_invoice_document"
               priority="50">
         <xpath expr="//table[@name='invoice_line_table']//td[@name='td_quantity']" position="before">
             <td name="td_tariff_code" class="text-start" style="font-size:8px;">
@@ -113,7 +113,7 @@
 
     <!-- ═══ 6. Weight columns — header ═══ -->
     <template id="report_invoice_fp_weight_th"
-              inherit_id="account.report_invoice_document"
+              inherit_id="account_accountant.report_invoice_document"
               priority="50">
         <xpath expr="//table[@name='invoice_line_table']//th[@name='th_subtotal']" position="before">
             <th name="th_net_weight" class="text-end" style="font-size:9px;">
@@ -127,7 +127,7 @@
 
     <!-- ═══ 7. Weight columns — body cells ═══ -->
     <template id="report_invoice_fp_weight_td"
-              inherit_id="account.report_invoice_document"
+              inherit_id="account_accountant.report_invoice_document"
               priority="50">
         <xpath expr="//table[@name='invoice_line_table']//td[@name='td_subtotal']" position="before">
             <td name="td_net_weight" class="text-end" style="font-size:9px;">
@@ -143,7 +143,7 @@
 
     <!-- ═══ 8. Shipment info inside payment_term area (LEFT column) ═══ -->
     <template id="report_invoice_fp_shipment_section"
-              inherit_id="account.report_invoice_document"
+              inherit_id="account_accountant.report_invoice_document"
               priority="50">
 
         <!-- Payment terms custom note BEFORE the standard payment_term div -->
@@ -238,7 +238,7 @@
 
     <!-- ═══ 9. Payment Communication + Bank + CANT ART (below totals) ═══ -->
     <template id="report_invoice_fp_payment_footer"
-              inherit_id="account.report_invoice_document"
+              inherit_id="account_accountant.report_invoice_document"
               priority="99">
         <xpath expr="//div[@id='payment_term']/.." position="after">
             <div style="font-size:10px;" class="mt-2">
@@ -267,7 +267,7 @@
 
     <!-- ═══ 10. Hide standard Odoo "amount in words" (we have our own) ═══ -->
     <template id="report_invoice_fp_hide_std_amount_words"
-              inherit_id="account.report_invoice_document"
+              inherit_id="account_accountant.report_invoice_document"
               priority="99">
         <!-- Hide Odoo's standard amount_to_text / amount in words div -->
         <xpath expr="//span[@t-field='o.amount_total_words']" position="replace">
@@ -277,7 +277,7 @@
 
     <!-- ═══ 12. CR electronic invoice footer ═══ -->
     <template id="report_invoice_fp_footer_note"
-              inherit_id="account.report_invoice_document"
+              inherit_id="account_accountant.report_invoice_document"
               priority="50">
         <xpath expr="//div[@id='payment_term']/.." position="after">
             <div t-if="o._fields.get('fp_consecutive_number') and o.fp_consecutive_number"

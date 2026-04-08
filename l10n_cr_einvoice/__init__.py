@@ -10,6 +10,11 @@ _DISABLE_SQL = """
            AND (arch_db::text LIKE '%%l10n_cr_header_information%%'
                 OR name = 'report_invoice_document_add_pesos'))
           OR arch_db::text LIKE '%%l10n_cr_document_id%%'
+          OR (arch_db::text LIKE '%%peso_neto%%'
+              AND key LIKE 'gen_key.%%')
+          OR (arch_db::text LIKE '%%peso_total%%'
+              AND key LIKE 'gen_key.%%'
+              AND name LIKE '%%weight%%')
       )
 """
 
