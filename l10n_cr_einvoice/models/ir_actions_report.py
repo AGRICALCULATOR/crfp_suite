@@ -9,15 +9,21 @@ class IrActionsReport(models.Model):
     _inherit = "ir.actions.report"
 
     def _register_hook(self):
-        """Run on every server start: deactivate broken QWeb views for Odoo 19.
+        """Run on every server start: deactivate broken l10n_cr views for Odoo 19.
 
-        Views from l10n_cr or auto-generated (gen_key.*) that reference
-        elements like 'l10n_cr_header_information' or 'no_shipping' cause
-        QWebError because those elements don't exist in Odoo 19's invoice
-        template. This runs on registry load — no manual upgrade needed.
+        The standard l10n_cr module (Costa Rica localization) has views that
+        reference elements/fields removed in Odoo 19:
+        - 'l10n_cr_header_information' / 'no_shipping' in QWeb report templates
+        - 'l10n_cr_document_id' field in list/form views
+
+        These cause QWebError or validation errors and block invoice rendering.
+        This hook runs on every registry load — no manual upgrade needed.
+        Only targets auto-generated views (gen_key.*) to avoid touching our own.
         """
         super()._register_hook()
         cr = self.env.cr
+
+        # 1. Broken QWeb report templates (gen_key.* views from l10n_cr)
         cr.execute("""
             UPDATE ir_ui_view SET active = false
             WHERE active = true
@@ -27,11 +33,22 @@ class IrActionsReport(models.Model):
                        AND key LIKE 'gen_key.%%'))
             RETURNING id, key
         """)
-        rows = cr.fetchall()
-        if rows:
+        qweb_rows = cr.fetchall()
+
+        # 2. Broken form/list views referencing l10n_cr_document_id (field removed in Odoo 19)
+        cr.execute("""
+            UPDATE ir_ui_view SET active = false
+            WHERE active = true
+              AND arch_db LIKE '%%l10n_cr_document_id%%'
+            RETURNING id, key
+        """)
+        form_rows = cr.fetchall()
+
+        all_rows = qweb_rows + form_rows
+        if all_rows:
             _logger.info(
-                'Deactivated %d broken QWeb view(s): %s',
-                len(rows), [r[1] for r in rows],
+                'Deactivated %d broken l10n_cr view(s): %s',
+                len(all_rows), [r[1] for r in all_rows],
             )
 
     @api.model
