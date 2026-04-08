@@ -154,9 +154,9 @@ class CrfpContainerConfig(models.Model):
     @api.constrains('total_boxes', 'fill_rate_pct')
     def _check_capacity(self):
         for rec in self:
-            if rec.fill_rate_pct > 105.0:
+            if rec.fill_rate_pct > 100.0:
                 raise ValidationError(
-                    'Container "%s" exceeds capacity by %.1f%%. '
+                    'Container "%s" exceeds capacity (%.1f%%). '
                     'Total boxes: %d, Capacity: %d. '
                     'Please reduce the number of boxes or pallets.'
                     % (rec.name, rec.fill_rate_pct, rec.total_boxes,
