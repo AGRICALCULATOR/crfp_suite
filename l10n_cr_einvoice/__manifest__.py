@@ -1,7 +1,7 @@
 {
     "name": "Factura Electrónica CR Hacienda Connector",
     "summary": "Integra Odoo 19 con Hacienda Costa Rica (Recepción v4.4)",
-    "version": "19.0.5.0.14",
+    "version": "19.0.5.0.15",
     "category": "Accounting",
     "license": "LGPL-3",
     "author": "FenixCR Solutions",
@@ -33,6 +33,7 @@
         "data/mail_template_data.xml",
         "data/ir_cron_data.xml",
     ],
+    "post_init_hook": "_post_init_disable_broken_views",
     "installable": True,
     "application": True,
 }
