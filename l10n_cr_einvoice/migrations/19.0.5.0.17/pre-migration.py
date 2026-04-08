@@ -15,8 +15,8 @@ import logging
 _logger = logging.getLogger(__name__)
 
 
-def migrate(env):
-    env.cr.execute("""
+def migrate(cr, version):
+    cr.execute("""
         UPDATE ir_ui_view SET active = false
         WHERE active = true
           AND (
@@ -28,7 +28,7 @@ def migrate(env):
           )
         RETURNING id, name, key
     """)
-    rows = env.cr.fetchall()
+    rows = cr.fetchall()
     if rows:
         _logger.info(
             'Pre-migration 5.0.17: deactivated %d broken view(s): %s',

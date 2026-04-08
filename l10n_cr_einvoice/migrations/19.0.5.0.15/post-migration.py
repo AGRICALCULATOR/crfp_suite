@@ -4,8 +4,8 @@ import logging
 _logger = logging.getLogger(__name__)
 
 
-def migrate(env):
-    env.cr.execute("""
+def migrate(cr, version):
+    cr.execute("""
         UPDATE ir_ui_view SET active = false
         WHERE active = true
           AND type = 'qweb'
@@ -13,7 +13,7 @@ def migrate(env):
                OR arch_db LIKE '%no_shipping%')
         RETURNING id, key
     """)
-    rows = env.cr.fetchall()
+    rows = cr.fetchall()
     if rows:
         _logger.info(
             'Deactivated %d broken QWeb views: %s',
