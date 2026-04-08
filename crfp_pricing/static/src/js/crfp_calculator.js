@@ -45,7 +45,7 @@ export class CrfpCalculator extends Component {
             containerTypes: d.container_types, boxTypes: d.box_types,
             palletConfigs: d.pallet_configs, incotermMatrix: d.incoterm_matrix,
             fixedCosts: d.fixed_costs,
-            exchangeRate: d.fixed_costs.default_exchange_rate || 503,
+            exchangeRate: d.fixed_costs.default_exchange_rate ?? 503,
             totalBoxes: d.fixed_costs.default_total_boxes || 1386,
             fc: {
                 fc_transport: d.fixed_costs.transport, fc_thc_origin: d.fixed_costs.thc_origin,
