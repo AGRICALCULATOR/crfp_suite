@@ -275,13 +275,6 @@
         </xpath>
     </template>
 
-    <!-- ═══ 11. Hide standard Odoo incoterm line (we show it in header) ═══ -->
-    <template id="report_invoice_fp_hide_std_incoterm"
-              inherit_id="account.report_invoice_document"
-              priority="99">
-        <xpath expr="//p[@t-if='o.incoterm_location']" position="replace"/>
-    </template>
-
     <!-- ═══ 12. CR electronic invoice footer ═══ -->
     <template id="report_invoice_fp_footer_note"
               inherit_id="account.report_invoice_document"
