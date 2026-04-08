@@ -9,8 +9,8 @@ def migrate(cr, version):
         UPDATE ir_ui_view SET active = false
         WHERE active = true
           AND type = 'qweb'
-          AND (arch_db LIKE '%%l10n_cr_header_information%%'
-               OR arch_db LIKE '%%no_shipping%%')
+          AND (arch_db::text LIKE '%%l10n_cr_header_information%%'
+               OR arch_db::text LIKE '%%no_shipping%%')
         RETURNING id, key
     """, ())
     rows = cr.fetchall()

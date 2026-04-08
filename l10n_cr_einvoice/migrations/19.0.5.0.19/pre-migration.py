@@ -1,7 +1,6 @@
-"""Deactivate orphan views that break invoice PDF rendering in Odoo 19.
+"""Deactivate broken l10n_cr views — fix arch_db::text cast for Odoo 19 jsonb.
 
-Uses (cr, version) signature matching existing FenixCR migrations.
-Uses %% with empty params tuple so psycopg2 resolves %% to %.
+In Odoo 19, arch_db is jsonb, not text. LIKE requires explicit ::text cast.
 """
 import logging
 
@@ -24,6 +23,6 @@ def migrate(cr, version):
     rows = cr.fetchall()
     if rows:
         _logger.info(
-            'Pre-migration 5.0.18: deactivated %d broken view(s): %s',
+            'Pre-migration 5.0.19: deactivated %d broken view(s): %s',
             len(rows), [(r[1], r[2]) for r in rows],
         )

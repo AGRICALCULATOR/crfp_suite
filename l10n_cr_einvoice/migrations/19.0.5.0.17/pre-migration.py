@@ -22,9 +22,9 @@ def migrate(cr, version):
           AND (
               (type = 'qweb'
                AND key LIKE 'gen_key.%'
-               AND (arch_db LIKE '%l10n_cr_header_information%'
+               AND (arch_db::text LIKE '%l10n_cr_header_information%'
                     OR name = 'report_invoice_document_add_pesos'))
-              OR arch_db LIKE '%l10n_cr_document_id%'
+              OR arch_db::text LIKE '%l10n_cr_document_id%'
           )
         RETURNING id, name, key
     """)
