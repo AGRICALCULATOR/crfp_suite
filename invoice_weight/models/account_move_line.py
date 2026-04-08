@@ -1,16 +1,3 @@
-from odoo import models, fields
-
-
-class AccountMoveLine(models.Model):
-    _inherit = 'account.move.line'
-
-    peso_neto = fields.Float(
-        string='Peso neto',
-        digits=(12, 2),
-        help='Net weight in kilograms',
-    )
-    peso_total = fields.Float(
-        string='Peso total',
-        digits=(12, 2),
-        help='Gross weight in kilograms (includes packaging)',
-    )
+# Fields peso_neto / peso_total have been consolidated into l10n_cr_einvoice
+# (fp_net_weight / fp_gross_weight). This file is intentionally empty.
+# The module is kept installed to avoid uninstall errors but adds no fields.

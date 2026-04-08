@@ -1,11 +1,15 @@
 {
-    'name': 'Invoice Weight',
-    'version': '19.0.1.0.0',
+    'name': 'Invoice Weight (Deprecated)',
+    'version': '19.0.2.0.0',
     'category': 'Sales',
-    'summary': 'Add net and total weight fields to sale and invoice lines',
+    'summary': 'Deprecated — weight fields consolidated into l10n_cr_einvoice',
     'description': """
-        Adds peso_neto (net weight) and peso_total (gross weight) fields
-        to sale.order.line and account.move.line for export logistics documents.
+        This module previously added peso_neto and peso_total fields to
+        sale.order.line and account.move.line. Those fields are now handled
+        by l10n_cr_einvoice (fp_net_weight / fp_gross_weight).
+
+        This module is kept as an empty shell to avoid uninstall issues.
+        It can be safely uninstalled from the UI when convenient.
     """,
     'author': 'CR Farm Products VYM S.A.',
     'license': 'LGPL-3',
