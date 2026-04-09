@@ -133,7 +133,7 @@ export class CrfpCalculator extends Component {
     }
 
     // ── Global params ──
-    onExchangeRateChange(ev) { this.state.exchangeRate = parseFloat(ev.target.value) || 503; this.recalcAll(); this.state.modified = true; }
+    onExchangeRateChange() { if (!this.state.exchangeRate) { this.state.exchangeRate = 503; } this.recalcAll(); this.state.modified = true; }
     onIncotermChange(ev) { this.state.incoterm = ev.target.value; this.recalcAll(); this.state.modified = true; }
     onPortChange(ev) { this.state.portId = parseInt(ev.target.value) || false; this.state.modified = true; }
     onTotalBoxesChange(ev) { this.state.totalBoxes = parseInt(ev.target.value) || 1386; this.recalcAll(); this.state.modified = true; }
