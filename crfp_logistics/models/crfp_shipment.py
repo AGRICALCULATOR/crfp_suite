@@ -93,7 +93,6 @@ class CrfpShipment(models.Model):
     document_ids = fields.One2many('crfp.shipment.document', 'shipment_id', string='Documents')
     checklist_ids = fields.One2many('crfp.shipment.checklist', 'shipment_id', string='Checklist')
     alert_ids = fields.One2many('crfp.shipment.alert', 'shipment_id', string='Alerts')
-    log_ids = fields.One2many('crfp.shipment.log', 'shipment_id', string='Communication Log')
     tracking_event_ids = fields.One2many('crfp.tracking.event', 'shipment_id', string='Tracking Events')
 
     # Container number (from first container for easy list display)
@@ -160,22 +159,16 @@ class CrfpShipment(models.Model):
             rec.alert_count = len(rec.alert_ids.filtered(lambda a: not a.is_resolved))
 
     def _check_blocking_tasks(self, target_state):
-        """Raise UserError if any blocking checklist items are not done for the transition."""
+        """Raise UserError if any blocking checklist items are not done for the transition.
+
+        Uses blocks_state on each checklist task for granular per-task blocking,
+        instead of the old category-based approach which was too coarse.
+        """
         self.ensure_one()
-        # Map: target state -> checklist categories that must be clear
-        # Blocking disabled temporarily while flow is being refined.
-        # TODO: Re-enable with correct blocking logic once workflow is finalized.
-        blocking_map = {
-            # 'booking_requested': ['booking'],
-            # 'si_sent': ['logistics', 'documentation'],
-            # 'docs_final': ['documentation', 'logistics'],
-            # 'shipped': ['documentation', 'commercial'],
-        }
-        categories = blocking_map.get(target_state)
-        if not categories:
-            return
         blocking = self.checklist_ids.filtered(
-            lambda c: c.is_blocking and c.category in categories and c.state not in ('done', 'na')
+            lambda c: c.is_blocking
+            and c.blocks_state == target_state
+            and c.state not in ('done', 'na')
         )
         if blocking:
             names = ', '.join(blocking.mapped('name'))
@@ -184,6 +177,10 @@ class CrfpShipment(models.Model):
             )
 
     def _default_origin_port(self):
+        settings = self.env['crfp.settings'].get_settings()
+        if settings.default_port_origin_id:
+            return settings.default_port_origin_id.id
+        # Fallback to MOI if not configured in settings
         port = self.env['crfp.port'].search([('code', '=', 'MOI')], limit=1)
         return port.id if port else False
 
@@ -282,7 +279,13 @@ class CrfpShipment(models.Model):
         self._create_lines_from_so_and_quotation(None)
 
     def _create_lines_from_so_and_quotation(self, quotation=None):
-        """Create shipment lines from SO, using quotation data when available."""
+        """Create shipment lines from SO, using container config or quotation data.
+
+        Priority for pallets/boxes/weights:
+        1. Confirmed container config on the SO (user explicitly planned)
+        2. Quotation line data (preserves calculator input)
+        3. Fallback: pallet_config by keyword
+        """
         self.ensure_one()
         if not self.sale_order_id:
             return
@@ -293,6 +296,31 @@ class CrfpShipment(models.Model):
             for ql in quotation.line_ids:
                 if ql.crfp_product_id:
                     q_lines_map[ql.crfp_product_id.id] = ql
+
+        # Build a map from confirmed container configs (by product_id)
+        cc_map = {}  # product_id -> {pallets, bpp, net_kg, gross_kg}
+        confirmed_configs = self.sale_order_id.crfp_container_config_ids.filtered(
+            lambda c: c.state == 'confirmed'
+        )
+        for cc in confirmed_configs:
+            if cc.is_mixed:
+                for cl in cc.product_line_ids:
+                    if cl.product_id:
+                        cc_map[cl.product_id.id] = {
+                            'pallets': cl.num_pallets,
+                            'bpp': cl.boxes_per_pallet,
+                            'net_kg': cl.net_weight_per_box_kg,
+                            'gross_kg': cl.gross_weight_per_box_kg,
+                        }
+            else:
+                # Simple mode: apply to all SO lines with matching container type
+                # Store with key False to use as default
+                cc_map['_simple'] = {
+                    'pallets': cc.num_pallets,
+                    'bpp': cc.boxes_per_pallet,
+                    'net_kg': cc.net_weight_per_box_kg,
+                    'gross_kg': cc.gross_weight_per_box_kg,
+                }
 
         # Get first container if exists
         container = self.container_ids[:1]
@@ -307,25 +335,32 @@ class CrfpShipment(models.Model):
                 ('product_id', '=', sol.product_id.id)
             ], limit=1)
 
-            # Try to get data from quotation line (most accurate)
-            q_line = q_lines_map.get(crfp_prod.id) if crfp_prod else None
-
-            if q_line:
-                # Use quotation line data (preserves exact user input)
-                net_kg = q_line.net_kg or (crfp_prod.net_kg if crfp_prod else 0)
-                bpp = q_line.boxes_per_pallet or 66
+            # Priority 1: Container config (user planned explicitly)
+            cc_data = cc_map.get(sol.product_id.id) or cc_map.get('_simple')
+            if cc_data:
+                bpp = cc_data['bpp'] or 66
+                net_kg = cc_data['net_kg'] or (crfp_prod.net_kg if crfp_prod else 0)
+                gross_kg_per_box = cc_data['gross_kg'] or (net_kg * 1.05)
+                pallets_planned = cc_data['pallets'] or (math.ceil(boxes_planned / bpp) if bpp else 0)
             else:
-                # Fallback: lookup from product and pallet config
-                net_kg = crfp_prod.net_kg if crfp_prod else 0
-                bpp = 66
-                if crfp_prod:
-                    pallet_cfg = self.env['crfp.pallet.config'].search([
-                        ('product_keyword', 'ilike', crfp_prod.name)
-                    ], limit=1)
-                    if pallet_cfg:
-                        bpp = pallet_cfg.boxes_per_pallet
+                # Priority 2: Quotation line data
+                q_line = q_lines_map.get(crfp_prod.id) if crfp_prod else None
+                if q_line:
+                    net_kg = q_line.net_kg or (crfp_prod.net_kg if crfp_prod else 0)
+                    bpp = q_line.boxes_per_pallet or 66
+                else:
+                    # Priority 3: Fallback from product and pallet config
+                    net_kg = crfp_prod.net_kg if crfp_prod else 0
+                    bpp = 66
+                    if crfp_prod:
+                        pallet_cfg = self.env['crfp.pallet.config'].search([
+                            ('product_keyword', 'ilike', crfp_prod.name)
+                        ], limit=1)
+                        if pallet_cfg:
+                            bpp = pallet_cfg.boxes_per_pallet
 
-            pallets_planned = math.ceil(boxes_planned / bpp) if bpp else 0
+                gross_kg_per_box = net_kg * 1.05
+                pallets_planned = math.ceil(boxes_planned / bpp) if bpp else 0
 
             self.env['crfp.shipment.line'].create({
                 'shipment_id': self.id,
@@ -337,7 +372,7 @@ class CrfpShipment(models.Model):
                 'pallets_planned': pallets_planned,
                 'boxes_per_pallet_planned': bpp,
                 'net_weight_planned': boxes_planned * net_kg,
-                'gross_weight_planned': boxes_planned * net_kg * 1.05,
+                'gross_weight_planned': boxes_planned * gross_kg_per_box,
                 'price_unit_planned': sol.price_unit,
                 'temperature_set': self.temperature_set or 0,
             })
@@ -377,27 +412,29 @@ class CrfpShipment(models.Model):
     def _auto_load_checklist(self):
         self.ensure_one()
         CL = self.env['crfp.shipment.checklist']
+        # (seq, category, task_name, is_blocking, blocks_state)
         tasks = [
-            (10, 'booking', 'Confirm carrier and booking details', True),
-            (20, 'documentation', 'Prepare and send Shipping Instructions', True),
-            (30, 'documentation', 'Obtain phytosanitary certificate', True),
-            (40, 'documentation', 'Obtain certificate of origin', True),
-            (50, 'logistics', 'Coordinate container pickup at plant', False),
-            (60, 'logistics', 'Confirm packing and actual quantities', True),
-            (70, 'documentation', 'Review BL draft from carrier', True),
-            (80, 'documentation', 'Generate packing list from actuals', True),
-            (90, 'commercial', 'Generate commercial invoice in Odoo', True),
-            (100, 'logistics', 'Verify container gate-in at terminal', False),
-            (110, 'logistics', 'Confirm departure (ATD)', False),
-            (120, 'documentation', 'Send document package to customer', False),
-            (130, 'logistics', 'Confirm arrival and delivery', False),
+            (10, 'booking', 'Confirm carrier and booking details', True, 'booking_requested'),
+            (20, 'documentation', 'Prepare and send Shipping Instructions', True, 'si_sent'),
+            (30, 'documentation', 'Obtain phytosanitary certificate', True, 'shipped'),
+            (40, 'documentation', 'Obtain certificate of origin', True, 'shipped'),
+            (50, 'logistics', 'Coordinate container pickup at plant', False, False),
+            (60, 'logistics', 'Confirm packing and actual quantities', True, 'docs_final'),
+            (70, 'documentation', 'Review BL draft from carrier', True, 'docs_final'),
+            (80, 'documentation', 'Generate packing list from actuals', True, 'docs_final'),
+            (90, 'commercial', 'Generate commercial invoice in Odoo', True, 'shipped'),
+            (100, 'logistics', 'Verify container gate-in at terminal', False, False),
+            (110, 'logistics', 'Confirm departure (ATD)', False, False),
+            (120, 'documentation', 'Send document package to customer', False, False),
+            (130, 'logistics', 'Confirm arrival and delivery', False, False),
         ]
-        for seq, cat, task_name, blocking in tasks:
+        for seq, cat, task_name, blocking, b_state in tasks:
             existing = CL.search([('shipment_id', '=', self.id), ('name', '=', task_name)], limit=1)
             if not existing:
                 CL.create({
                     'shipment_id': self.id, 'name': task_name, 'sequence': seq,
                     'category': cat, 'is_blocking': blocking,
+                    'blocks_state': b_state or False,
                     'responsible_id': self.responsible_id.id,
                 })
 
@@ -550,10 +587,6 @@ class CrfpShipment(models.Model):
             rec.write({'state': 'docs_final'})
             rec._update_document_states('docs_final')
             rec._push_weights_and_dates_to_invoice()
-
-    def _push_weights_to_invoice(self):
-        """Legacy wrapper — calls the improved version."""
-        self._push_weights_and_dates_to_invoice()
 
     def _push_weights_and_dates_to_invoice(self):
         """Copy actual net/gross weights from shipment lines to linked invoice lines.

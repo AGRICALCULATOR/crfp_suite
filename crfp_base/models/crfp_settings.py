@@ -76,6 +76,12 @@ class CrfpSettings(models.Model):
         string='Duties (%)', default=0.0, digits=(12, 2),
     )
 
+    # ── Logistics Defaults ─────────────────────────────────────────────────────
+    default_port_origin_id = fields.Many2one(
+        'crfp.port', string='Default Port of Origin',
+        help='Default origin port for new shipments (e.g. Puerto Moin)',
+    )
+
     # ── Quality / Monitoring ───────────────────────────────────────────────────
     temperature_tolerance = fields.Float(
         string='Temperature Tolerance (°C)', default=2.0, digits=(12, 1),

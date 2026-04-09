@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<odoo>
-    <!-- Weight fields consolidated into l10n_cr_einvoice module.
-         This view is intentionally empty to avoid duplicate columns. -->
-</odoo>

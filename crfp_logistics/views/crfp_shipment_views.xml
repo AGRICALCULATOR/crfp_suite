@@ -308,6 +308,7 @@
                                            decoration-success="state == 'done'"
                                            decoration-muted="state == 'na'"/>
                                     <field name="is_blocking"/>
+                                    <field name="blocks_state" optional="show"/>
                                     <field name="date_done" optional="show"/>
                                     <button name="action_done" type="object" string="Done"
                                             icon="fa-check" invisible="state != 'pending'"/>
@@ -353,21 +354,7 @@
                             </field>
                         </page>
 
-                        <!-- TAB 7: Communication Log -->
-                        <page string="Log" name="log">
-                            <field name="log_ids">
-                                <list editable="bottom">
-                                    <field name="date"/>
-                                    <field name="log_type" widget="badge"/>
-                                    <field name="subject"/>
-                                    <field name="partner_id"/>
-                                    <field name="user_id"/>
-                                    <field name="attachment_ids" widget="many2many_binary" optional="show"/>
-                                </list>
-                            </field>
-                        </page>
-
-                        <!-- TAB 8: Notes -->
+                        <!-- TAB 7: Notes -->
                         <page string="Notes" name="notes">
                             <field name="notes"/>
                         </page>

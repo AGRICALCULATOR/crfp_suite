@@ -27,6 +27,22 @@ class CrfpShipmentChecklist(models.Model):
     ], string='Category', default='logistics')
     is_blocking = fields.Boolean(string='Blocking',
                                   help='If checked, this task blocks shipment progress')
+    blocks_state = fields.Selection([
+        ('space_requested', 'Space Requested'),
+        ('booking_requested', 'Booking Requested'),
+        ('booking_confirmed', 'Booking Confirmed'),
+        ('si_sent', 'SI Sent'),
+        ('bl_draft_received', 'BL Draft Received'),
+        ('loading', 'Loading'),
+        ('docs_final', 'Docs Final'),
+        ('shipped', 'Shipped'),
+        ('in_transit', 'In Transit'),
+        ('arrived', 'Arrived'),
+        ('delivered', 'Delivered'),
+        ('closed', 'Closed'),
+    ], string='Blocks State',
+       help='Which shipment state transition this task blocks. '
+            'Task must be done/na before shipment can advance to this state.')
     notes = fields.Text(string='Notes')
 
     def action_done(self):

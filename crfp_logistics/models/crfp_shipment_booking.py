@@ -12,7 +12,6 @@ class CrfpShipmentBooking(models.Model):
     state = fields.Selection([
         ('requested', 'Requested'),
         ('confirmed', 'Confirmed'),
-        ('amended', 'Amended'),
         ('cancelled', 'Cancelled'),
     ], string='Status', default='requested', tracking=True)
 
