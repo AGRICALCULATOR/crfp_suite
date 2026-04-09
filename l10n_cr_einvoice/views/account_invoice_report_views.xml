@@ -1,298 +1,816 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- ============================================================
-         CR Farm — Export Invoice PDF (Factura Electrónica CR)
-         Matches commercial export invoice layout (Invoice 682 ref).
-         Single-page, consistent 10px body font.
-
-         Layout:
-         [Logo/Company]              [Consignatary address]
-         Invoice / Consecutivo / Clave
-         [Date | Due | Delivery | Incoterm | Source | Ref | Cond | Pay | Currency]
-         [Description | CABYS | Qty | Price | Tax | Net Wt | Gross Wt | Amount]
-         Términos de pago: ...
-         [Shipment info LEFT]        [Totals RIGHT]
-                                     [Amount in words]
-         Payment Communication / Bank / CANT ART
-         [FE footer]
-         ============================================================ -->
-
-    <!-- ═══ 1. Title: Consecutive + Numeric Key below title ═══ -->
-    <template id="report_invoice_fp_title"
-              inherit_id="account.report_invoice_document"
-              priority="50">
-        <xpath expr="//t[@t-set='layout_document_title']//span[@t-field='o.name']" position="replace">
-            <span t-field="o.name"/>
+    <template id="report_invoice_document_fp_template_router" inherit_id="account_accountant.report_invoice_document">
+        <xpath expr="//t[@t-call='web.external_layout']" position="before">
+            <t t-if="o.company_id.fp_invoice_template_style and o.company_id.fp_invoice_template_style != 'standard'">
+                <t t-call="l10n_cr_einvoice.report_invoice_document_fp_custom"/>
+            </t>
+        </xpath>
+        <xpath expr="//t[@t-call='web.external_layout']" position="attributes">
+            <attribute name="t-if">not (o.company_id.fp_invoice_template_style and o.company_id.fp_invoice_template_style != 'standard')</attribute>
         </xpath>
     </template>
 
-    <!-- ═══ 2. Consecutive + Clave below document title ═══ -->
-    <template id="report_invoice_fp_consecutive_block"
-              inherit_id="account.report_invoice_document"
-              priority="50">
-        <xpath expr="//div[@id='informations']" position="before">
-            <div t-if="o._fields.get('fp_consecutive_number') and o.fp_consecutive_number"
-                 class="mb-2" style="font-size:10px;">
-                <strong>Consecutive:</strong><br/>
-                <span t-esc="o.fp_consecutive_number" style="font-size:9px;"/>
-                <br/>
-                <t t-if="o._fields.get('fp_external_id') and o.fp_external_id">
-                    <strong>Numeric Key:</strong><br/>
-                    <span t-esc="o.fp_external_id" style="font-size:8px; word-break:break-all;"/>
-                </t>
-            </div>
-        </xpath>
-    </template>
-
-    <!-- ═══ 3. Header info row: Delivery Date, Incoterm, Cond, Pay, Currency ═══ -->
-    <template id="report_invoice_fp_extra_info"
-              inherit_id="account.report_invoice_document"
-              priority="50">
-        <xpath expr="//div[@id='informations']" position="inside">
-            <t t-set="fp_ship_hdr" t-value="o.crfp_shipment_id if o._fields.get('crfp_shipment_id') else False"/>
-
-            <!-- Delivery Date -->
-            <div class="col" t-if="fp_ship_hdr and fp_ship_hdr.eta" name="fp_delivery_date">
-                <strong>Delivery Date</strong>
-                <div t-field="fp_ship_hdr.eta" style="font-size:10px;"/>
-            </div>
-            <!-- Incoterm + port -->
-            <div class="col" t-if="fp_ship_hdr and fp_ship_hdr.incoterm" name="fp_incoterm">
-                <strong>Incoterm</strong>
-                <div style="font-size:10px;">
-                    <span t-esc="fp_ship_hdr.incoterm"/>
-                    <t t-if="fp_ship_hdr.port_destination_id">
-                        <br/><span t-esc="fp_ship_hdr.port_destination_id.name"/>
-                    </t>
-                </div>
-            </div>
-            <!-- Condition Sale -->
-            <div class="col" t-if="o._fields.get('fp_sale_condition') and o.fp_sale_condition"
-                 name="fp_sale_condition">
-                <strong>Condition Sale:</strong>
-                <div t-field="o.fp_sale_condition" style="font-size:10px;"/>
-            </div>
-            <!-- Payment Way -->
-            <div class="col" t-if="o._fields.get('fp_payment_method') and o.fp_payment_method"
-                 name="fp_payment_method">
-                <strong>Payment Way:</strong>
-                <div t-field="o.fp_payment_method" style="font-size:10px;"/>
-            </div>
-            <!-- Currency + rate -->
-            <div class="col" name="fp_currency_rate"
-                 t-if="o._fields.get('invoice_currency_rate') and o.invoice_currency_rate and o.invoice_currency_rate != 1.0">
-                <strong>Currency:</strong>
-                <div style="font-size:10px;">
-                    <span t-field="o.currency_id"/>
-                    <br/>(&#8353; <span t-esc="'%.2f' % o.invoice_currency_rate"/>)
-                </div>
-            </div>
-        </xpath>
-    </template>
-
-    <!-- ═══ 4. CABYS column — header ═══ -->
-    <template id="report_invoice_fp_cabys_th"
-              inherit_id="account.report_invoice_document"
-              priority="50">
-        <xpath expr="//table[@name='invoice_line_table']//th[@name='th_quantity']" position="before">
-            <th name="th_tariff_code" class="text-start" style="font-size:9px;"><span>CABYS</span></th>
-        </xpath>
-    </template>
-
-    <!-- ═══ 5. CABYS column — body cell ═══ -->
-    <template id="report_invoice_fp_cabys_td"
-              inherit_id="account.report_invoice_document"
-              priority="50">
-        <xpath expr="//table[@name='invoice_line_table']//td[@name='td_quantity']" position="before">
-            <td name="td_tariff_code" class="text-start" style="font-size:8px;">
-                <span t-if="(line.display_type == 'product' or not line.display_type) and line.product_id"
-                      t-esc="line.product_id.fp_cabys_code if line.product_id._fields.get('fp_cabys_code') else ''"/>
-            </td>
-        </xpath>
-    </template>
-
-    <!-- ═══ 6. Weight columns — header ═══ -->
-    <template id="report_invoice_fp_weight_th"
-              inherit_id="account.report_invoice_document"
-              priority="50">
-        <xpath expr="//table[@name='invoice_line_table']//th[@name='th_subtotal']" position="before">
-            <th name="th_net_weight" class="text-end" style="font-size:9px;">
-                <span>Net weight<br/>(kg)</span>
-            </th>
-            <th name="th_gross_weight" class="text-end" style="font-size:9px;">
-                <span>Gross weight<br/>(kg)</span>
-            </th>
-        </xpath>
-    </template>
-
-    <!-- ═══ 7. Weight columns — body cells ═══ -->
-    <template id="report_invoice_fp_weight_td"
-              inherit_id="account.report_invoice_document"
-              priority="50">
-        <xpath expr="//table[@name='invoice_line_table']//td[@name='td_subtotal']" position="before">
-            <td name="td_net_weight" class="text-end" style="font-size:9px;">
-                <span t-if="line.display_type == 'product' or not line.display_type"
-                      t-esc="'{:,.1f}'.format(line.fp_net_weight if line._fields.get('fp_net_weight') else 0.0)"/>
-            </td>
-            <td name="td_gross_weight" class="text-end" style="font-size:9px;">
-                <span t-if="line.display_type == 'product' or not line.display_type"
-                      t-esc="'{:,.1f}'.format(line.fp_gross_weight if line._fields.get('fp_gross_weight') else 0.0)"/>
-            </td>
-        </xpath>
-    </template>
-
-    <!-- ═══ 8. Shipment info inside payment_term area (LEFT column) ═══ -->
-    <template id="report_invoice_fp_shipment_section"
-              inherit_id="account.report_invoice_document"
-              priority="50">
-
-        <!-- Payment terms custom note BEFORE the standard payment_term div -->
-        <xpath expr="//div[@id='payment_term']" position="before">
-            <div t-if="o.invoice_payment_term_id and o.invoice_payment_term_id.note"
-                 class="mb-1" style="font-size:10px;">
-                <strong>Términos de pago: </strong>
-                <span t-esc="o.invoice_payment_term_id.note"/>
-            </div>
-        </xpath>
-
-        <!-- Inject shipment info INSIDE the payment_term div (left side) -->
-        <xpath expr="//div[@id='payment_term']" position="inside">
+    <template id="report_invoice_document_fp_custom">
+        <t t-call="web.html_container">
+            <t t-set="fp_template_style" t-value="o.company_id.fp_invoice_template_style"/>
+            <t t-set="fp_document_types" t-value="o._fp_get_selection_map('fp_document_type')"/>
+            <t t-set="fp_lines_to_report" t-value="o.invoice_line_ids"/>
+            <t t-set="fp_product_lines" t-value="fp_lines_to_report.filtered_domain([('display_type', 'in', [False, 'product'])])"/>
+            <t t-set="qr_code_url" t-value="o._generate_qr_code(silent_errors=True) if o.display_qr_code else False"/>
+            <t t-set="fp_company_partner" t-value="o.company_id.partner_id"/>
+            <t t-set="fp_receiver_partner" t-value="o.partner_id"/>
+            <t t-set="fp_receiver_address" t-value="', '.join(filter(None, [fp_receiver_partner.street, fp_receiver_partner.fp_district_id.name if fp_receiver_partner.fp_district_id else False, fp_receiver_partner.fp_canton_id.name if fp_receiver_partner.fp_canton_id else False, fp_receiver_partner.fp_province_id.name if fp_receiver_partner.fp_province_id else False]))"/>
+            <t t-set="fp_receiver_phone" t-value="fp_receiver_partner.phone or (fp_receiver_partner._fields.get('mobile') and fp_receiver_partner.mobile) or ''"/>
+            <t t-set="fp_reference_value" t-value="o.reversed_entry_id.fp_consecutive_number if o.fp_document_type == 'NC' and o.reversed_entry_id else (o.ref or '-')"/>
+            <t t-set="fp_summary_totals" t-value="o._fp_get_report_summary_totals()"/>
+            <t t-set="fp_tax_rate_breakdown" t-value="o._fp_get_report_tax_rate_breakdown()"/>
+            <t t-set="fp_electronic_key_value" t-value="o.fp_external_id if o._fields.get('fp_external_id') else '-'"/>
+            <t t-set="fp_consecutive_value" t-value="o.fp_consecutive_number if o._fields.get('fp_consecutive_number') else '-'"/>
+            <t t-set="fp_currency_rate_value" t-value="o.invoice_currency_rate if o._fields.get('invoice_currency_rate') and o.invoice_currency_rate else 1.0"/>
+            <t t-set="fp_sale_condition_value" t-value="o.fp_sale_condition if o._fields.get('fp_sale_condition') and o.fp_sale_condition else (o.invoice_payment_term_id.name or '-')"/>
+            <t t-set="fp_payment_method_value" t-value="o.fp_payment_method if o._fields.get('fp_payment_method') and o.fp_payment_method else '-'"/>
+            <t t-set="fp_sale_condition_map" t-value="o._fp_get_selection_map('fp_sale_condition')"/>
+            <t t-set="fp_payment_method_map" t-value="o._fp_get_selection_map('fp_payment_method')"/>
+            <t t-set="fp_sale_condition_label" t-value="fp_sale_condition_map.get(o.fp_sale_condition, fp_sale_condition_value) if o._fields.get('fp_sale_condition') else fp_sale_condition_value"/>
+            <t t-set="fp_payment_method_label" t-value="fp_payment_method_map.get(o.fp_payment_method, fp_payment_method_value) if o._fields.get('fp_payment_method') else fp_payment_method_value"/>
+            <t t-set="fp_pdf_fill_style" t-value="'background: #f2f2f2 !important; background-color: #f2f2f2 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;'"/>
             <t t-set="fp_ship" t-value="o.crfp_shipment_id if o._fields.get('crfp_shipment_id') else False"/>
             <t t-set="fp_ship_has_data" t-value="fp_ship and (fp_ship.port_origin_id or fp_ship.port_destination_id or fp_ship.etd or fp_ship.eta or fp_ship.vessel_name or fp_ship.shipping_company or fp_ship.carrier_partner_id or fp_ship.container_ids or fp_ship.booking_id or fp_ship.gps_device_id)"/>
 
-            <div t-if="fp_ship_has_data" class="mt-2" style="font-size:9px; line-height:1.7;">
-                <div t-if="fp_ship.port_origin_id">
-                    <strong>Shipment place:</strong>
-                    <span t-esc="(fp_ship.port_origin_id.name + ', ' + fp_ship.port_origin_id.country).upper()"/>
-                </div>
-                <div t-if="fp_ship.port_origin_id and fp_ship.port_origin_id.country">
-                    <strong>Origin country:</strong>
-                    <span t-esc="fp_ship.port_origin_id.country.upper()"/>
-                </div>
-                <div t-if="fp_ship.port_destination_id and fp_ship.port_destination_id.country">
-                    <strong>Arrival country:</strong>
-                    <span t-esc="fp_ship.port_destination_id.country.upper()"/>
-                </div>
-                <div t-if="fp_ship.port_destination_id">
-                    <strong>Port of discharge:</strong>
-                    <span t-esc="fp_ship.port_destination_id.name.upper()"/>
-                </div>
-                <div t-if="fp_ship.etd">
-                    <strong>Departure :</strong>
-                    <span t-field="fp_ship.etd" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/>
-                </div>
-                <div t-if="fp_ship.eta">
-                    <strong>Arrival :</strong>
-                    <span t-field="fp_ship.eta" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/>
-                </div>
-                <div t-if="fp_ship.shipping_company or fp_ship.carrier_partner_id">
-                    <strong>Shipping Company:</strong>
-                    <span t-esc="fp_ship.shipping_company or (fp_ship.carrier_partner_id.name if fp_ship.carrier_partner_id else '')"/>
-                </div>
-                <div t-if="fp_ship.vessel_name">
-                    <strong>Vessel and Voyage:</strong>
-                    <span t-esc="fp_ship.vessel_name"/>
-                    <t t-if="fp_ship.voyage_number"> <span t-esc="fp_ship.voyage_number"/></t>
-                </div>
-                <t t-if="fp_ship.container_ids">
-                    <t t-foreach="fp_ship.container_ids" t-as="cnt">
-                        <div t-if="cnt.container_number">
-                            <strong>Container:</strong> <span t-esc="cnt.container_number"/>
+            <!-- PROHYGIENE STYLE -->
+            <t t-if="fp_template_style == 'modern_prohygiene'">
+                <style>
+                    .fp-cr-wrap {
+                        --fp-cr-border-color: #00a9eb;
+                        --fp-cr-surface-soft: #f3f5f7;
+                        --fp-cr-page-fill: #eef0f2;
+                        color: #111;
+                        font-size: 13px;
+                        -webkit-print-color-adjust: exact;
+                        print-color-adjust: exact;
+                    }
+                    .fp-cr-wrap .text-end { text-align: right !important; }
+                    .fp-cr-wrap * {
+                        box-shadow: none !important;
+                        outline: none !important;
+                    }
+                    .fp-cr-top-bar { height: 24px; margin-bottom: 8px; background: linear-gradient(90deg, #10b7a5 0%, #1160aa 82%); }
+                    .fp-cr-row {
+                        width: 100%;
+                        margin-bottom: 6px;
+                        border: 0 !important;
+                        border-collapse: separate !important;
+                        border-spacing: 0 !important;
+                    }
+                    .fp-cr-row tr, .fp-cr-row td { vertical-align: top; border: 0 !important; }
+                    .fp-cr-head-title { background: #0d4f9b; color: #fff; padding: 8px 10px; font-weight: 700; font-size: 14px; text-transform: uppercase; }
+                    .fp-cr-head-meta {
+                        width: 100%;
+                        border: 1px solid var(--fp-cr-border-color);
+                        border-top: 0;
+                        border-collapse: collapse !important;
+                        border-spacing: 0 !important;
+                        background-color: var(--fp-cr-page-fill);
+                    }
+                    .fp-cr-head-meta td {
+                        padding: 2px 10px;
+                        border: 0 !important;
+                        background: var(--fp-cr-page-fill);
+                        background-color: var(--fp-cr-page-fill);
+                    }
+                    .fp-cr-box { border: 2px solid #00a9eb !important; margin-top: 6px; }
+                    .fp-cr-box-title { background: #0d4f9b; color: #fff; padding: 4px 8px; font-weight: 700; text-transform: uppercase; }
+                    .fp-cr-box-body { padding: 6px 8px; background-color: var(--fp-cr-page-fill); border: 0; }
+                    .fp-cr-label { font-weight: 700; }
+                    .fp-cr-table {
+                        width: 100%;
+                        font-size: 12px;
+                        border: 0;
+                        border-collapse: separate !important;
+                        border-spacing: 0 !important;
+                    }
+                    .fp-cr-table tr { border: 0 !important; }
+                    .fp-cr-table th,
+                    .fp-cr-table td {
+                        border: 0;
+                        border-right: 2px solid #00a9eb !important;
+                        border-bottom: 2px solid #00a9eb !important;
+                        padding: 5px 6px;
+                        background-clip: padding-box;
+                    }
+                    .fp-cr-table tr:first-child > th,
+                    .fp-cr-table tr:first-child > td { border-top: 2px solid var(--fp-cr-border-color); }
+                    .fp-cr-table th:first-child,
+                    .fp-cr-table td:first-child { border-left: 2px solid var(--fp-cr-border-color); }
+                    .fp-cr-table th { background: #0d4f9b; color: #fff; text-align: center; }
+                    .fp-cr-table td { background-color: #fff; }
+                    .fp-cr-table td.text-end { text-align: right; }
+                    .fp-cr-grid-2 {
+                        width: 100%;
+                        margin-top: 8px;
+                        border: 0;
+                        border-collapse: separate !important;
+                        border-spacing: 0 !important;
+                    }
+                    .fp-cr-grid-2 tr,
+                    .fp-cr-grid-2 td { border: 0 !important; }
+                    .fp-cr-grid-2 > tbody > tr > td { width: 50%; vertical-align: top; }
+                    .fp-cr-small-table {
+                        width: 100%;
+                        font-size: 12px;
+                        border: 0;
+                        border-collapse: separate !important;
+                        border-spacing: 0 !important;
+                    }
+                    .fp-cr-small-table tr { border: 0 !important; }
+                    .fp-cr-small-table th,
+                    .fp-cr-small-table td {
+                        border: 0;
+                        border-right: 2px solid #00a9eb !important;
+                        border-bottom: 2px solid #00a9eb !important;
+                        padding: 4px 6px;
+                        background-clip: padding-box;
+                    }
+                    .fp-cr-small-table tr:first-child > th,
+                    .fp-cr-small-table tr:first-child > td { border-top: 2px solid #00a9eb !important; }
+                    .fp-cr-small-table th:first-child,
+                    .fp-cr-small-table td:first-child { border-left: 2px solid #00a9eb !important; }
+                    .fp-cr-small-table th { background: #0d4f9b; color: #fff; }
+                    .fp-cr-small-table td { background-color: var(--fp-cr-page-fill); }
+                    .fp-cr-total td { font-size: 13px; }
+                    .fp-cr-receiver-table {
+                        width: 100%;
+                        table-layout: fixed;
+                        border: 0;
+                        border-collapse: separate !important;
+                        border-spacing: 0 !important;
+                    }
+                    .fp-cr-receiver-table tr,
+                    .fp-cr-receiver-table td {
+                        width: 50%;
+                        vertical-align: top;
+                        padding: 0;
+                        border: 0 !important;
+                    }
+                    .fp-cr-sign { border: 2px solid var(--fp-cr-border-color); margin-top: 8px; padding: 8px; min-height: 70px; }
+                    .fp-cr-footer { margin-top: 10px; background: #0d4f9b; color: #fff; padding: 8px 10px; font-size: 12px; }
+                    .fp-cr-qr img { max-width: 140px; max-height: 140px; }
+                </style>
+                <div class="fp-cr-wrap">
+                    <div class="fp-cr-top-bar"/>
+                    <!-- Company/Emitter Data -->
+                    <table class="fp-cr-row">
+                        <tr>
+                            <td style="width: 20%; vertical-align: top;">
+                                <t t-if="fp_company_partner.image_1920">
+                                    <img t-att-src="image_data_uri(fp_company_partner.image_1920)" style="max-width: 100px; max-height: 80px;"/>
+                                </t>
+                            </td>
+                            <td style="width: 80%; padding-left: 10px;">
+                                <div class="fp-cr-head-title" t-esc="fp_company_partner.name"/>
+                                <table class="fp-cr-head-meta">
+                                    <tr>
+                                        <td><span class="fp-cr-label">VAT/ID:</span> <span t-esc="fp_company_partner.vat or '-'"/></td>
+                                        <td><span class="fp-cr-label">Phone:</span> <span t-esc="fp_company_partner.phone or '-'"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="fp-cr-label">Email:</span> <span t-esc="fp_company_partner.email or '-'"/></td>
+                                        <td><span class="fp-cr-label">Address:</span> <span t-esc="fp_company_partner.street or '-'"/></td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                    <!-- Document Header -->
+                    <div class="fp-cr-box">
+                        <div class="fp-cr-box-title">Document Information</div>
+                        <div class="fp-cr-box-body">
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <tr>
+                                    <td style="padding: 4px; width: 50%;"><span class="fp-cr-label">Type:</span> <span t-esc="fp_document_types.get(o.fp_document_type, o.fp_document_type) if o._fields.get('fp_document_type') else o.move_type"/></td>
+                                    <td style="padding: 4px; width: 50%;"><span class="fp-cr-label">Consecutive:</span> <span t-esc="fp_consecutive_value"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 4px;"><span class="fp-cr-label">Electronic Key:</span> <span t-esc="fp_electronic_key_value"/></td>
+                                    <td style="padding: 4px;"><span class="fp-cr-label">Date:</span> <span t-field="o.invoice_date" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 4px;"><span class="fp-cr-label">Due Date:</span> <span t-field="o.invoice_date_due" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/></td>
+                                    <td style="padding: 4px;"><span class="fp-cr-label">Currency:</span> <span t-esc="o.currency_id.name"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 4px;"><span class="fp-cr-label">Exchange Rate:</span> <span t-esc="'{:.4f}'.format(fp_currency_rate_value)"/></td>
+                                    <td style="padding: 4px;"><span class="fp-cr-label">Sale Condition:</span> <span t-esc="fp_sale_condition_label"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 4px;"><span class="fp-cr-label">Payment Method:</span> <span t-esc="fp_payment_method_label"/></td>
+                                    <td style="padding: 4px;"><span class="fp-cr-label">Reference:</span> <span t-esc="fp_reference_value"/></td>
+                                </tr>
+                            </table>
                         </div>
-                        <div t-if="cnt.seal_number">
-                            <strong>Seal / Marchamo:</strong> <span t-esc="cnt.seal_number"/>
+                    </div>
+                    <!-- Receiver Data -->
+                    <div class="fp-cr-box">
+                        <div class="fp-cr-box-title">Receiver Information</div>
+                        <div class="fp-cr-box-body">
+                            <table class="fp-cr-receiver-table">
+                                <tr>
+                                    <td><span class="fp-cr-label">Name:</span> <span t-esc="fp_receiver_partner.name"/></td>
+                                    <td><span class="fp-cr-label">VAT/ID:</span> <span t-esc="fp_receiver_partner.vat or '-'"/></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2"><span class="fp-cr-label">Address:</span> <span t-esc="fp_receiver_address or '-'"/></td>
+                                </tr>
+                                <tr>
+                                    <td><span class="fp-cr-label">Phone:</span> <span t-esc="fp_receiver_phone or '-'"/></td>
+                                    <td><span class="fp-cr-label">Email:</span> <span t-esc="fp_receiver_partner.email or '-'"/></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <!-- Logistics Section -->
+                    <t t-if="fp_ship_has_data">
+                        <div class="fp-cr-box">
+                            <div class="fp-cr-box-title">Datos de Embarque / Shipment Info</div>
+                            <div class="fp-cr-box-body">
+                                <div t-if="fp_ship.port_origin_id" style="margin-bottom: 4px;">
+                                    <span class="fp-cr-label">Shipment place:</span> <span t-esc="(fp_ship.port_origin_id.name + ', ' + fp_ship.port_origin_id.country).upper()"/>
+                                </div>
+                                <div t-if="fp_ship.port_origin_id and fp_ship.port_origin_id.country" style="margin-bottom: 4px;">
+                                    <span class="fp-cr-label">Origin country:</span> <span t-esc="fp_ship.port_origin_id.country.upper()"/>
+                                </div>
+                                <div t-if="fp_ship.port_destination_id and fp_ship.port_destination_id.country" style="margin-bottom: 4px;">
+                                    <span class="fp-cr-label">Arrival country:</span> <span t-esc="fp_ship.port_destination_id.country.upper()"/>
+                                </div>
+                                <div t-if="fp_ship.port_destination_id" style="margin-bottom: 4px;">
+                                    <span class="fp-cr-label">Port of discharge:</span> <span t-esc="fp_ship.port_destination_id.name.upper()"/>
+                                </div>
+                                <div t-if="fp_ship.incoterm" style="margin-bottom: 4px;">
+                                    <span class="fp-cr-label">Incoterm:</span> <span t-esc="fp_ship.incoterm"/>
+                                    <t t-if="fp_ship.port_destination_id"> - <span t-esc="fp_ship.port_destination_id.name"/></t>
+                                </div>
+                                <div t-if="fp_ship.etd" style="margin-bottom: 4px;">
+                                    <span class="fp-cr-label">Departure:</span> <span t-field="fp_ship.etd" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/>
+                                </div>
+                                <div t-if="fp_ship.eta" style="margin-bottom: 4px;">
+                                    <span class="fp-cr-label">Arrival:</span> <span t-field="fp_ship.eta" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/>
+                                </div>
+                                <div t-if="fp_ship.shipping_company or fp_ship.carrier_partner_id" style="margin-bottom: 4px;">
+                                    <span class="fp-cr-label">Shipping Company:</span> <span t-esc="fp_ship.shipping_company or (fp_ship.carrier_partner_id.name if fp_ship.carrier_partner_id else '')"/>
+                                </div>
+                                <div t-if="fp_ship.vessel_name" style="margin-bottom: 4px;">
+                                    <span class="fp-cr-label">Vessel and Voyage:</span> <span t-esc="fp_ship.vessel_name"/>
+                                    <t t-if="fp_ship.voyage_number"> - <span t-esc="fp_ship.voyage_number"/></t>
+                                </div>
+                                <t t-if="fp_ship.container_ids">
+                                    <t t-foreach="fp_ship.container_ids" t-as="cnt">
+                                        <div t-if="cnt.container_number" style="margin-bottom: 4px;">
+                                            <span class="fp-cr-label">Container:</span> <span t-esc="cnt.container_number"/>
+                                        </div>
+                                        <div t-if="cnt.seal_number" style="margin-bottom: 4px;">
+                                            <span class="fp-cr-label">Seal / Marchamo:</span> <span t-esc="cnt.seal_number"/>
+                                        </div>
+                                    </t>
+                                </t>
+                                <t t-if="fp_ship.booking_id">
+                                    <div t-if="fp_ship.booking_id.booking_reference" style="margin-bottom: 4px;">
+                                        <span class="fp-cr-label">Booking Number:</span> <span t-esc="fp_ship.booking_id.booking_reference"/>
+                                    </div>
+                                    <div t-if="fp_ship.booking_id.bl_number" style="margin-bottom: 4px;">
+                                        <span class="fp-cr-label">Bill of Lading:</span> <span t-esc="fp_ship.booking_id.bl_number"/>
+                                    </div>
+                                </t>
+                                <div t-if="fp_ship.gps_device_id" style="margin-bottom: 4px;">
+                                    <span class="fp-cr-label">Tracker:</span> <span t-esc="fp_ship.gps_device_id"/>
+                                </div>
+                            </div>
                         </div>
                     </t>
-                </t>
-                <t t-if="fp_ship.booking_id">
-                    <div t-if="fp_ship.booking_id.booking_reference">
-                        <strong>Booking Number :</strong>
-                        <span t-esc="fp_ship.booking_id.booking_reference"/>
-                    </div>
-                    <div t-if="fp_ship.booking_id.bl_number">
-                        <strong>Bill of Lading:</strong>
-                        <span t-esc="fp_ship.booking_id.bl_number"/>
-                    </div>
-                </t>
-                <div t-if="fp_ship.gps_device_id">
-                    <strong>Tracker:</strong>
-                    <span t-esc="fp_ship.gps_device_id"/>
-                </div>
-            </div>
+                    <!-- Line Items Table -->
+                    <table class="fp-cr-table" style="margin-top: 8px;">
+                        <thead>
+                            <tr>
+                                <th>CABYS</th>
+                                <th>Description</th>
+                                <th style="text-align: center;">Qty</th>
+                                <th style="text-align: right;">Net Weight (kg)</th>
+                                <th style="text-align: right;">Gross Weight (kg)</th>
+                                <th style="text-align: right;">Unit Price</th>
+                                <th style="text-align: right;">Tax</th>
+                                <th style="text-align: right;">Discount</th>
+                                <th style="text-align: right;">Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="fp_product_lines" t-as="line">
+                                <tr>
+                                    <td t-esc="line.product_id.fp_cabys_code or '-'"/>
+                                    <td><span t-field="line.name"/></td>
+                                    <td class="text-end" t-esc="line.quantity"/>
+                                    <td class="text-end" t-esc="'%.3f' % (line.fp_net_weight or 0.0)"/>
+                                    <td class="text-end" t-esc="'%.3f' % (line.fp_gross_weight or 0.0)"/>
+                                    <td class="text-end"><span t-field="line.price_unit" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                    <td class="text-end">
+                                        <span t-esc="line.price_total - line.price_subtotal" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                                        <span t-if="line.tax_ids"> (<span t-esc="'%.0f' % (line.tax_ids[0].amount or 0.0)"/>%)</span>
+                                    </td>
+                                    <td class="text-end"><span t-esc="line.discount"/>%</td>
+                                    <td class="text-end"><span t-field="line.price_total" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                </tr>
+                            </t>
+                        </tbody>
+                        <tfoot>
+                            <tr style="font-weight: 700; border-top: 2px solid #00a9eb;">
+                                <td colspan="2" style="text-align: right; padding: 5px 6px; background: var(--fp-cr-page-fill);">TOTALES</td>
+                                <td style="text-align: right; padding: 5px 6px; background: var(--fp-cr-page-fill);" t-esc="sum(l.quantity for l in fp_product_lines)"/>
+                                <td style="text-align: right; padding: 5px 6px; background: var(--fp-cr-page-fill);">
+                                    <t t-if="fp_ship and fp_ship.total_net_weight_actual"><span t-esc="'%.3f' % fp_ship.total_net_weight_actual"/></t>
+                                    <t t-else=""><span t-esc="'%.3f' % sum(l.fp_net_weight or 0.0 for l in fp_product_lines)"/></t>
+                                </td>
+                                <td style="text-align: right; padding: 5px 6px; background: var(--fp-cr-page-fill);">
+                                    <t t-if="fp_ship and fp_ship.total_gross_weight_actual"><span t-esc="'%.3f' % fp_ship.total_gross_weight_actual"/></t>
+                                    <t t-else=""><span t-esc="'%.3f' % sum(l.fp_gross_weight or 0.0 for l in fp_product_lines)"/></t>
+                                </td>
+                                <td style="padding: 5px 6px; background: var(--fp-cr-page-fill);"/>
+                                <td style="padding: 5px 6px; background: var(--fp-cr-page-fill);"/>
+                                <td style="padding: 5px 6px; background: var(--fp-cr-page-fill);"/>
+                                <td style="text-align: right; padding: 5px 6px; background: var(--fp-cr-page-fill);">
+                                    <span t-field="o.amount_total" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                    <!-- Additional Info and Totals -->
+                    <table class="fp-cr-grid-2" style="margin-top: 8px;">
+                        <tr>
+                            <td style="padding-right: 8px;">
+                                <!-- Additional Info Table -->
+                                <table class="fp-cr-small-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Additional Info</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><span class="fp-cr-label">Reference:</span> <span t-esc="fp_reference_value"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="fp-cr-label">Internal #:</span> <span t-esc="o.name or '-'"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="fp-cr-label">Observation:</span> <span t-esc="(o.narration or '-')[:80]"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="fp-cr-label">Amount in words:</span> <span t-esc="o.amount_in_words or '-'"/></td>
+                                        </tr>
+                                        <t t-if="fp_tax_rate_breakdown">
+                                            <tr>
+                                                <td colspan="2">
+                                                    <table class="fp-cr-small-table" style="margin-top: 6px;">
+                                                        <thead>
+                                            <tr>
+                                                <th colspan="2">Tax Rate Breakdown</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <t t-foreach="fp_tax_rate_breakdown" t-as="tax_item">
+                                                <tr>
+                                                    <td><span t-esc="tax_item.get('name', 'Tax')"/></td>
+                                                    <td class="text-end"><span t-esc="'{:.2f}'.format(tax_item.get('amount', 0))"/></td>
+                                                </tr>
+                                            </t>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+            </td>
+            <td style="padding-left: 8px;">
+                <!-- Totals Summary -->
+                <table class="fp-cr-small-table">
+                    <thead>
+                        <tr>
+                            <th colspan="2">Totals Summary</th>
+                        </tr>
+                    </thead>
+                    <tbody class="fp-cr-total">
+                        <tr>
+                            <td><span class="fp-cr-label">Total Gravado:</span></td>
+                            <td class="text-end"><span t-esc="'{:.2f}'.format(fp_summary_totals.get('taxable_total', 0))"/></td>
+                        </tr>
+                        <tr>
+                            <td><span class="fp-cr-label">Total Exento:</span></td>
+                            <td class="text-end"><span t-esc="'{:.2f}'.format(fp_summary_totals.get('exempt_total', 0))"/></td>
+                        </tr>
+                        <tr>
+                            <td><span class="fp-cr-label">Total Exonerado:</span></td>
+                            <td class="text-end"><span t-esc="'{:.2f}'.format(fp_summary_totals.get('exonerated_total', 0))"/></td>
+                        </tr>
+                        <tr>
+                            <td><span class="fp-cr-label">Total No Sujeto:</span></td>
+                            <td class="text-end"><span t-esc="'{:.2f}'.format(fp_summary_totals.get('non_subject_total', 0))"/></td>
+                        </tr>
+                        <tr style="border-top: 1px solid #00a9eb;">
+                            <td><span class="fp-cr-label">Total Venta:</span></td>
+                            <td class="text-end"><span t-esc="'{:.2f}'.format(o.amount_untaxed)"/></td>
+                        </tr>
+                        <tr>
+                            <td><span class="fp-cr-label">Total Descuento:</span></td>
+                            <td class="text-end"><span t-esc="'{:.2f}'.format(fp_summary_totals.get('discount_total', 0))"/></td>
+                        </tr>
+                        <tr>
+                            <td><span class="fp-cr-label">Total Venta Neta:</span></td>
+                            <td class="text-end"><span t-esc="'{:.2f}'.format(o.amount_untaxed - fp_summary_totals.get('discount_total', 0))"/></td>
+                        </tr>
+                        <tr>
+                            <td><span class="fp-cr-label">Total IVA:</span></td>
+                            <td class="text-end"><span t-esc="'{:.2f}'.format(sum(t.amount for t in o.line_ids.filtered(lambda l: l.tax_line_id)))"/></td>
+                        </tr>
+                        <tr>
+                            <td><span class="fp-cr-label">Total Otros Cargos:</span></td>
+                            <td class="text-end"><span t-esc="'{:.2f}'.format(fp_summary_totals.get('other_charges', 0))"/></td>
+                        </tr>
+                        <tr style="border-top: 2px solid #00a9eb; font-weight: 700;">
+                            <td><span class="fp-cr-label">Total Comprobante:</span></td>
+                            <td class="text-end"><span t-esc="'{:.2f}'.format(o.amount_total)"/></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+    </table>
+    <!-- Signature Area (Prohygiene) -->
+    <div class="fp-cr-sign">
+        <div style="text-align: center; font-weight: 700; margin-bottom: 20px;">Authorized Signature</div>
+        <div style="height: 40px;"/>
+        <div style="text-align: center; font-size: 11px; border-top: 1px solid #111;">Signature and Date</div>
+    </div>
+    <!-- QR Code -->
+    <t t-if="qr_code_url">
+        <div class="fp-cr-qr" style="text-align: center; margin-top: 8px;">
+            <img t-att-src="qr_code_url" alt="QR Code"/>
+        </div>
+    </t>
+    <!-- Footer -->
+    <div class="fp-cr-footer">
+        Emitida conforme la resolución de Facturación Electrónica de Costa Rica. Versión del documento 4.4.
+    </div>
+</div>
+</t>
 
-            <!-- Fallback: show notes if no shipment -->
-            <div t-if="not fp_ship_has_data and o.narration" class="mt-2" style="font-size:9px;">
-                <div t-field="o.narration"/>
-            </div>
-        </xpath>
-
-        <!-- Amount in words AFTER totals (right-aligned, single instance) -->
-        <xpath expr="//div[@id='total']" position="after">
-            <div t-if="o._fields.get('fp_amount_in_words') and o.fp_amount_in_words"
-                 class="text-end mb-1" style="font-size:8px;">
-                <strong>Total amount in words:</strong><br/>
-                <i t-esc="o.fp_amount_in_words"/>
-            </div>
-        </xpath>
-    </template>
-
-    <!-- ═══ 9. Payment Communication + Bank + CANT ART (below totals) ═══ -->
-    <template id="report_invoice_fp_payment_footer"
-              inherit_id="account.report_invoice_document"
-              priority="99">
-        <xpath expr="//div[@id='payment_term']/.." position="after">
-            <div style="font-size:10px;" class="mt-2">
-                <!-- FE Payment Communication -->
-                <div t-if="o._fields.get('fp_consecutive_number') and o.fp_consecutive_number">
-                    <strong>Payment Communication: </strong>
-                    <strong t-esc="o.fp_consecutive_number"/>
-                </div>
-                <!-- Bank Account -->
-                <t t-set="fp_bank" t-value="o.company_id.partner_id.bank_ids[:1]"/>
-                <div t-if="fp_bank">
-                    <span>on this account: </span>
-                    <strong t-esc="fp_bank.acc_number"/>
-                    <t t-if="fp_bank.bank_id">
-                        - <strong t-esc="fp_bank.bank_id.name"/>
+<!-- DEFAULT REFINED STYLES -->
+<t t-if="fp_template_style in ('modern_blue', 'modern_dark', 'modern_clean', 'modern_emerald', 'modern_sunset', False)">
+    <style>
+        .fp-ref-wrap { color: #111827; font-size: 12px; }
+        .fp-ref-wrap .text-end { text-align: right !important; }
+        .fp-ref-banner {
+            border-radius: 16px;
+            color: #0f172a;
+            margin-bottom: 10px;
+            overflow: hidden;
+            border: 1px solid #cbd5e1;
+        }
+        .fp-ref-banner td { vertical-align: top; padding: 0; }
+        .fp-ref-head-box { border-right: 1px solid #cbd5e1; }
+        .fp-ref-head-box:last-child { border-right: 0; }
+        .fp-ref-head-title { color: #fff; font-size: 13px; font-weight: 700; text-transform: uppercase; padding: 8px 10px; }
+        .fp-ref-head-body { background: #fff; padding: 10px 12px; }
+        .fp-ref-company { font-size: 22px; font-weight: 700; line-height: 1.2; margin-bottom: 8px; }
+        .fp-ref-line { margin-bottom: 3px; font-size: 12px; }
+        .fp-ref-line--break { word-break: break-all; }
+        .fp-ref-line strong { font-weight: 700; }
+        .fp-ref-card {
+            border: 0;
+            border-radius: 0;
+            margin-bottom: 8px;
+            overflow: visible;
+            background: transparent;
+        }
+        .fp-ref-card-title {
+            color: #ffffff;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            padding: 8px 10px;
+        }
+        .fp-ref-card-body { padding: 8px 2px 6px 2px; }
+        .fp-ref-grid { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        .fp-ref-grid td { width: 50%; vertical-align: top; padding: 0 8px 0 0; }
+        .fp-ref-grid td:last-child { padding-right: 0; }
+        .fp-ref-data-row { margin-bottom: 5px; }
+        .fp-ref-label { font-weight: 700; color: #1e293b; margin-right: 5px; }
+        .fp-ref-table { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+        .fp-ref-table th, .fp-ref-table td { border: 1px solid #cbd5e1; padding: 5px 6px; }
+        .fp-ref-table th { color: #fff; font-size: 11px; text-transform: uppercase; }
+        .fp-ref-table td.text-end { text-align: right; }
+        .fp-ref-summary { width: 46%; margin-left: auto; margin-top: 10px; }
+        .fp-ref-summary td { border-bottom: 1px solid #e2e8f0; padding: 4px 0; }
+        .fp-ref-summary tr:last-child td { border-bottom: 0; }
+        .fp-ref-summary .fp-ref-grand td { font-size: 14px; font-weight: 700; border-top: 2px solid #94a3b8; padding-top: 6px; }
+        .fp-ref-note {
+            margin-top: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            padding: 8px 10px;
+            font-size: 11px;
+            color: #334155;
+            background: #f8fafc;
+        }
+        .fp-ref-qr img { max-width: 110px; max-height: 110px; }
+        .fp-ref-company-bg { background: #1e293b; }
+        .fp-ref-document-bg { background: #475569; }
+        .fp-ref-receiver-bg { background: #64748b; }
+        .fp-ref-logistics-bg { background: #78909c; }
+    </style>
+    <div class="fp-ref-wrap">
+        <!-- Company Banner -->
+        <table class="fp-ref-banner">
+            <tr>
+                <td class="fp-ref-head-box fp-ref-company-bg" style="width: 20%;">
+                    <t t-if="fp_company_partner.image_1920">
+                        <div style="padding: 8px;">
+                            <img t-att-src="image_data_uri(fp_company_partner.image_1920)" style="max-width: 80px; max-height: 60px;"/>
+                        </div>
                     </t>
-                </div>
-                <!-- CANT ART -->
-                <div class="mt-1">
-                    <strong>CANT. ART(S): </strong>
-                    <span t-esc="len(o.invoice_line_ids.filtered(lambda x: x.display_type in (False, 'product')))"/>
+                </td>
+                <td class="fp-ref-head-box fp-ref-company-bg" style="width: 80%;">
+                    <div class="fp-ref-head-body">
+                        <div class="fp-ref-company" t-esc="fp_company_partner.name"/>
+                        <div class="fp-ref-line"><strong>VAT/ID:</strong> <span t-esc="fp_company_partner.vat or '-'"/></div>
+                        <div class="fp-ref-line"><strong>Phone:</strong> <span t-esc="fp_company_partner.phone or '-'"/></div>
+                        <div class="fp-ref-line"><strong>Email:</strong> <span t-esc="fp_company_partner.email or '-'"/></div>
+                        <div class="fp-ref-line"><strong>Address:</strong> <span t-esc="fp_company_partner.street or '-'"/></div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+        <!-- Document Header Card -->
+        <div class="fp-ref-card">
+            <div class="fp-ref-card-title fp-ref-document-bg">Document Information</div>
+            <div class="fp-ref-card-body">
+                <table class="fp-ref-grid">
+                    <tr>
+                        <td>
+                            <div class="fp-ref-data-row"><span class="fp-ref-label">Type:</span> <span t-esc="fp_document_types.get(o.fp_document_type, o.fp_document_type) if o._fields.get('fp_document_type') else o.move_type"/></div>
+                            <div class="fp-ref-data-row"><span class="fp-ref-label">Consecutive:</span> <span t-esc="fp_consecutive_value"/></div>
+                            <div class="fp-ref-data-row"><span class="fp-ref-label">Electronic Key:</span> <span t-esc="fp_electronic_key_value"/></div>
+                        </td>
+                        <td>
+                            <div class="fp-ref-data-row"><span class="fp-ref-label">Date:</span> <span t-field="o.invoice_date" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/></div>
+                            <div class="fp-ref-data-row"><span class="fp-ref-label">Due Date:</span> <span t-field="o.invoice_date_due" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/></div>
+                            <div class="fp-ref-data-row"><span class="fp-ref-label">Currency:</span> <span t-esc="o.currency_id.name"/></div>
+                        </td>
+                    </tr>
+                </table>
+                <table class="fp-ref-grid" style="margin-top: 8px;">
+                    <tr>
+                        <td>
+                            <div class="fp-ref-data-row"><span class="fp-ref-label">Exchange Rate:</span> <span t-esc="'{:.4f}'.format(fp_currency_rate_value)"/></div>
+                            <div class="fp-ref-data-row"><span class="fp-ref-label">Sale Condition:</span> <span t-esc="fp_sale_condition_label"/></div>
+                        </td>
+                        <td>
+                            <div class="fp-ref-data-row"><span class="fp-ref-label">Payment Method:</span> <span t-esc="fp_payment_method_label"/></div>
+                            <div class="fp-ref-data-row"><span class="fp-ref-label">Reference:</span> <span t-esc="fp_reference_value"/></div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <!-- Receiver Card -->
+        <div class="fp-ref-card">
+            <div class="fp-ref-card-title fp-ref-receiver-bg">Receiver Information</div>
+            <div class="fp-ref-card-body">
+                <table class="fp-ref-grid">
+                    <tr>
+                        <td colspan="2">
+                            <div class="fp-ref-data-row"><span class="fp-ref-label">Name:</span> <span t-esc="fp_receiver_partner.name"/></div>
+                            <div class="fp-ref-data-row"><span class="fp-ref-label">VAT/ID:</span> <span t-esc="fp_receiver_partner.vat or '-'"/></div>
+                            <div class="fp-ref-data-row"><span class="fp-ref-label">Address:</span> <span t-esc="fp_receiver_address or '-'"/></div>
+                            <div class="fp-ref-data-row"><span class="fp-ref-label">Phone:</span> <span t-esc="fp_receiver_phone or '-'"/></div>
+                            <div class="fp-ref-data-row"><span class="fp-ref-label">Email:</span> <span t-esc="fp_receiver_partner.email or '-'"/></div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <!-- Logistics Card -->
+        <t t-if="fp_ship_has_data">
+            <div class="fp-ref-card">
+                <div class="fp-ref-card-title fp-ref-logistics-bg">Datos de Embarque / Shipment Info</div>
+                <div class="fp-ref-card-body">
+                    <table class="fp-ref-grid">
+                        <tr>
+                            <td>
+                                <div t-if="fp_ship.port_origin_id" class="fp-ref-data-row">
+                                    <span class="fp-ref-label">Shipment place:</span> <span t-esc="(fp_ship.port_origin_id.name + ', ' + fp_ship.port_origin_id.country).upper()"/>
+                                </div>
+                                <div t-if="fp_ship.port_origin_id and fp_ship.port_origin_id.country" class="fp-ref-data-row">
+                                    <span class="fp-ref-label">Origin country:</span> <span t-esc="fp_ship.port_origin_id.country.upper()"/>
+                                </div>
+                                <div t-if="fp_ship.port_destination_id and fp_ship.port_destination_id.country" class="fp-ref-data-row">
+                                    <span class="fp-ref-label">Arrival country:</span> <span t-esc="fp_ship.port_destination_id.country.upper()"/>
+                                </div>
+                                <div t-if="fp_ship.port_destination_id" class="fp-ref-data-row">
+                                    <span class="fp-ref-label">Port of discharge:</span> <span t-esc="fp_ship.port_destination_id.name.upper()"/>
+                                </div>
+                                <div t-if="fp_ship.incoterm" class="fp-ref-data-row">
+                                    <span class="fp-ref-label">Incoterm:</span> <span t-esc="fp_ship.incoterm"/>
+                                    <t t-if="fp_ship.port_destination_id"> - <span t-esc="fp_ship.port_destination_id.name"/></t>
+                                </div>
+                            </td>
+                            <td>
+                                <div t-if="fp_ship.etd" class="fp-ref-data-row">
+                                    <span class="fp-ref-label">Departure:</span> <span t-field="fp_ship.etd" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/>
+                                </div>
+                                <div t-if="fp_ship.eta" class="fp-ref-data-row">
+                                    <span class="fp-ref-label">Arrival:</span> <span t-field="fp_ship.eta" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/>
+                                </div>
+                                <div t-if="fp_ship.shipping_company or fp_ship.carrier_partner_id" class="fp-ref-data-row">
+                                    <span class="fp-ref-label">Shipping Company:</span> <span t-esc="fp_ship.shipping_company or (fp_ship.carrier_partner_id.name if fp_ship.carrier_partner_id else '')"/>
+                                </div>
+                                <div t-if="fp_ship.vessel_name" class="fp-ref-data-row">
+                                    <span class="fp-ref-label">Vessel and Voyage:</span> <span t-esc="fp_ship.vessel_name"/>
+                                    <t t-if="fp_ship.voyage_number"> - <span t-esc="fp_ship.voyage_number"/></t>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                    <t t-if="fp_ship.container_ids">
+                        <table class="fp-ref-grid" style="margin-top: 8px;">
+                            <tr>
+                                <td colspan="2">
+                                    <t t-foreach="fp_ship.container_ids" t-as="cnt">
+                                        <div t-if="cnt.container_number" class="fp-ref-data-row">
+                                            <span class="fp-ref-label">Container:</span> <span t-esc="cnt.container_number"/>
+                                        </div>
+                                        <div t-if="cnt.seal_number" class="fp-ref-data-row">
+                                            <span class="fp-ref-label">Seal / Marchamo:</span> <span t-esc="cnt.seal_number"/>
+                                        </div>
+                                    </t>
+                                </td>
+                            </tr>
+                        </table>
+                    </t>
+                    <t t-if="fp_ship.booking_id">
+                        <table class="fp-ref-grid" style="margin-top: 8px;">
+                            <tr>
+                                <td>
+                                    <div t-if="fp_ship.booking_id.booking_reference" class="fp-ref-data-row">
+                                        <span class="fp-ref-label">Booking Number:</span> <span t-esc="fp_ship.booking_id.booking_reference"/>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div t-if="fp_ship.booking_id.bl_number" class="fp-ref-data-row">
+                                        <span class="fp-ref-label">Bill of Lading:</span> <span t-esc="fp_ship.booking_id.bl_number"/>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </t>
+                    <div t-if="fp_ship.gps_device_id" class="fp-ref-data-row" style="margin-top: 8px;">
+                        <span class="fp-ref-label">Tracker:</span> <span t-esc="fp_ship.gps_device_id"/>
+                    </div>
                 </div>
             </div>
-        </xpath>
-    </template>
-
-    <!-- ═══ 10. Hide standard Odoo "amount in words" (we have our own) ═══ -->
-    <template id="report_invoice_fp_hide_std_amount_words"
-              inherit_id="account.report_invoice_document"
-              priority="99">
-        <!-- Hide Odoo's standard amount_to_text / amount in words div -->
-        <xpath expr="//span[@t-field='o.amount_total_words']" position="replace">
-            <span/>
-        </xpath>
-    </template>
-
-    <!-- ═══ 11. Hide standard Odoo incoterm line (we show it in header) ═══ -->
-    <template id="report_invoice_fp_hide_std_incoterm"
-              inherit_id="account.report_invoice_document"
-              priority="99">
-        <xpath expr="//p[@t-if='o.incoterm_location']" position="replace"/>
-    </template>
-
-    <!-- ═══ 12. CR electronic invoice footer ═══ -->
-    <template id="report_invoice_fp_footer_note"
-              inherit_id="account.report_invoice_document"
-              priority="50">
-        <xpath expr="//div[@id='payment_term']/.." position="after">
-            <div t-if="o._fields.get('fp_consecutive_number') and o.fp_consecutive_number"
-                 class="text-center mt-3" style="font-size:8px; color:#888;">
-                Emitida conforme lo establecido en la resolución de Facturación Electrónica,
-                MH-DGT-RES-0027-2024 del 19 de noviembre de 2024 de la DGTD. Versión XML 4.4
+        </t>
+        <!-- Line Items Table -->
+        <table class="fp-ref-table" style="margin-top: 10px;">
+            <thead>
+                <tr>
+                    <th>CABYS</th>
+                    <th>Description</th>
+                    <th style="text-align: center;">Qty</th>
+                    <th style="text-align: right;">Net Weight (kg)</th>
+                    <th style="text-align: right;">Gross Weight (kg)</th>
+                    <th style="text-align: right;">Unit Price</th>
+                    <th style="text-align: right;">Tax</th>
+                    <th style="text-align: right;">Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                <t t-foreach="fp_product_lines" t-as="line">
+                    <tr>
+                        <td t-esc="line.product_id.fp_cabys_code or '-'"/>
+                        <td><span t-field="line.name"/></td>
+                        <td class="text-end" t-esc="line.quantity"/>
+                        <td class="text-end" t-esc="'%.3f' % (line.fp_net_weight or 0.0)"/>
+                        <td class="text-end" t-esc="'%.3f' % (line.fp_gross_weight or 0.0)"/>
+                        <td class="text-end"><span t-field="line.price_unit" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                        <td class="text-end"><span t-esc="line.price_total - line.price_subtotal" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                        <td class="text-end"><span t-field="line.price_subtotal" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                    </tr>
+                </t>
+            </tbody>
+            <tfoot>
+                <tr style="font-weight: 700; border-top: 2px solid #333;">
+                    <td colspan="2" style="text-align: right; padding: 5px 6px;">TOTALES</td>
+                    <td style="text-align: right; padding: 5px 6px;" t-esc="sum(l.quantity for l in fp_product_lines)"/>
+                    <td style="text-align: right; padding: 5px 6px;">
+                        <t t-if="fp_ship and fp_ship.total_net_weight_actual"><span t-esc="'%.3f' % fp_ship.total_net_weight_actual"/></t>
+                        <t t-else=""><span t-esc="'%.3f' % sum(l.fp_net_weight or 0.0 for l in fp_product_lines)"/></t>
+                    </td>
+                    <td style="text-align: right; padding: 5px 6px;">
+                        <t t-if="fp_ship and fp_ship.total_gross_weight_actual"><span t-esc="'%.3f' % fp_ship.total_gross_weight_actual"/></t>
+                        <t t-else=""><span t-esc="'%.3f' % sum(l.fp_gross_weight or 0.0 for l in fp_product_lines)"/></t>
+                    </td>
+                    <td style="padding: 5px 6px;"/>
+                    <td style="padding: 5px 6px;"/>
+                    <td style="text-align: right; padding: 5px 6px;">
+                        <span t-field="o.amount_total" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+        <!-- Additional Info and Totals -->
+        <table class="fp-ref-grid" style="margin-top: 10px;">
+            <tr>
+                <td>
+                    <!-- Additional Info Card -->
+                    <div class="fp-ref-card">
+                        <div class="fp-ref-card-title fp-ref-document-bg">Additional Info</div>
+                        <div class="fp-ref-card-body">
+                            <div class="fp-ref-data-row"><span class="fp-ref-label">Reference:</span> <span t-esc="fp_reference_value"/></div>
+                            <div class="fp-ref-data-row"><span class="fp-ref-label">Internal #:</span> <span t-esc="o.name or '-'"/></div>
+                            <div class="fp-ref-data-row"><span class="fp-ref-label">Observation:</span> <span t-esc="(o.narration or '-')[:80]"/></div>
+                            <div class="fp-ref-data-row"><span class="fp-ref-label">Amount in words:</span> <span t-esc="o.amount_in_words or '-'"/></div>
+                        </div>
+                    </div>
+                    <!-- Tax Rate Breakdown -->
+                    <t t-if="fp_tax_rate_breakdown">
+                        <div class="fp-ref-card">
+                            <div class="fp-ref-card-title fp-ref-document-bg">Tax Rate Breakdown</div>
+                            <div class="fp-ref-card-body">
+                                <t t-foreach="fp_tax_rate_breakdown" t-as="tax_item">
+                                    <div class="fp-ref-data-row"><span class="fp-ref-label" t-esc="tax_item.get('name', 'Tax') + ':'"/><span class="text-end" style="float: right;" t-esc="'{:.2f}'.format(tax_item.get('amount', 0))"/></div>
+                                </t>
+                            </div>
+                        </div>
+                    </t>
+                </td>
+                <td>
+                    <!-- Totals Summary -->
+                    <table class="fp-ref-summary">
+                        <tr>
+                            <td><span class="fp-ref-label">Total Gravado:</span></td>
+                            <td class="text-end"><span t-esc="'{:.2f}'.format(fp_summary_totals.get('taxable_total', 0))"/></td>
+                        </tr>
+                        <tr>
+                            <td><span class="fp-ref-label">Total Exento:</span></td>
+                            <td class="text-end"><span t-esc="'{:.2f}'.format(fp_summary_totals.get('exempt_total', 0))"/></td>
+                        </tr>
+                        <tr>
+                            <td><span class="fp-ref-label">Total Exonerado:</span></td>
+                            <td class="text-end"><span t-esc="'{:.2f}'.format(fp_summary_totals.get('exonerated_total', 0))"/></td>
+                        </tr>
+                        <tr>
+                            <td><span class="fp-ref-label">Total No Sujeto:</span></td>
+                            <td class="text-end"><span t-esc="'{:.2f}'.format(fp_summary_totals.get('non_subject_total', 0))"/></td>
+                        </tr>
+                        <tr>
+                            <td><span class="fp-ref-label">Total Venta:</span></td>
+                            <td class="text-end"><span t-esc="'{:.2f}'.format(o.amount_untaxed)"/></td>
+                        </tr>
+                        <tr>
+                            <td><span class="fp-ref-label">Total Descuento:</span></td>
+                            <td class="text-end"><span t-esc="'{:.2f}'.format(fp_summary_totals.get('discount_total', 0))"/></td>
+                        </tr>
+                        <tr>
+                            <td><span class="fp-ref-label">Total Venta Neta:</span></td>
+                            <td class="text-end"><span t-esc="'{:.2f}'.format(o.amount_untaxed - fp_summary_totals.get('discount_total', 0))"/></td>
+                        </tr>
+                        <tr>
+                            <td><span class="fp-ref-label">Total IVA:</span></td>
+                            <td class="text-end"><span t-esc="'{:.2f}'.format(sum(t.amount for t in o.line_ids.filtered(lambda l: l.tax_line_id)))"/></td>
+                        </tr>
+                        <tr>
+                            <td><span class="fp-ref-label">Total Otros Cargos:</span></td>
+                            <td class="text-end"><span t-esc="'{:.2f}'.format(fp_summary_totals.get('other_charges', 0))"/></td>
+                        </tr>
+                        <tr class="fp-ref-grand">
+                            <td><span class="fp-ref-label">Total Comprobante:</span></td>
+                            <td class="text-end"><span t-esc="'{:.2f}'.format(o.amount_total)"/></td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+        <!-- QR Code -->
+        <t t-if="qr_code_url">
+            <div class="fp-ref-qr" style="text-align: center; margin-top: 10px;">
+                <img t-att-src="qr_code_url" alt="QR Code"/>
             </div>
-        </xpath>
-    </template>
-
+        </t>
+        <!-- Footer Note -->
+        <div class="fp-ref-note">
+            Emitida conforme la resolución de Facturación Electrónica de Costa Rica. Versión del documento 4.4.
+        </div>
+    </div>
+</t>
+</t>
+</template>
 </odoo>
