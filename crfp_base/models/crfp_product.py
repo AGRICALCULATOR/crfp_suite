@@ -79,17 +79,3 @@ class CrfpProduct(models.Model):
         store=True,
         digits=(12, 4),
     )
-
-    def write(self, vals):
-        """BP-04: When raw_price_crc changes, update draft quotation lines."""
-        res = super().write(vals)
-        if 'raw_price_crc' in vals:
-            # Find draft quotation lines referencing these products
-            lines = self.env['crfp.quotation.line'].search([
-                ('crfp_product_id', 'in', self.ids),
-                ('quotation_id.state', '=', 'draft'),
-            ])
-            if lines:
-                lines.write({'raw_price_crc': vals['raw_price_crc']})
-                lines._compute_all_prices()
-        return res

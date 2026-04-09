@@ -136,9 +136,7 @@ class CrfpQuotation(models.Model):
         if not self.partner_id:
             raise UserError('Please select a client before creating a Sale Order.')
 
-        # Build lines and track which quotation line maps to each SO line
         order_lines = []
-        quotation_lines_with_pallets = []
         for line in self.line_ids.filtered('include_in_pdf'):
             if line.pallets <= 0:
                 continue
@@ -157,7 +155,6 @@ class CrfpQuotation(models.Model):
                 'name': (f"{line.crfp_product_id.name} — "
                          f"{line.pallets} pallets × {line.boxes_per_pallet} boxes/pallet"),
             }))
-            quotation_lines_with_pallets.append(line)
 
         if not order_lines:
             raise UserError('No product lines with pallets > 0. Enter pallet quantities first.')
@@ -182,12 +179,13 @@ class CrfpQuotation(models.Model):
 
         so = self.env['sale.order'].create(so_vals)
 
-        # Force correct prices — match by position in the filtered list (1:1)
-        for idx, q_line in enumerate(quotation_lines_with_pallets):
-            if idx < len(so.order_line):
-                so_line = so.order_line[idx]
-                if abs(so_line.price_unit - q_line.final_price) > 0.01:
-                    so_line.write({'price_unit': q_line.final_price})
+        # Force correct prices (Odoo onchange may override price_unit)
+        for idx, line in enumerate(self.line_ids.filtered('include_in_pdf')):
+            if line.pallets <= 0:
+                continue
+            so_line = so.order_line[idx] if idx < len(so.order_line) else None
+            if so_line and abs(so_line.price_unit - line.final_price) > 0.01:
+                so_line.write({'price_unit': line.final_price})
 
         try:
             so.write({'crfp_quotation_id': self.id})
@@ -362,40 +360,6 @@ class CrfpQuotation(models.Model):
                 'force_email': True,
             },
         }
-
-    # ─────────────────────────────────────────────────────────────────────────
-    # BP-02: Recalculate draft lines when exchange rate changes
-    # ─────────────────────────────────────────────────────────────────────────
-
-    def write(self, vals):
-        res = super().write(vals)
-        # If exchange_rate changed, recalculate all draft lines
-        if 'exchange_rate' in vals:
-            for rec in self.filtered(lambda r: r.state == 'draft'):
-                rec.line_ids._compute_all_prices()
-        return res
-
-    # ─────────────────────────────────────────────────────────────────────────
-    # BP-07: Onchange freight_quote_id — copy costs and recalculate
-    # ─────────────────────────────────────────────────────────────────────────
-
-    @api.onchange('freight_quote_id')
-    def _onchange_freight_quote(self):
-        if self.state == 'draft' and self.line_ids:
-            self.line_ids._compute_all_prices()
-
-    # ─────────────────────────────────────────────────────────────────────────
-    # BP-08: Onchange incoterm — recalculate with new incoterm matrix
-    # ─────────────────────────────────────────────────────────────────────────
-
-    @api.onchange('incoterm')
-    def _onchange_incoterm(self):
-        if self.state == 'draft' and self.line_ids:
-            self.line_ids._compute_all_prices()
-
-    # ─────────────────────────────────────────────────────────────────────────
-    # State actions
-    # ─────────────────────────────────────────────────────────────────────────
 
     def action_confirm(self):
         self.write({'state': 'confirmed'})

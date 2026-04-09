@@ -73,6 +73,6 @@
               parent="menu_crfp_pricing_config" action="crfp_base.action_crfp_pallet_config" sequence="60"/>
     <menuitem id="menu_crfp_pc_incoterms" name="Incoterm Matrix"
               parent="menu_crfp_pricing_config" action="crfp_base.action_crfp_incoterm_matrix" sequence="70"/>
-    <menuitem id="menu_crfp_pc_settings" name="Settings"
-              parent="menu_crfp_pricing_config" action="crfp_base.action_open_crfp_settings" sequence="80"/>
+    <menuitem id="menu_crfp_pc_fixed" name="Fixed Costs"
+              parent="menu_crfp_pricing_config" action="crfp_base.action_crfp_fixed_cost" sequence="80"/>
 </odoo>

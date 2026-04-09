@@ -1,8 +1,18 @@
 import logging
+import requests
+import xml.etree.ElementTree as ET
+from datetime import date
 from odoo import models, fields, api
 from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
+
+# BCCR public API — indicator 318 = USD sell rate (tipo de cambio venta)
+_BCCR_URL = (
+    'https://gee.bccr.fi.cr/Indicadores/Suscripciones/WS/'
+    'wsindicadoreseconomicos.asmx/ObtenerIndicadoresEconomicosXML'
+)
+_BCCR_INDICATOR = '318'
 
 
 class CrfpSettings(models.Model):
@@ -16,20 +26,13 @@ class CrfpSettings(models.Model):
     )
 
     # ── Exchange Rate ──────────────────────────────────────────────────────────
-    # Actualizado via botón "Sincronizar" o cron diario.
-    # Lee de res.currency.rate (misma fuente que l10n_cr_einvoice).
-    # Configurar proveedor en: Contabilidad → Configuración → Monedas → Tasas automáticas.
     exchange_rate = fields.Float(
-        string='Exchange Rate (CRC/USD)', digits=(12, 2), default=503.0,
-        help='Tipo de cambio CRC/USD. Se sincroniza desde Contabilidad '
-             '(res.currency.rate) via botón o cron diario.',
+        string='Exchange Rate (CRC/USD)', default=503.0, digits=(12, 2),
+        help='Costa Rican Colon to US Dollar exchange rate (sell rate)',
     )
-    exchange_rate_source = fields.Selection([
-        ('auto', 'Automático (Odoo Contabilidad)'),
-        ('manual', 'Manual'),
-    ], string='Fuente Tipo de Cambio', default='auto',
-        help='Auto: usa la tasa de res.currency.rate (xe.com/ECB). '
-             'Manual: permite ingresar el tipo de cambio a mano.',
+    exchange_rate_auto = fields.Boolean(
+        string='Auto-Update from BCCR', default=False,
+        help='Automatically fetch the exchange rate from BCCR every day',
     )
     exchange_rate_last_update = fields.Datetime(
         string='Last Update', readonly=True,
@@ -117,110 +120,75 @@ class CrfpSettings(models.Model):
         return record
 
     # ─────────────────────────────────────────────────────────────────────────
-    # Exchange Rate — Centralizado con res.currency.rate (Odoo Contabilidad)
+    # BCCR Exchange Rate
     # ─────────────────────────────────────────────────────────────────────────
 
-    def _get_odoo_exchange_rate(self):
-        """
-        Obtiene el tipo de cambio CRC/USD desde res.currency.rate.
-        Usa inverse_company_rate (CRC por 1 USD) — misma lógica que
-        l10n_cr_einvoice._fp_get_exchange_rate().
-        """
-        self.ensure_one()
-        usd = self.env.ref('base.USD', raise_if_not_found=False)
-        if not usd or not usd.active:
-            _logger.warning('Currency USD not found or inactive')
-            return 0.0
-
-        # inverse_company_rate = cuántos CRC por 1 USD
-        rate = getattr(usd, 'inverse_company_rate', 0.0)
-        if rate and rate > 0:
-            return round(rate, 2)
-
-        # Fallback: buscar última tasa en res.currency.rate
-        company = self.company_id or self.env.company
-        rate_record = self.env['res.currency.rate'].search([
-            ('currency_id', '=', usd.id),
-            ('company_id', 'in', [company.id, False]),
-        ], order='name desc', limit=1)
-        if rate_record and rate_record.company_rate:
-            # company_rate = CRC por 1 USD (inverse_company_rate)
-            return round(1.0 / rate_record.company_rate, 2) if rate_record.company_rate else 0.0
-        return 0.0
-
     def action_update_exchange_rate(self):
-        """Sincroniza el tipo de cambio desde res.currency.rate (Odoo Contabilidad)."""
+        """Fetch today's USD sell rate from the BCCR public API and store it."""
         self.ensure_one()
-        rate = self._get_odoo_exchange_rate()
-        if not rate or rate <= 0:
+        today_str = date.today().strftime('%d/%m/%Y')
+        params = {
+            'Indicador': _BCCR_INDICATOR,
+            'FechaInicio': today_str,
+            'FechaFinal': today_str,
+            'Nombre': 'CRFARM',
+            'SubNiveles': 'N',
+            'CorreoElectronico': '',
+            'Token': '',
+        }
+        try:
+            resp = requests.get(_BCCR_URL, params=params, timeout=10)
+            resp.raise_for_status()
+            rate = self._parse_bccr_response(resp.text)
+        except requests.RequestException as e:
+            _logger.error('BCCR API request failed: %s', e)
             raise UserError(
-                'No se encontró tipo de cambio USD en Odoo.\n\n'
-                'Verifique que en Contabilidad → Configuración → Monedas:\n'
-                '• La moneda USD esté activa\n'
-                '• "Tasas de cambio automáticas" esté activado\n'
-                '• El servicio sea xe.com y el intervalo "Diario"\n\n'
-                'Luego dele click al botón de actualizar (↻) en esa sección.'
+                f'Could not connect to BCCR API: {e}\n'
+                'The exchange rate was NOT updated. Please try again or enter it manually.'
             )
+
+        if not rate:
+            raise UserError(
+                'BCCR returned no exchange rate for today. '
+                'The market may be closed. Please update manually.'
+            )
+
         self.write({
             'exchange_rate': rate,
             'exchange_rate_last_update': fields.Datetime.now(),
         })
-        _logger.info('Exchange rate synced from Odoo: %.2f CRC/USD', rate)
+        _logger.info('BCCR exchange rate updated to %.2f CRC/USD', rate)
         return {
             'type': 'ir.actions.client',
             'tag': 'display_notification',
             'params': {
-                'title': 'Tipo de Cambio Actualizado',
-                'message': f'Tasa: {rate:.2f} CRC/USD (desde Odoo Contabilidad)',
+                'title': 'Exchange Rate Updated',
+                'message': f'New rate: {rate:.2f} CRC/USD (BCCR sell rate)',
                 'type': 'success',
                 'sticky': False,
             },
         }
 
+    @staticmethod
+    def _parse_bccr_response(xml_text):
+        """Parse BCCR XML response and return the float rate, or None."""
+        try:
+            root = ET.fromstring(xml_text)
+            # The value lives in NUM_VALOR inside any nested element
+            for elem in root.iter('NUM_VALOR'):
+                text = (elem.text or '').strip()
+                if text:
+                    return float(text.replace(',', '.'))
+        except Exception as e:
+            _logger.warning('Could not parse BCCR response: %s', e)
+        return None
+
     def _cron_update_exchange_rate(self):
-        """Cron diario: sincroniza tipo de cambio desde res.currency.rate."""
-        rate_changed = False
-        for record in self.search([('exchange_rate_source', '=', 'auto')]):
+        """Daily cron: update exchange rate for all settings with auto-update enabled."""
+        for record in self.search([('exchange_rate_auto', '=', True)]):
             try:
-                rate = record._get_odoo_exchange_rate()
-                if rate and rate > 0:
-                    old_rate = record.exchange_rate
-                    record.write({
-                        'exchange_rate': rate,
-                        'exchange_rate_last_update': fields.Datetime.now(),
-                    })
-                    if abs(old_rate - rate) > 0.01:
-                        rate_changed = True
-                    _logger.info(
-                        'Cron: exchange rate for %s updated to %.2f', record.name, rate
-                    )
-                else:
-                    _logger.warning(
-                        'Cron: no USD rate found in res.currency.rate for %s', record.name
-                    )
+                record.action_update_exchange_rate()
             except Exception as e:
                 _logger.error(
-                    'Cron failed to sync exchange rate for %s: %s', record.name, e
+                    'Cron failed to update exchange rate for %s: %s', record.name, e
                 )
-
-        # BP-02: Recalculate draft quotations with new exchange rate
-        if rate_changed:
-            try:
-                settings = self.search([], limit=1)
-                new_rate = settings.exchange_rate if settings else 0
-                if new_rate > 0:
-                    drafts = self.env['crfp.quotation'].search([('state', '=', 'draft')])
-                    for q in drafts:
-                        q.write({'exchange_rate': new_rate})
-                    _logger.info('Cron: updated %d draft quotations with new TC', len(drafts))
-            except Exception as e:
-                _logger.error('Cron: failed to update draft quotations: %s', e)
-
-        # BP-06: Recalculate active price lists with new exchange rate
-        if rate_changed:
-            try:
-                active_lists = self.env['crfp.price.list'].search([('status', '=', 'active')])
-                if active_lists:
-                    _logger.info('Cron: %d active price lists flagged for TC update', len(active_lists))
-            except Exception as e:
-                _logger.error('Cron: failed to check price lists: %s', e)

@@ -41,9 +41,15 @@
               action="action_crfp_incoterm_matrix"
               sequence="70"/>
 
+    <menuitem id="menu_crfp_config_fixed_costs"
+              name="Fixed Costs"
+              parent="menu_crfp_config_root"
+              action="action_crfp_fixed_cost"
+              sequence="80"/>
+
     <menuitem id="menu_crfp_config_settings"
               name="Settings"
               parent="menu_crfp_config_root"
               action="crfp_base.action_open_crfp_settings"
-              sequence="80"/>
+              sequence="100"/>
 </odoo>
