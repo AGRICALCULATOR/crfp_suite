@@ -13,9 +13,10 @@ Modulos Odoo 19 para CR Farm Products, empresa exportadora agricola de Costa Ric
 ```
 crfp_claims -> crfp_logistics -> crfp_pricing -> crfp_base -> [base, sale, product, mail]
 crfp_website -> crfp_base
-invoice_weight (independiente)
-l10n_cr_einvoice (independiente, FenixCR v4.4)
+l10n_cr_einvoice (independiente, FenixCR v4.4 — NO modificar)
 ```
+
+> invoice_weight fue ELIMINADO en Fase 2 (redundante con l10n_cr_einvoice)
 
 Flujo principal: `crfp.quotation` -> `sale.order` -> `crfp.shipment` (14 estados) -> `account.move`
 
@@ -124,6 +125,21 @@ raw_price_crc (CRC)
 
 ---
 
+## FASE 2 COMPLETADA — Correcciones crfp_logistics
+
+| ID | Estado | Correccion aplicada |
+|----|--------|---------------------|
+| PL-01 | HECHO | Modulo invoice_weight eliminado (redundante con l10n_cr_einvoice) |
+| PL-02 | HECHO | container_config confirmado se integra a creacion de embarque (prioridad 1) |
+| PL-03 | HECHO | blocks_state en checklist + _check_blocking_tasks() reactivado con logica granular |
+| PL-04 | HECHO | Wrapper muerto _push_weights_to_invoice() eliminado |
+| PL-05 | HECHO | Tab Log y modelo crfp.shipment.log eliminados (redundante con chatter) |
+| PL-06 | HECHO | tracking.position y tracking.temperature eliminados (sin APIs/GPS) |
+| PL-07 | HECHO | Estado 'amended' eliminado del booking (codigo muerto) |
+| PL-08 | HECHO | Puerto origen configurable en crfp.settings (default_port_origin_id, fallback MOI) |
+
+---
+
 ## MODELOS CLAVE
 
 ### crfp.settings (Singleton, crfp_base)
@@ -131,6 +147,7 @@ raw_price_crc (CRC)
 - `exchange_rate_source`: Selection(auto/manual)
 - `fc_*_default`: 9 campos costos fijos por defecto (USD/contenedor) — fuente unica (crfp.fixed.cost eliminado)
 - `default_total_boxes`: 1386
+- `default_port_origin_id`: Many2one(crfp.port) — puerto origen default para embarques
 - `price_validity_days`: 7
 - Acceso: `crfp.settings.get_settings()`
 - API: `pricing_api.py` lee de settings (no de crfp.fixed.cost)
@@ -174,7 +191,9 @@ raw_price_crc (CRC)
 ## Notas Tecnicas
 
 - `product_id` en `crfp.quotation.line` es POR LINEA — un producto base puede tener multiples SKUs
-- Pesos cruzan frontera de modulos: shipment -> invoice (`peso_neto`/`peso_total` vs `fp_net_weight`/`fp_gross_weight`)
+- Pesos: shipment -> invoice via `fp_net_weight`/`fp_gross_weight` (l10n_cr_einvoice). invoice_weight eliminado en Fase 2
+- Checklist blocking: usa `blocks_state` por tarea (NO por categoria). _check_blocking_tasks() filtra por blocks_state == target_state
+- Container config: si SO tiene configs confirmados, _create_lines_from_so_and_quotation() los usa como prioridad 1
 - `crfp.pallet.config` usa matching por keyword, NO por foreign key
 - El endpoint `/crfp/api/quotation/save` es critico — es lo que usa el calculator
 - `_compute_all_prices()` en `crfp_quotation_line.py` replica EXACTAMENTE las formulas del JS (`calculator_service.js`)
