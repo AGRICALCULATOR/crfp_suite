@@ -8,22 +8,24 @@
                 <sheet>
                     <h2><field name="name"/></h2>
 
-                    <!-- Exchange Rate -->
-                    <group string="Exchange Rate">
+                    <!-- Exchange Rate — Centralizado con Odoo Contabilidad -->
+                    <group string="Tipo de Cambio">
                         <group>
+                            <field name="exchange_rate_source"/>
                             <field name="exchange_rate"/>
-                            <field name="exchange_rate_auto"/>
                             <field name="exchange_rate_last_update" readonly="1"/>
                         </group>
                         <group>
                             <div>
                                 <button name="action_update_exchange_rate"
-                                        string="Fetch from BCCR Now"
+                                        string="Sincronizar Tipo de Cambio"
                                         type="object"
                                         class="btn-primary"/>
                                 <p class="text-muted mt-2" style="font-size:0.85em;">
-                                    Uses BCCR public API — Indicator 318 (USD sell rate).
-                                    Enable Auto-Update to refresh daily.
+                                    Lee la tasa USD/CRC de Contabilidad (res.currency.rate).
+                                    La misma fuente que usa la Factura Electrónica.
+                                    Configure el proveedor en:
+                                    Contabilidad → Configuración → Monedas → Tasas automáticas.
                                 </p>
                             </div>
                         </group>

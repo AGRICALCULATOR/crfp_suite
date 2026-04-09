@@ -66,7 +66,7 @@
                             <div class="crfp-sb-body" t-if="state.sections.global">
                                 <div class="crfp-pg">
                                     <label><i class="fa fa-exchange-alt"/> Exchange Rate (CRC / $1)</label>
-                                    <input type="number" t-att-value="state.exchangeRate" t-on-change="onExchangeRateChange"/>
+                                    <input type="number" t-model.number="state.exchangeRate" t-on-change="onExchangeRateChange"/>
                                 </div>
                                 <div class="crfp-pg">
                                     <label><i class="fa fa-handshake"/> Incoterm 2020</label>
