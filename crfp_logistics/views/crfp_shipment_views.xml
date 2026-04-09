@@ -145,7 +145,7 @@
                     <!-- Alerts -->
                     <field name="has_shortages" invisible="1"/>
                     <div class="alert alert-warning" role="alert" invisible="not has_shortages">
-                        <i class="fa fa-exclamation-triangle"/>
+                        <i class="fa fa-exclamation-triangle" title="Shortage Warning"/>
                         <strong> SHORTAGES detected.</strong> Some products have fewer actual boxes than planned.
                     </div>
 
