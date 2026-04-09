@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="0">
+    <!--
+        Ensure the base invoice report template stays active.
+        This is needed because Odoo.sh Rebuild may restore a database
+        where this view was previously deactivated, which breaks the
+        entire invoice template inheritance chain.
+    -->
+    <record id="account.report_invoice_document" model="ir.ui.view">
+        <field name="active" eval="True"/>
+    </record>
+</odoo>
