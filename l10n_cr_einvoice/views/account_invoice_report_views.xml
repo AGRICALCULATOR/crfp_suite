@@ -7,7 +7,7 @@
             </t>
         </xpath>
         <xpath expr="//t[@t-call='web.external_layout']" position="attributes">
-            <attribute name="t-if" add="not (o.company_id.fp_invoice_template_style and o.company_id.fp_invoice_template_style != 'standard')"/>
+            <attribute name="t-if" add="not (o.company_id.fp_invoice_template_style and o.company_id.fp_invoice_template_style != 'standard')" separator=" and "/>
         </xpath>
     </template>
 
