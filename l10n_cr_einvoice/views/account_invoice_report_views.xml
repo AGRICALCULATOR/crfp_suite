@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <template id="report_invoice_document_fp_template_router" inherit_id="account_accountant.report_invoice_document">
+    <template id="report_invoice_document_fp_template_router" inherit_id="account.report_invoice_document">
         <xpath expr="//t[@t-call='web.external_layout']" position="before">
             <t t-if="o.company_id.fp_invoice_template_style and o.company_id.fp_invoice_template_style != 'standard'">
-                <t t-call="report_invoice_document_fp_custom"/>
+                <t t-call="l10n_cr_einvoice.report_invoice_document_fp_custom"/>
             </t>
         </xpath>
         <xpath expr="//t[@t-call='web.external_layout']" position="attributes">
