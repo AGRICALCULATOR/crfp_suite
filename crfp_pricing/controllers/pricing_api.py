@@ -57,20 +57,19 @@ class CrfpPricingAPI(http.Controller):
             order='sequence',
         )
 
-        fixed_cost = env['crfp.fixed.cost'].get_fixed_costs()
         settings = env['crfp.settings'].get_settings()
         fc_data = {
-            'transport': fixed_cost.transport,
-            'thc_origin': fixed_cost.thc_origin,
-            'fumigation': fixed_cost.fumigation,
-            'broker': fixed_cost.broker,
-            'thc_dest': fixed_cost.thc_dest,
-            'fumig_dest': fixed_cost.fumig_dest,
-            'inland_dest': fixed_cost.inland_dest,
-            'insurance_pct': fixed_cost.insurance_pct,
-            'duties_pct': fixed_cost.duties_pct,
-            'default_total_boxes': settings.default_total_boxes or fixed_cost.default_total_boxes,
-            'default_exchange_rate': settings.exchange_rate or fixed_cost.default_exchange_rate,
+            'transport': settings.fc_transport_default,
+            'thc_origin': settings.fc_thc_origin_default,
+            'fumigation': settings.fc_fumigation_default,
+            'broker': settings.fc_broker_default,
+            'thc_dest': settings.fc_thc_dest_default,
+            'fumig_dest': settings.fc_fumig_dest_default,
+            'inland_dest': settings.fc_inland_dest_default,
+            'insurance_pct': settings.fc_insurance_pct_default,
+            'duties_pct': settings.fc_duties_pct_default,
+            'default_total_boxes': settings.default_total_boxes,
+            'default_exchange_rate': settings.exchange_rate,
         }
 
         return {
@@ -340,7 +339,24 @@ class CrfpPricingAPI(http.Controller):
 
     @http.route('/crfp/api/fixed-costs/save', type='jsonrpc', auth='user')
     def save_fixed_costs(self, vals):
-        """Update fixed costs from the calculator UI."""
-        fc = request.env['crfp.fixed.cost'].get_fixed_costs()
-        fc.write(vals)
+        """Update fixed costs from the calculator UI (writes to crfp.settings)."""
+        settings = request.env['crfp.settings'].get_settings()
+        # Map short names from JS to settings field names
+        field_map = {
+            'transport': 'fc_transport_default',
+            'thc_origin': 'fc_thc_origin_default',
+            'fumigation': 'fc_fumigation_default',
+            'broker': 'fc_broker_default',
+            'thc_dest': 'fc_thc_dest_default',
+            'fumig_dest': 'fc_fumig_dest_default',
+            'inland_dest': 'fc_inland_dest_default',
+            'insurance_pct': 'fc_insurance_pct_default',
+            'duties_pct': 'fc_duties_pct_default',
+        }
+        write_vals = {}
+        for js_name, odoo_name in field_map.items():
+            if js_name in vals:
+                write_vals[odoo_name] = vals[js_name]
+        if write_vals:
+            settings.write(write_vals)
         return True
