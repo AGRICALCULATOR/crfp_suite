@@ -196,3 +196,18 @@
 /* ─── RESPONSIVE ─── */
 @media (max-width:1100px) { .crfp-calc-layout { grid-template-columns:1fr; } .crfp-sidebar { max-height:none; } }
 @media (max-width:700px) { .crfp-pgrid { grid-template-columns:1fr; } .crfp-header { flex-direction:column; } }
+
+/* ─── FORCE LIGHT THEME (calculator always uses light mode) ─── */
+html.dark .crfp-app { background:white; color:var(--crfp-text); }
+html.dark .crfp-pg input, html.dark .crfp-pg select { background:white; color:var(--crfp-text); border-color:var(--crfp-border); }
+html.dark .crfp-fg input, html.dark .crfp-fg select { background:white; color:var(--crfp-text); border-color:var(--crfp-border); }
+html.dark .crfp-opcost-input-wrap input { background:white; color:var(--crfp-text); border-color:var(--crfp-border); }
+html.dark .crfp-bp-row input { background:white; color:var(--crfp-text); border-color:var(--crfp-border); }
+html.dark .crfp-pcard { background:white; color:var(--crfp-text); border-color:var(--crfp-border); }
+html.dark .crfp-sidebar { background:var(--crfp-light); border-right-color:var(--crfp-border); }
+html.dark .crfp-sb-hdr { background:white; color:var(--crfp-primary); }
+html.dark .crfp-calc-main { background:white; }
+html.dark .crfp-actions { background:rgba(255,255,255,.97); }
+html.dark .crfp-client-dropdown { background:white; border-color:var(--crfp-border); }
+html.dark .crfp-client-option { color:var(--crfp-text); }
+html.dark .crfp-client-name { color:var(--crfp-dark); }
