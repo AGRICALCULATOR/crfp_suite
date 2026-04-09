@@ -363,7 +363,7 @@
                                             <td><span class="fp-cr-label">Observation:</span> <span t-esc="(o.narration or '-')[:80]"/></td>
                                         </tr>
                                         <tr>
-                                            <td><span class="fp-cr-label">Amount in words:</span> <span t-esc="o.amount_in_words or '-'"/></td>
+                                            <td><span class="fp-cr-label">Amount in words:</span> <span t-esc="o.fp_amount_in_words or '-'"/></td>
                                         </tr>
                                         <t t-if="fp_tax_rate_breakdown">
                                             <tr>
@@ -737,7 +737,7 @@
                             <div class="fp-ref-data-row"><span class="fp-ref-label">Reference:</span> <span t-esc="fp_reference_value"/></div>
                             <div class="fp-ref-data-row"><span class="fp-ref-label">Internal #:</span> <span t-esc="o.name or '-'"/></div>
                             <div class="fp-ref-data-row"><span class="fp-ref-label">Observation:</span> <span t-esc="(o.narration or '-')[:80]"/></div>
-                            <div class="fp-ref-data-row"><span class="fp-ref-label">Amount in words:</span> <span t-esc="o.amount_in_words or '-'"/></div>
+                            <div class="fp-ref-data-row"><span class="fp-ref-label">Amount in words:</span> <span t-esc="o.fp_amount_in_words or '-'"/></div>
                         </div>
                     </div>
                     <!-- Tax Rate Breakdown -->
