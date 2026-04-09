@@ -68,8 +68,8 @@ class CrfpPricingAPI(http.Controller):
             'inland_dest': settings.fc_inland_dest_default,
             'insurance_pct': settings.fc_insurance_pct_default,
             'duties_pct': settings.fc_duties_pct_default,
-            'default_total_boxes': settings.default_total_boxes,
-            'default_exchange_rate': settings.exchange_rate,
+            'default_total_boxes': settings.default_total_boxes or 1386,
+            'default_exchange_rate': settings.exchange_rate or 503.0,
         }
 
         return {

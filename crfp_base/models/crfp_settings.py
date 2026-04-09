@@ -16,15 +16,13 @@ class CrfpSettings(models.Model):
     )
 
     # ── Exchange Rate ──────────────────────────────────────────────────────────
-    # Centralizado: lee de res.currency.rate (la misma fuente que usa
-    # l10n_cr_einvoice para factura electrónica). Se actualiza automáticamente
-    # desde Contabilidad → Configuración → Monedas → Tasas automáticas (xe.com).
-    # El campo exchange_rate se mantiene como override manual opcional.
+    # Actualizado via botón "Sincronizar" o cron diario.
+    # Lee de res.currency.rate (misma fuente que l10n_cr_einvoice).
+    # Configurar proveedor en: Contabilidad → Configuración → Monedas → Tasas automáticas.
     exchange_rate = fields.Float(
-        string='Exchange Rate (CRC/USD)', digits=(12, 2),
-        compute='_compute_exchange_rate', store=True, readonly=False,
-        help='Tipo de cambio CRC/USD. Se sincroniza automáticamente desde '
-             'Contabilidad (res.currency.rate). Puede editarse manualmente.',
+        string='Exchange Rate (CRC/USD)', digits=(12, 2), default=503.0,
+        help='Tipo de cambio CRC/USD. Se sincroniza desde Contabilidad '
+             '(res.currency.rate) via botón o cron diario.',
     )
     exchange_rate_source = fields.Selection([
         ('auto', 'Automático (Odoo Contabilidad)'),
@@ -121,30 +119,6 @@ class CrfpSettings(models.Model):
     # ─────────────────────────────────────────────────────────────────────────
     # Exchange Rate — Centralizado con res.currency.rate (Odoo Contabilidad)
     # ─────────────────────────────────────────────────────────────────────────
-
-    @api.depends('exchange_rate_source', 'company_id')
-    def _compute_exchange_rate(self):
-        """
-        Lee el tipo de cambio de res.currency.rate (la misma fuente que usa
-        l10n_cr_einvoice para la factura electrónica de Hacienda CR).
-
-        En Odoo Enterprise, esta tasa se actualiza automáticamente si se
-        configura un proveedor en:
-        Contabilidad → Configuración → Monedas → Tasas de cambio automáticas.
-
-        El proveedor recomendado es xe.com con intervalo "Diario".
-        """
-        for record in self:
-            if record.exchange_rate_source == 'manual':
-                # En modo manual, no sobreescribir — el usuario controla el valor
-                continue
-            rate = record._get_odoo_exchange_rate()
-            if rate and rate > 0:
-                record.exchange_rate = rate
-                record.exchange_rate_last_update = fields.Datetime.now()
-            elif not record.exchange_rate or record.exchange_rate <= 0:
-                # Sin tasa disponible y sin valor previo — fallback seguro
-                record.exchange_rate = 0.0
 
     def _get_odoo_exchange_rate(self):
         """
