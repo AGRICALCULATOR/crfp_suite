@@ -4,7 +4,7 @@
         <record id="default_crfp_settings" model="crfp.settings">
             <field name="name">CR Farm Settings</field>
             <field name="exchange_rate">505.21</field>
-            <field name="exchange_rate_auto" eval="True"/>
+            <field name="exchange_rate_source">auto</field>
             <field name="default_total_boxes">1386</field>
             <field name="default_boxes_per_pallet">66</field>
             <field name="fc_transport_default">600.0</field>
