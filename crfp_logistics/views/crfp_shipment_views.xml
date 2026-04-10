@@ -218,12 +218,10 @@
                                     <field name="container_id" string="Container" optional="show"/>
                                     <field name="boxes_planned" string="Boxes Plan"/>
                                     <field name="pallets_planned" string="Plts Plan"/>
-                                    <field name="net_weight_planned" string="Net Kg Plan" optional="show"/>
-                                    <field name="gross_weight_planned" string="Gross Kg Plan" optional="show"/>
                                     <field name="boxes_actual" string="Boxes Actual"/>
                                     <field name="pallets_actual" string="Plts Actual"/>
-                                    <field name="net_weight_actual" string="Net Kg Actual" optional="show"/>
-                                    <field name="gross_weight_actual" string="Gross Kg Actual" optional="show"/>
+                                    <field name="net_weight_actual" string="Net Kg" optional="show"/>
+                                    <field name="gross_weight_actual" string="Gross Kg" optional="show"/>
                                     <field name="boxes_diff" string="Diff"
                                            decoration-danger="boxes_diff &lt; 0"
                                            decoration-success="boxes_diff >= 0"/>
