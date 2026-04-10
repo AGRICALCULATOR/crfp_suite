@@ -93,7 +93,6 @@ class CrfpShipment(models.Model):
     document_ids = fields.One2many('crfp.shipment.document', 'shipment_id', string='Documents')
     checklist_ids = fields.One2many('crfp.shipment.checklist', 'shipment_id', string='Checklist')
     alert_ids = fields.One2many('crfp.shipment.alert', 'shipment_id', string='Alerts')
-    log_ids = fields.One2many('crfp.shipment.log', 'shipment_id', string='Communication Log')
     tracking_event_ids = fields.One2many('crfp.tracking.event', 'shipment_id', string='Tracking Events')
 
     # Container number (from first container for easy list display)
