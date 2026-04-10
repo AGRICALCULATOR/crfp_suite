@@ -5,6 +5,7 @@ from . import crfp_shipment_booking
 from . import crfp_shipment_document
 from . import crfp_shipment_checklist
 from . import crfp_shipment_alert
+# crfp_shipment_log removed (PL-05) — redundant with mail.thread chatter
 from . import crfp_checklist_template
 from . import crfp_document_type
 from . import crfp_tracking_event

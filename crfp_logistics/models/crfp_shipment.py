@@ -93,6 +93,7 @@ class CrfpShipment(models.Model):
     document_ids = fields.One2many('crfp.shipment.document', 'shipment_id', string='Documents')
     checklist_ids = fields.One2many('crfp.shipment.checklist', 'shipment_id', string='Checklist')
     alert_ids = fields.One2many('crfp.shipment.alert', 'shipment_id', string='Alerts')
+    # log_ids removed (PL-05) — redundant with mail.thread chatter
     tracking_event_ids = fields.One2many('crfp.tracking.event', 'shipment_id', string='Tracking Events')
 
     # Container number (from first container for easy list display)
@@ -297,6 +298,12 @@ class CrfpShipment(models.Model):
         # Build map: product.product.id → config data
         cc_map = {}
         if cc:
+            # Always set _fallback from header fields (works for single AND mixed)
+            cc_map['_fallback'] = {
+                'bpp': cc.boxes_per_pallet or 66,
+                'net_kg': cc.net_weight_per_box_kg or 0,
+                'gross_kg': cc.gross_weight_per_box_kg or 0,
+            }
             if cc.is_mixed and cc.product_line_ids:
                 for cl in cc.product_line_ids:
                     if cl.product_id:
@@ -305,13 +312,6 @@ class CrfpShipment(models.Model):
                             'net_kg': cl.net_weight_per_box_kg or 0,
                             'gross_kg': cl.gross_weight_per_box_kg or 0,
                         }
-            else:
-                # Single-product mode: same config for all lines
-                cc_map['_single'] = {
-                    'bpp': cc.boxes_per_pallet or 66,
-                    'net_kg': cc.net_weight_per_box_kg or 0,
-                    'gross_kg': cc.gross_weight_per_box_kg or 0,
-                }
 
         # ── Priority 2: Quotation lines by crfp_product_id ──
         q_lines_map = {}
@@ -334,7 +334,7 @@ class CrfpShipment(models.Model):
             ], limit=1)
 
             # ── Resolve weights and bpp by priority ──
-            cc_data = cc_map.get(sol.product_id.id) or cc_map.get('_single')
+            cc_data = cc_map.get(sol.product_id.id) or cc_map.get('_fallback')
             q_line = q_lines_map.get(crfp_prod.id) if crfp_prod else None
 
             if cc_data:
