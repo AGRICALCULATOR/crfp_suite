@@ -365,6 +365,9 @@ class CrfpShipment(models.Model):
 
             pallets_planned = math.ceil(boxes_planned / bpp) if bpp else 0
 
+            net_planned = boxes_planned * net_kg
+            gross_planned = boxes_planned * gross_kg
+
             self.env['crfp.shipment.line'].create({
                 'shipment_id': self.id,
                 'sale_order_line_id': sol.id,
@@ -374,8 +377,11 @@ class CrfpShipment(models.Model):
                 'boxes_planned': boxes_planned,
                 'pallets_planned': pallets_planned,
                 'boxes_per_pallet_planned': bpp,
-                'net_weight_planned': boxes_planned * net_kg,
-                'gross_weight_planned': boxes_planned * gross_kg,
+                'net_weight_planned': net_planned,
+                'gross_weight_planned': gross_planned,
+                # Pre-fill actual with planned as starting point
+                'net_weight_actual': net_planned,
+                'gross_weight_actual': gross_planned,
                 'price_unit_planned': sol.price_unit,
                 'temperature_set': self.temperature_set or 0,
             })
