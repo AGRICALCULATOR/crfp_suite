@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo noupdate="0">
+    <!--
+    Activate filter_currency on all standard accounting reports.
+    xml_ids verified against Odoo 19 Enterprise account_reports module.
+    noupdate="0" ensures the flag can be re-applied on module upgrade.
+    -->
+
+    <!-- Aged Receivable (ID=9) -->
+    <record id="account_reports.aged_receivable_report" model="account.report">
+        <field name="filter_currency" eval="True"/>
+    </record>
+
+    <!-- Aged Payable (ID=10) -->
+    <record id="account_reports.aged_payable_report" model="account.report">
+        <field name="filter_currency" eval="True"/>
+    </record>
+
+    <!-- Partner Ledger (ID=14) -->
+    <record id="account_reports.partner_ledger_report" model="account.report">
+        <field name="filter_currency" eval="True"/>
+    </record>
+
+    <!-- General Ledger (ID=11) -->
+    <record id="account_reports.general_ledger_report" model="account.report">
+        <field name="filter_currency" eval="True"/>
+    </record>
+
+    <!-- Trial Balance (ID=12) -->
+    <record id="account_reports.trial_balance_report" model="account.report">
+        <field name="filter_currency" eval="True"/>
+    </record>
+
+    <!-- Balance Sheet (ID=4) -->
+    <record id="account_reports.balance_sheet" model="account.report">
+        <field name="filter_currency" eval="True"/>
+    </record>
+
+    <!-- Profit and Loss (ID=7) -->
+    <record id="account_reports.profit_and_loss" model="account.report">
+        <field name="filter_currency" eval="True"/>
+    </record>
+
+    <!-- Cash Flow Statement (ID=5) -->
+    <record id="account_reports.cash_flow_report" model="account.report">
+        <field name="filter_currency" eval="True"/>
+    </record>
+
+    <!-- Journal Report (ID=20) -->
+    <record id="account_reports.journal_report" model="account.report">
+        <field name="filter_currency" eval="True"/>
+    </record>
+
+    <!-- Tax Report (ID=1) — note: xml_id is in account module, not account_reports -->
+    <record id="account.generic_tax_report" model="account.report">
+        <field name="filter_currency" eval="True"/>
+    </record>
+</odoo>

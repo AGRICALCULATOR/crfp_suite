@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Add filter_currency checkbox to the report configuration form -->
+    <record id="account_report_form_inherit_currency" model="ir.ui.view">
+        <field name="name">account.report.form.inherit.currency</field>
+        <field name="model">account.report</field>
+        <field name="inherit_id" ref="account.account_report_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='filter_partner']" position="after">
+                <field name="filter_currency"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
