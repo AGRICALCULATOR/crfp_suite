@@ -1,43 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
-
     <t t-name="crfp_multicurrency_reports.CurrencyFilter"
-       t-inherit="account_reports.AccountReportFiltersCustomizable"
+       t-inherit="account_reports.AccountReportFilters"
        t-inherit-mode="extension">
-
-        <!-- Insert currency dropdown after the last filter group -->
-        <xpath expr="//div[hasclass('o_account_reports_filter_actions')]" position="before">
-            <div class="btn-group o_account_reports_filter_currency ms-1"
-                 t-if="controller.options.currency_filter">
-                <button type="button"
-                        class="btn btn-outline-secondary dropdown-toggle"
-                        data-bs-toggle="dropdown"
-                        data-bs-auto-close="true"
-                        aria-expanded="false"
-                        title="Currency">
-                    <i class="fa fa-money me-1"/>
-                    <span t-esc="controller.getCurrencyFilterLabel
-                        ? controller.getCurrencyFilterLabel()
-                        : _getCurrencyLabel(controller.options)"/>
-                </button>
-                <ul class="dropdown-menu" role="menu">
-                    <t t-foreach="controller.options.currency_filter.available_currencies"
-                       t-as="currency" t-key="currency.id">
-                        <li>
-                            <a class="dropdown-item"
-                               role="menuitemradio"
-                               t-att-class="{'active': currency.selected}"
-                               href="#"
-                               t-on-click.prevent="(ev) => this._onCurrencySelected(currency.id)">
-                                <t t-esc="currency.name"/>
-                                <span class="text-muted ms-1">(<t t-esc="currency.symbol"/>)</span>
-                            </a>
-                        </li>
-                    </t>
-                </ul>
-            </div>
+        <xpath expr="//div[@id='filter_rounding_unit']" position="after">
+            <t t-if="'currency_filter' in controller.cachedFilterOptions">
+                <div id="filter_currency" class="btn-group">
+                    <Dropdown togglerClass="'btn btn-secondary'">
+                        <t t-set-slot="toggler">
+                            <i class="fa fa-money me-1"/>
+                            <t t-esc="this.getSelectedCurrencyName()"/>
+                        </t>
+                        <t t-foreach="controller.cachedFilterOptions.currency_filter.available_currencies"
+                           t-as="currency" t-key="currency.id">
+                            <DropdownItem onSelected="() => this.onCurrencySelected(currency.id)">
+                                <span t-att-class="currency.selected ? 'fw-bold' : ''">
+                                    <t t-esc="currency.name"/>
+                                    <span class="text-muted ms-1">(<t t-esc="currency.symbol"/>)</span>
+                                </span>
+                            </DropdownItem>
+                        </t>
+                    </Dropdown>
+                </div>
+            </t>
         </xpath>
-
     </t>
-
 </templates>
