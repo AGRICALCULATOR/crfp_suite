@@ -1,0 +1,61 @@
+<odoo>
+    <record id="view_supplier_xml_gateway_tree" model="ir.ui.view">
+        <field name="name">supplier.xml.gateway.tree</field>
+        <field name="model">supplier.xml.gateway</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="company_id"/>
+                <field name="journal_id"/>
+                <field name="alias_name"/>
+                <field name="move_count"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_supplier_xml_gateway_form" model="ir.ui.view">
+        <field name="name">supplier.xml.gateway.form</field>
+        <field name="model">supplier.xml.gateway</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_received_moves"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-file-text-o">
+                            <field name="move_count" string="Facturas" widget="statinfo"/>
+                        </button>
+                    </div>
+                    <group>
+                        <field name="name"/>
+                        <field name="company_id"/>
+                        <field name="journal_id"/>
+                    </group>
+                    <notebook>
+                        <page string="Facturas recibidas">
+                            <field name="move_ids" readonly="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="partner_id"/>
+                                    <field name="invoice_date"/>
+                                    <field name="state"/>
+                                    <field name="amount_total"/>
+                                    <field name="currency_id" optional="show"/>
+                                    <field name="supplier_xml_filename" optional="show"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_supplier_xml_gateway" model="ir.actions.act_window">
+        <field name="name">Buzones XML proveedor</field>
+        <field name="res_model">supplier.xml.gateway</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>
