@@ -1,0 +1,324 @@
+import base64
+from email.utils import getaddresses, parsedate_to_datetime
+from email import message_from_string
+
+from odoo import _, api, fields, models
+from odoo.exceptions import UserError
+
+
+class SupplierXMLGateway(models.Model):
+    _name = "supplier.xml.gateway"
+    _description = "Buzón de XML de proveedor"
+    _inherit = ["mail.thread", "mail.alias.mixin"]
+
+    name = fields.Char(required=True, default="Buzón XML Proveedor")
+    company_id = fields.Many2one("res.company", required=True, default=lambda self: self.env.company)
+
+    @api.model
+    def _default_journal_id(self):
+        configured_journal_id = self.env["ir.config_parameter"].sudo().get_param(
+            "l10n_cr_supplier_xml_import.default_purchase_journal_id"
+        )
+        if configured_journal_id and configured_journal_id.isdigit():
+            journal = self.env["account.journal"].browse(int(configured_journal_id))
+            if journal and journal.type == "purchase" and journal.company_id == self.env.company:
+                return journal.id
+        return False
+
+    journal_id = fields.Many2one(
+        "account.journal",
+        domain="[('type', '=', 'purchase'), ('company_id', '=', company_id)]",
+        default=lambda self: self._default_journal_id(),
+        help="Diario usado para las facturas importadas automáticamente desde correo.",
+    )
+    move_ids = fields.One2many("account.move", "supplier_xml_gateway_id", string="Facturas recibidas")
+    move_count = fields.Integer(compute="_compute_move_count", string="Facturas recibidas")
+
+    @api.model
+    def _normalize_config_datetime(self, value):
+        """Return a datetime or False for empty/sentinel config values."""
+        if value in (False, None, "", "False", "None"):
+            return False
+        return fields.Datetime.to_datetime(value)
+
+    @api.model
+    def _get_global_process_emails_date_range(self):
+        icp = self.env["ir.config_parameter"].sudo()
+        from_value = icp.get_param("l10n_cr_supplier_xml_import.process_emails_from_date")
+        to_value = icp.get_param("l10n_cr_supplier_xml_import.process_emails_to_date")
+
+        process_from_datetime = self._normalize_config_datetime(from_value)
+        process_to_datetime = self._normalize_config_datetime(to_value)
+
+        return process_from_datetime, process_to_datetime
+
+    @api.depends("move_ids")
+    def _compute_move_count(self):
+        for record in self:
+            record.move_count = len(record.move_ids)
+
+    @api.model
+    def _email_recipients_from_message(self, msg_dict):
+        recipient_headers = []
+        for key in ("to", "cc", "recipients", "email_to"):
+            value = msg_dict.get(key)
+            if value:
+                recipient_headers.append(value)
+
+        parsed_addresses = []
+        for _, email_address in getaddresses(recipient_headers):
+            normalized_address = (email_address or "").strip().lower()
+            if normalized_address:
+                parsed_addresses.append(normalized_address)
+        return set(parsed_addresses)
+
+    @api.model
+    def _gateway_from_email_message(self, msg_dict):
+        recipients = self._email_recipients_from_message(msg_dict)
+        gateways = self.search([("company_id", "=", self.env.company.id)])
+
+        if recipients:
+            for gateway in gateways:
+                alias_contact = (gateway.alias_id.alias_full_name or "").strip().lower() if gateway.alias_id else ""
+                if alias_contact and alias_contact in recipients:
+                    return gateway
+
+        configured_journal_id = self.env["ir.config_parameter"].sudo().get_param(
+            "l10n_cr_supplier_xml_import.default_purchase_journal_id"
+        )
+        if configured_journal_id and configured_journal_id.isdigit():
+            gateway = gateways.filtered(lambda gateway: gateway.journal_id.id == int(configured_journal_id))[:1]
+            if gateway:
+                return gateway
+
+        for gateway in gateways:
+            if gateway.journal_id:
+                return gateway
+
+        return self.env["supplier.xml.gateway"]
+
+
+
+    @api.model
+    def _extract_message_id_from_message(self, msg_dict):
+        direct_message_id = (msg_dict.get("message_id") or msg_dict.get("Message-Id") or "").strip()
+        if direct_message_id:
+            return direct_message_id
+
+        headers = msg_dict.get("headers")
+        if isinstance(headers, str) and headers.strip():
+            try:
+                parsed_message = message_from_string(headers)
+            except Exception:  # pragma: no cover - defensive header parsing
+                parsed_message = False
+            if parsed_message:
+                header_message_id = (parsed_message.get("Message-Id") or "").strip()
+                if header_message_id:
+                    return header_message_id
+
+        return ""
+
+    @api.model
+    def _is_duplicate_supplier_email(self, msg_dict, company_id):
+        message_id = self._extract_message_id_from_message(msg_dict)
+        if not message_id:
+            return False, ""
+        duplicate_move = self.env["account.move"].search(
+            [
+                ("supplier_xml_message_id", "=", message_id),
+                ("company_id", "=", company_id),
+                ("move_type", "in", ["in_invoice", "in_refund"]),
+            ],
+            limit=1,
+        )
+        return bool(duplicate_move), message_id
+
+    @api.model
+    def _get_invoice_xml_attachments(self, attachments):
+        xml_candidates = []
+        move_model = self.env["account.move"]
+
+        for attachment in attachments or []:
+            if len(attachment) < 2:
+                continue
+            filename, payload = attachment[0], attachment[1]
+            mimetype = attachment[2] if len(attachment) > 2 else False
+            is_xml_name = bool(filename and filename.lower().endswith(".xml"))
+            is_xml_mimetype = mimetype in {"text/xml", "application/xml"}
+            is_zip_name = bool(filename and filename.lower().endswith(".zip"))
+            is_zip_mimetype = mimetype in {"application/zip", "application/x-zip-compressed"}
+            if not is_xml_name and not is_xml_mimetype and not is_zip_name and not is_zip_mimetype:
+                continue
+            xml_candidates.extend(move_model._extract_supported_xml_payloads(payload, filename=filename))
+
+        return xml_candidates
+
+    @api.model
+    def _attachment_datas(self, payload):
+        if isinstance(payload, bytes):
+            return base64.b64encode(payload)
+        if isinstance(payload, str):
+            return payload.encode()
+        return payload
+
+    def _keep_mail_attachments_on_move(self, move, msg_dict):
+        attachment_ids = []
+        for attachment in msg_dict.get("attachments", []):
+            filename, payload = attachment[0], attachment[1]
+            if not filename or payload is None:
+                continue
+            ir_attachment = self.env["ir.attachment"].create(
+                {
+                    "name": filename,
+                    "datas": self._attachment_datas(payload),
+                    "res_model": "account.move",
+                    "res_id": move.id,
+                    "type": "binary",
+                }
+            )
+            attachment_ids.append(ir_attachment.id)
+
+        if attachment_ids:
+            move.message_post(
+                body=_("Adjuntos del correo original guardados en la factura."),
+                attachment_ids=attachment_ids,
+            )
+
+    @api.model
+    def _parse_email_datetime(self, msg_dict):
+        for key in ("date", "internal_date"):
+            raw_date = msg_dict.get(key)
+            if not raw_date:
+                continue
+
+            parsed_datetime = fields.Datetime.to_datetime(raw_date)
+            if parsed_datetime:
+                return parsed_datetime
+
+            if isinstance(raw_date, str):
+                try:
+                    return parsedate_to_datetime(raw_date)
+                except (TypeError, ValueError):
+                    continue
+        return False
+
+    def _process_supplier_email(self, msg_dict):
+        self.ensure_one()
+
+        is_duplicate_message, message_id = self._is_duplicate_supplier_email(msg_dict, self.company_id.id)
+        if is_duplicate_message:
+            self.message_post(
+                body=_("Correo omitido: Message-ID ya procesado previamente (%s).") % message_id
+            )
+            return
+
+        process_from_datetime, process_to_datetime = self._get_global_process_emails_date_range()
+        if process_from_datetime or process_to_datetime:
+            email_datetime = self._parse_email_datetime(msg_dict)
+            if email_datetime and process_from_datetime and email_datetime < process_from_datetime:
+                self.message_post(
+                    body=_(
+                        "Correo ignorado por fecha (%s). Solo se procesan correos desde %s."
+                    )
+                    % (
+                        fields.Datetime.to_string(email_datetime),
+                        fields.Datetime.to_string(process_from_datetime),
+                    )
+                )
+                return
+            if email_datetime and process_to_datetime and email_datetime > process_to_datetime:
+                self.message_post(
+                    body=_("Correo ignorado por fecha (%s). Solo se procesan correos hasta %s.")
+                    % (
+                        fields.Datetime.to_string(email_datetime),
+                        fields.Datetime.to_string(process_to_datetime),
+                    )
+                )
+                return
+            if not email_datetime:
+                configured_range = []
+                if process_from_datetime:
+                    configured_range.append(_("desde %s") % fields.Datetime.to_string(process_from_datetime))
+                if process_to_datetime:
+                    configured_range.append(_("hasta %s") % fields.Datetime.to_string(process_to_datetime))
+                self.message_post(
+                    body=_(
+                        "Correo ignorado: no se pudo determinar la fecha del mensaje y existe una fecha "
+                        "de procesamiento configurada (%s)."
+                    )
+                    % " ".join(configured_range)
+                )
+                return
+
+        xml_attachments = self._get_invoice_xml_attachments(msg_dict.get("attachments", []))
+        if not xml_attachments:
+            raise UserError(_("El correo no contiene XML de factura o nota de crédito para procesar."))
+
+        move = False
+        for filename, payload in xml_attachments:
+            try:
+                move = self.env["account.move"].create_from_supplier_xml(
+                    xml_content=payload,
+                    journal_id=self.journal_id.id or None,
+                    company_id=self.company_id.id,
+                    filename=filename,
+                    supplier_xml_gateway_id=self.id,
+                )
+                break
+            except UserError:
+                continue
+
+        if not move:
+            raise UserError(_("No se encontró un XML de factura o nota de crédito válido en el correo."))
+
+        if message_id:
+            move.write({"supplier_xml_message_id": message_id})
+
+        self._keep_mail_attachments_on_move(move, msg_dict)
+        move.message_post(body=_("Factura creada automáticamente desde correo: %s") % (msg_dict.get("subject") or ""))
+
+    @api.model
+    def message_new(self, msg_dict, custom_values=None):
+        values = custom_values or {}
+        values.setdefault("name", msg_dict.get("subject") or _("Correo XML proveedor"))
+        record = super().message_new(msg_dict, custom_values=values)
+        record._process_supplier_email(msg_dict)
+        return record
+
+    def message_update(self, msg_dict, update_vals=None):
+        result = super().message_update(msg_dict, update_vals=update_vals)
+        for gateway in self:
+            gateway._process_supplier_email(msg_dict)
+        return result
+
+    def action_process_incoming_emails(self):
+        self.ensure_one()
+        raise UserError(
+            _(
+                "Odoo 19 ya no incluye el recolector fetchmail para ejecutar una revisión manual. "
+                "Use el alias del buzón y el enrutamiento de correo entrante configurado en Ajustes > Técnico > Correo."
+            )
+        )
+
+    def action_view_received_moves(self):
+        self.ensure_one()
+        return {
+            "name": _("Facturas recibidas"),
+            "type": "ir.actions.act_window",
+            "res_model": "account.move",
+            "view_mode": "list,form",
+            "domain": [("supplier_xml_gateway_id", "=", self.id)],
+            "context": {
+                "default_move_type": "in_invoice",
+            },
+        }
+
+    def _alias_get_creation_values(self):
+        values = super()._alias_get_creation_values()
+        values.update(
+            {
+                "alias_model_id": self.env["ir.model"]._get_id("supplier.xml.gateway"),
+                "alias_force_thread_id": self.id,
+            }
+        )
+        return values
