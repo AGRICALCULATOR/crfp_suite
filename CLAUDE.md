@@ -13,9 +13,10 @@ Modulos Odoo 19 para CR Farm Products, empresa exportadora agricola de Costa Ric
 ```
 crfp_claims -> crfp_logistics -> crfp_pricing -> crfp_base -> [base, sale, product, mail]
 crfp_website -> crfp_base
-invoice_weight (independiente)
-l10n_cr_einvoice (independiente, FenixCR v4.4)
+l10n_cr_einvoice (independiente, FenixCR v4.4 — NO modificar)
 ```
+
+> invoice_weight fue ELIMINADO en Fase 2 (redundante con l10n_cr_einvoice)
 
 Flujo principal: `crfp.quotation` -> `sale.order` -> `crfp.shipment` (14 estados) -> `account.move`
 
@@ -90,11 +91,12 @@ raw_price_crc (CRC)
 
 ### Tipo de Cambio
 - Pipeline: xe.com → Odoo Contabilidad (res.currency.rate) → crfp.settings.exchange_rate → snapshot en cotizacion
-- `exchange_rate`: campo computed/stored con `readonly=False` (override manual)
+- `exchange_rate`: campo Float plano (default=503.0) — NO computed (se cambio en Fase 1 porque computed retornaba 0 al actualizar modulo)
 - `exchange_rate_source`: Selection (auto/manual) — auto lee de res.currency.rate
-- `_compute_exchange_rate()`: lee via `_get_odoo_exchange_rate()` usando `inverse_company_rate`
+- Sincronizar: boton "Sincronizar Tipo de Cambio" en Settings o cron diario
+- `_get_odoo_exchange_rate()`: lee `inverse_company_rate` de USD, fallback a res.currency.rate
 - Cron: `_cron_update_exchange_rate()` a las 02:00 UTC (solo registros con source=auto)
-- Cada cotizacion guarda snapshot al crearse via `default_get()`
+- Cada cotizacion guarda snapshot al crearse
 - Borradores: se recalculan automaticamente al cambiar TC (write() override en crfp.quotation)
 - Confirmadas: congeladas — NO se recalculan
 - Configurar en Odoo: Contabilidad → Configuracion → Monedas → Tasas automaticas (xe.com, diario)
@@ -114,7 +116,7 @@ raw_price_crc (CRC)
 | BP-02 | HECHO | write() override en crfp_quotation.py recalcula drafts al cambiar TC |
 | BP-04 | HECHO | write() override en crfp_product.py propaga raw_price_crc a lineas draft |
 | BP-05 | HECHO | action_create_sale_order() usa lista filtrada 1:1 en vez de enumerate |
-| BP-06 | HECHO | Cron actualiza drafts y detecta price lists activas al cambiar TC |
+| BP-06 | FASE 2 | Cron detecta price lists activas al cambiar TC (solo log, recalculo pendiente Fase 2) |
 | BP-07 | HECHO | @api.onchange('freight_quote_id') recalcula lineas |
 | BP-08 | HECHO | @api.onchange('incoterm') recalcula lineas |
 | BP-09 | OK | partner_id ya se guarda correctamente como integer en JS/API |
@@ -123,15 +125,32 @@ raw_price_crc (CRC)
 
 ---
 
+## FASE 2 COMPLETADA — Correcciones crfp_logistics
+
+| ID | Estado | Correccion aplicada |
+|----|--------|---------------------|
+| PL-01 | HECHO | Modulo invoice_weight eliminado (redundante con l10n_cr_einvoice) |
+| PL-02 | HECHO | container_config confirmado se integra a creacion de embarque (prioridad 1) |
+| PL-03 | HECHO | blocks_state en checklist + _check_blocking_tasks() reactivado con logica granular |
+| PL-04 | HECHO | Wrapper muerto _push_weights_to_invoice() eliminado |
+| PL-05 | HECHO | Tab Log y modelo crfp.shipment.log eliminados (redundante con chatter) |
+| PL-06 | HECHO | tracking.position y tracking.temperature eliminados (sin APIs/GPS) |
+| PL-07 | HECHO | Estado 'amended' eliminado del booking (codigo muerto) |
+| PL-08 | HECHO | Puerto origen configurable en crfp.settings (default_port_origin_id, fallback MOI) |
+
+---
+
 ## MODELOS CLAVE
 
 ### crfp.settings (Singleton, crfp_base)
-- `exchange_rate`: Float(12,2) computed/stored desde res.currency.rate
+- `exchange_rate`: Float(12,2) default=503.0 — campo plano, sincronizado via boton o cron
 - `exchange_rate_source`: Selection(auto/manual)
-- `fc_*_default`: 11 campos costos fijos por defecto (USD/contenedor)
+- `fc_*_default`: 9 campos costos fijos por defecto (USD/contenedor) — fuente unica (crfp.fixed.cost eliminado)
 - `default_total_boxes`: 1386
+- `default_port_origin_id`: Many2one(crfp.port) — puerto origen default para embarques
 - `price_validity_days`: 7
 - Acceso: `crfp.settings.get_settings()`
+- API: `pricing_api.py` lee de settings (no de crfp.fixed.cost)
 
 ### crfp.product (crfp_base)
 - `raw_price_crc`: Precio campo en colones (lo actualiza comprador via portal)
@@ -172,8 +191,18 @@ raw_price_crc (CRC)
 ## Notas Tecnicas
 
 - `product_id` en `crfp.quotation.line` es POR LINEA — un producto base puede tener multiples SKUs
-- Pesos cruzan frontera de modulos: shipment -> invoice (`peso_neto`/`peso_total` vs `fp_net_weight`/`fp_gross_weight`)
+- Pesos: shipment -> invoice via `fp_net_weight`/`fp_gross_weight` (l10n_cr_einvoice). invoice_weight eliminado en Fase 2
+- Checklist blocking: usa `blocks_state` por tarea (NO por categoria). _check_blocking_tasks() filtra por blocks_state == target_state
+- Container config: si SO tiene configs confirmados, _create_lines_from_so_and_quotation() los usa como prioridad 1
 - `crfp.pallet.config` usa matching por keyword, NO por foreign key
 - El endpoint `/crfp/api/quotation/save` es critico — es lo que usa el calculator
-- Al crear `_compute_all_prices()`, respetar EXACTAMENTE las formulas del JS (`calculator_service.js` lineas 16-173)
+- `_compute_all_prices()` en `crfp_quotation_line.py` replica EXACTAMENTE las formulas del JS (`calculator_service.js`)
 - Todos los costos fijos son USD/contenedor, se dividen entre `total_boxes` para obtener costo por caja
+- Owl: NO usar `t-model.number` en Odoo 19 — usar `t-att-value` + `t-on-input` (t-model falla silenciosamente)
+- CSS: Calculator fuerza light theme via `html.dark .crfp-app` overrides
+
+## Proteccion de Templates (Rebuilds Odoo.sh)
+
+- `l10n_cr_einvoice/data/ensure_base_template_active.xml` — previene desactivacion del template base de factura durante rebuilds
+- **NUNCA** modificar `l10n_cr_einvoice/` sin verificar impacto en facturacion electronica
+- Al hacer cherry-pick o merge, siempre verificar con `git diff-tree --name-only` que no se toquen archivos de facturacion

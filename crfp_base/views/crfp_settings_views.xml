@@ -56,6 +56,13 @@
                         </group>
                     </group>
 
+                    <!-- Logistics Defaults -->
+                    <group string="Logistics Defaults">
+                        <group>
+                            <field name="default_port_origin_id"/>
+                        </group>
+                    </group>
+
                     <!-- Quality &amp; Monitoring -->
                     <group string="Quality &amp; Monitoring">
                         <group>

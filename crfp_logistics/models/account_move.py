@@ -64,3 +64,14 @@ class AccountMove(models.Model):
                 ship.commercial_invoice_id = move.id
 
         return records
+
+    def action_view_crfp_shipment(self):
+        """Open the linked shipment from the smart button."""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'crfp.shipment',
+            'res_id': self.crfp_shipment_id.id,
+            'view_mode': 'form',
+            'target': 'current',
+        }

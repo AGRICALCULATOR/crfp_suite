@@ -76,6 +76,12 @@ class CrfpSettings(models.Model):
         string='Duties (%)', default=0.0, digits=(12, 2),
     )
 
+    # ── Logistics Defaults ─────────────────────────────────────────────────────
+    default_port_origin_id = fields.Many2one(
+        'crfp.port', string='Default Port of Origin',
+        help='Default origin port for new shipments (e.g. Puerto Moin)',
+    )
+
     # ── Quality / Monitoring ───────────────────────────────────────────────────
     temperature_tolerance = fields.Float(
         string='Temperature Tolerance (°C)', default=2.0, digits=(12, 1),
@@ -91,17 +97,25 @@ class CrfpSettings(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
-        """Enforce singleton: only one settings record per company."""
+        """Enforce singleton: one settings record per company.
+
+        During XML data loading (module install/update) the ORM may try to
+        create the seed record even though a manually-created record already
+        exists.  In that case we return the existing record instead of
+        raising, so the XML-ID gets linked without duplicating data.
+        """
+        results = self.env['crfp.settings']
+        remaining = []
         for vals in vals_list:
             company_id = vals.get('company_id', self.env.company.id)
             existing = self.search([('company_id', '=', company_id)], limit=1)
             if existing:
-                raise UserError(
-                    'A settings record already exists for this company (ID=%d). '
-                    'Please edit the existing record instead of creating a new one.'
-                    % existing.id
-                )
-        return super().create(vals_list)
+                results |= existing
+            else:
+                remaining.append(vals)
+        if remaining:
+            results |= super().create(remaining)
+        return results
 
     # ─────────────────────────────────────────────────────────────────────────
     # Singleton accessor

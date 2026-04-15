@@ -32,6 +32,7 @@
                             <field name="name"/>
                             <field name="category" widget="badge"/>
                             <field name="is_blocking"/>
+                            <field name="blocks_state" optional="show"/>
                         </list>
                     </field>
                     <field name="notes" placeholder="Template notes..."/>

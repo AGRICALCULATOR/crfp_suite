@@ -1,6 +1,6 @@
 {
     'name': 'CR Farm Products - Export Suite Base',
-    'version': '19.0.1.1.0',
+    'version': '19.0.1.2.0',
     'category': 'Sales/Export',
     'summary': 'Master data for CR Farm Products export suite',
     'description': """
@@ -31,6 +31,7 @@
         'data/crfp_box_type_data.xml',
         'data/crfp_pallet_data.xml',
         'data/crfp_incoterm_matrix_data.xml',
+        'data/crfp_settings_data.xml',
         'data/crfp_settings_cron.xml',
     ],
     'installable': True,

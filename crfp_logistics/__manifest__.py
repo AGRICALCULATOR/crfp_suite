@@ -1,6 +1,6 @@
 {
     'name': 'CR Farm Logistics - Export Shipment Management',
-    'version': '19.0.1.0.0',
+    'version': '19.0.2.0.0',
     'category': 'Inventory/Logistics',
     'summary': 'Export shipment management: containers, documents, tracking, packing lists',
     'description': """
@@ -22,6 +22,7 @@
         'data/crfp_shipment_mail_templates.xml',
         'report/crfp_packing_list_report.xml',
         'wizard/container_config_wizard_views.xml',
+        'views/account_move_views.xml',
         'views/crfp_shipment_views.xml',
         'views/crfp_booking_views.xml',
         'views/crfp_document_views.xml',

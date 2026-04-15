@@ -226,6 +226,12 @@ class ResCompany(models.Model):
         attrs = [attr.value for attr in x509_name if attr.oid._name == key]
         return ", ".join(attrs) if attrs else ""
 
+    def _fp_get_certificate_date(self, certificate, utc_attr, legacy_attr):
+        date_value = getattr(certificate, utc_attr, None)
+        if date_value is None:
+            date_value = getattr(certificate, legacy_attr, None)
+        return date_value.date() if date_value else False
+
     @api.depends("fp_signing_certificate_file", "fp_signing_certificate_password")
     def _compute_fp_certificate_info(self):
         for company in self:
@@ -267,8 +273,12 @@ class ResCompany(models.Model):
 
             company.fp_certificate_subject = company._extract_name_attribute(certificate.subject, "organizationName") or str(certificate.subject.rfc4514_string())
             company.fp_certificate_serial_subject = company._extract_name_attribute(certificate.subject, "serialNumber")
-            company.fp_certificate_issue_date = certificate.not_valid_before_utc.date()
-            company.fp_certificate_expiration_date = certificate.not_valid_after_utc.date()
+            company.fp_certificate_issue_date = company._fp_get_certificate_date(
+                certificate, "not_valid_before_utc", "not_valid_before"
+            )
+            company.fp_certificate_expiration_date = company._fp_get_certificate_date(
+                certificate, "not_valid_after_utc", "not_valid_after"
+            )
             company.fp_certificate_issuer = company._extract_name_attribute(certificate.issuer, "commonName") or str(certificate.issuer.rfc4514_string())
             company.fp_certificate_serial_number = str(certificate.serial_number)
             company.fp_certificate_version = f"Version.v{certificate.version.value}"

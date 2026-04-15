@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <template id="report_invoice_document_fp_template_router" inherit_id="account_accountant.report_invoice_document">
+    <template id="report_invoice_document_fp_template_router" inherit_id="account.report_invoice_document">
         <xpath expr="//t[@t-call='web.external_layout']" position="before">
             <t t-if="o.company_id.fp_invoice_template_style and o.company_id.fp_invoice_template_style != 'standard'">
                 <t t-call="l10n_cr_einvoice.report_invoice_document_fp_custom"/>
             </t>
         </xpath>
         <xpath expr="//t[@t-call='web.external_layout']" position="attributes">
-            <attribute name="t-if">not (o.company_id.fp_invoice_template_style and o.company_id.fp_invoice_template_style != 'standard')</attribute>
+            <attribute name="t-if" add="not (o.company_id.fp_invoice_template_style and o.company_id.fp_invoice_template_style != 'standard')" separator=" and "/>
         </xpath>
     </template>
 
@@ -363,7 +363,7 @@
                                             <td><span class="fp-cr-label">Observation:</span> <span t-esc="(o.narration or '-')[:80]"/></td>
                                         </tr>
                                         <tr>
-                                            <td><span class="fp-cr-label">Amount in words:</span> <span t-esc="o.amount_total_words or '-'"/></td>
+                                            <td><span class="fp-cr-label">Amount in words:</span> <span t-esc="o.fp_amount_in_words or '-'"/></td>
                                         </tr>
                                         <t t-if="fp_tax_rate_breakdown">
                                             <tr>
@@ -737,7 +737,7 @@
                             <div class="fp-ref-data-row"><span class="fp-ref-label">Reference:</span> <span t-esc="fp_reference_value"/></div>
                             <div class="fp-ref-data-row"><span class="fp-ref-label">Internal #:</span> <span t-esc="o.name or '-'"/></div>
                             <div class="fp-ref-data-row"><span class="fp-ref-label">Observation:</span> <span t-esc="(o.narration or '-')[:80]"/></div>
-                            <div class="fp-ref-data-row"><span class="fp-ref-label">Amount in words:</span> <span t-esc="o.amount_total_words or '-'"/></div>
+                            <div class="fp-ref-data-row"><span class="fp-ref-label">Amount in words:</span> <span t-esc="o.fp_amount_in_words or '-'"/></div>
                         </div>
                     </div>
                     <!-- Tax Rate Breakdown -->

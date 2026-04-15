@@ -93,7 +93,7 @@ class CrfpShipment(models.Model):
     document_ids = fields.One2many('crfp.shipment.document', 'shipment_id', string='Documents')
     checklist_ids = fields.One2many('crfp.shipment.checklist', 'shipment_id', string='Checklist')
     alert_ids = fields.One2many('crfp.shipment.alert', 'shipment_id', string='Alerts')
-    log_ids = fields.One2many('crfp.shipment.log', 'shipment_id', string='Communication Log')
+    # log_ids removed (PL-05) — redundant with mail.thread chatter
     tracking_event_ids = fields.One2many('crfp.tracking.event', 'shipment_id', string='Tracking Events')
 
     # Container number (from first container for easy list display)
@@ -282,12 +282,38 @@ class CrfpShipment(models.Model):
         self._create_lines_from_so_and_quotation(None)
 
     def _create_lines_from_so_and_quotation(self, quotation=None):
-        """Create shipment lines from SO, using quotation data when available."""
+        """Create shipment lines from SO.
+        Priority: 1) confirmed container_config, 2) quotation line, 3) product defaults.
+        """
         self.ensure_one()
         if not self.sale_order_id:
             return
 
-        # Build a map of quotation lines by crfp_product_id for fast lookup
+        # ── Priority 1: Confirmed container config on SO ──
+        cc = self.env['crfp.container.config'].search([
+            ('sale_order_id', '=', self.sale_order_id.id),
+            ('state', '=', 'confirmed'),
+        ], order='date desc', limit=1)
+
+        # Build map: product.product.id → config data
+        cc_map = {}
+        if cc:
+            # Always set _fallback from header fields (works for single AND mixed)
+            cc_map['_fallback'] = {
+                'bpp': cc.boxes_per_pallet or 66,
+                'net_kg': cc.net_weight_per_box_kg or 0,
+                'gross_kg': cc.gross_weight_per_box_kg or 0,
+            }
+            if cc.is_mixed and cc.product_line_ids:
+                for cl in cc.product_line_ids:
+                    if cl.product_id:
+                        cc_map[cl.product_id.id] = {
+                            'bpp': cl.boxes_per_pallet or 66,
+                            'net_kg': cl.net_weight_per_box_kg or 0,
+                            'gross_kg': cl.gross_weight_per_box_kg or 0,
+                        }
+
+        # ── Priority 2: Quotation lines by crfp_product_id ──
         q_lines_map = {}
         if quotation:
             for ql in quotation.line_ids:
@@ -307,16 +333,24 @@ class CrfpShipment(models.Model):
                 ('product_id', '=', sol.product_id.id)
             ], limit=1)
 
-            # Try to get data from quotation line (most accurate)
+            # ── Resolve weights and bpp by priority ──
+            cc_data = cc_map.get(sol.product_id.id) or cc_map.get('_fallback')
             q_line = q_lines_map.get(crfp_prod.id) if crfp_prod else None
 
-            if q_line:
-                # Use quotation line data (preserves exact user input)
+            if cc_data:
+                # Priority 1: Container Config (user explicitly planned this)
+                net_kg = cc_data['net_kg']
+                gross_kg = cc_data['gross_kg']
+                bpp = cc_data['bpp']
+            elif q_line:
+                # Priority 2: Quotation line data
                 net_kg = q_line.net_kg or (crfp_prod.net_kg if crfp_prod else 0)
+                gross_kg = 0  # will be calculated below
                 bpp = q_line.boxes_per_pallet or 66
             else:
-                # Fallback: lookup from product and pallet config
+                # Priority 3: Product defaults + pallet config
                 net_kg = crfp_prod.net_kg if crfp_prod else 0
+                gross_kg = 0
                 bpp = 66
                 if crfp_prod:
                     pallet_cfg = self.env['crfp.pallet.config'].search([
@@ -325,7 +359,14 @@ class CrfpShipment(models.Model):
                     if pallet_cfg:
                         bpp = pallet_cfg.boxes_per_pallet
 
+            # Calculate gross if not set by container config (5% tare — shipping line standard)
+            if not gross_kg and net_kg:
+                gross_kg = net_kg * 1.05
+
             pallets_planned = math.ceil(boxes_planned / bpp) if bpp else 0
+
+            net_planned = boxes_planned * net_kg
+            gross_planned = boxes_planned * gross_kg
 
             self.env['crfp.shipment.line'].create({
                 'shipment_id': self.id,
@@ -336,8 +377,11 @@ class CrfpShipment(models.Model):
                 'boxes_planned': boxes_planned,
                 'pallets_planned': pallets_planned,
                 'boxes_per_pallet_planned': bpp,
-                'net_weight_planned': boxes_planned * net_kg,
-                'gross_weight_planned': boxes_planned * net_kg * 1.05,
+                'net_weight_planned': net_planned,
+                'gross_weight_planned': gross_planned,
+                # Pre-fill actual with planned as starting point
+                'net_weight_actual': net_planned,
+                'gross_weight_actual': gross_planned,
                 'price_unit_planned': sol.price_unit,
                 'temperature_set': self.temperature_set or 0,
             })

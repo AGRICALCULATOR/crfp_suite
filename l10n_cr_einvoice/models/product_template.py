@@ -15,7 +15,7 @@ class ProductTemplate(models.Model):
         help="Código CABYS del producto para facturación electrónica.",
     )
     fp_cabys_code = fields.Char(
-        string="Código CABYS",
+        string="CABYS",
         related="fp_cabys_code_id.code",
         store=True,
         readonly=True,
