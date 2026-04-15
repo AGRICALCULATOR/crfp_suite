@@ -108,5 +108,6 @@ class CrfpShipmentDocument(models.Model):
                     ship.name, self.reference or ''),
                 'default_attachment_ids': attachment_ids,
                 'default_composition_mode': 'comment',
+                'default_email_from': 'logistics@crfarmexport.com',
             },
         }

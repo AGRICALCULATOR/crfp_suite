@@ -744,6 +744,7 @@ class CrfpShipment(models.Model):
                 'default_subject': 'Booking Request - %s - %s' % (self.name, self.port_destination_id.name or ''),
                 'default_body': body,
                 'default_composition_mode': 'comment',
+                'default_email_from': 'logistics@crfarmexport.com',
             },
         }
 
@@ -800,6 +801,7 @@ class CrfpShipment(models.Model):
                 'default_subject': 'Shipping Instructions - %s - %s' % (self.name, booking_ref),
                 'default_body': body,
                 'default_composition_mode': 'comment',
+                'default_email_from': 'logistics@crfarmexport.com',
             },
         }
 
@@ -818,6 +820,7 @@ class CrfpShipment(models.Model):
                 'default_subject': '%s - Carrier Document' % self.name,
                 'default_body': '<p>Please find attached the requested document.</p>',
                 'default_composition_mode': 'comment',
+                'default_email_from': 'logistics@crfarmexport.com',
             },
         }
 
@@ -874,6 +877,7 @@ class CrfpShipment(models.Model):
                 'default_body': body,
                 'default_attachment_ids': all_attachment_ids,
                 'default_composition_mode': 'comment',
+                'default_email_from': 'logistics@crfarmexport.com',
             },
         }
 
