@@ -70,8 +70,8 @@
     align-items:center; gap:5px; font-size:13px; transition:.2s; }
 .crfp-list-btn:hover { background:white; }
 .crfp-btn-new { background:var(--crfp-dark); color:white; }
-.crfp-modified-badge { background:var(--crfp-warn); color:white; border-radius:10px;
-    padding:4px 10px; font-size:14px; font-weight:700; }
+.crfp-btn-refresh { background:#e67e22; color:white; font-weight:700; }
+.crfp-btn-refresh:hover { background:#d35400; color:white; }
 
 /* ─── LAYOUT ─── */
 .crfp-calc-layout { display:grid; grid-template-columns:360px 1fr; flex:1; }
