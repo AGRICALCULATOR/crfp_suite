@@ -1,0 +1,41 @@
+name: Auto-bump submodule in odoo-crfarm
+
+on:
+  push:
+    branches:
+      - main
+      - staging-test-modules
+      - production
+
+jobs:
+  bump-submodule:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Determine target branch
+        id: branch
+        run: echo "branch=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout odoo-crfarm
+        uses: actions/checkout@v4
+        with:
+          repository: AGRICALCULATOR/odoo-crfarm
+          ref: ${{ steps.branch.outputs.branch }}
+          token: ${{ secrets.PAT_TOKEN }}
+          submodules: true
+
+      - name: Update crfp_suite submodule to latest
+        run: |
+          cd crfp_suite
+          git fetch origin ${{ steps.branch.outputs.branch }}
+          git checkout ${{ steps.branch.outputs.branch }}
+          git pull origin ${{ steps.branch.outputs.branch }}
+          cd ..
+          git config user.name "AGRICALCULATOR"
+          git config user.email "noreply@agricalculator.com"
+          git add crfp_suite
+          if git diff --cached --quiet; then
+            echo "No submodule changes to commit"
+          else
+            git commit -m "chore: auto-bump crfp_suite — ${{ github.event.head_commit.message }}"
+            git push origin ${{ steps.branch.outputs.branch }}
+          fi
