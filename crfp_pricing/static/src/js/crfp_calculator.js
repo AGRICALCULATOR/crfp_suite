@@ -229,6 +229,54 @@ export class CrfpCalculator extends Component {
         this.initLines(); this.recalcAll(); this.state.modified = false;
     }
 
+    async refreshQuotation() {
+        if (!this.state.quotationId) {
+            this.notification.add("Load a quotation first", { type: "warning" });
+            return;
+        }
+        // 1. Reload master data to get latest exchange rate & product prices
+        await this.loadMasterData();
+        const currentRate = this.state.exchangeRate;
+        const masterProducts = this.state.products;
+
+        // 2. Reload the original quotation (restores incoterm, port, freight, etc.)
+        await this.loadQuotation(this.state.quotationId);
+
+        // 3. Override exchange rate with today's rate
+        this.state.exchangeRate = currentRate;
+
+        // 4. Override raw material prices with current master prices
+        for (const line of this.state.lines) {
+            const master = masterProducts.find(p => p.id === line.crfp_product_id);
+            if (master) {
+                line.raw_price_crc = master.raw_price_crc;
+            }
+        }
+
+        // 5. Recalculate everything with updated values
+        this.recalcAll();
+
+        // 6. Detach from original — this becomes a NEW quotation
+        const weekNum = this._getCurrentWeek();
+        const baseName = this.state.quotationName.replace(/\s*WEEK\s*\d+/i, '').trim();
+        this.state.quotationName = `${baseName} WEEK ${weekNum}`;
+        this.state.quotationId = null;
+        this.state.modified = true;
+
+        this.notification.add(
+            `Updated to today's rate (${currentRate}) and current prices. Save as new quotation.`,
+            { type: "success" }
+        );
+    }
+
+    _getCurrentWeek() {
+        const now = new Date();
+        const start = new Date(now.getFullYear(), 0, 1);
+        const diff = now - start;
+        const oneWeek = 604800000;
+        return Math.ceil((diff / oneWeek) + 1);
+    }
+
     openQuotationForm(qId) {
         this.action.doAction({
             type: 'ir.actions.act_window', res_model: 'crfp.quotation',

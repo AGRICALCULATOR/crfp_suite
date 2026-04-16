@@ -46,10 +46,12 @@
                         </div>
                         <div class="crfp-list-mgr">
                             <input type="text" t-att-value="state.quotationName" placeholder="Quotation Name" t-on-change="onQuotationNameChange"/>
-                            <button class="crfp-list-btn" t-on-click="saveQuotation"><i class="fa fa-save"/> Save</button>
-                            <button class="crfp-list-btn crfp-btn-new" t-on-click="newQuotation"><i class="fa fa-plus"/> New</button>
+                            <button class="crfp-list-btn crfp-btn-refresh" t-if="state.quotationId" t-on-click="refreshQuotation" title="Duplicate quotation with today's exchange rate and current raw material prices">
+                                <i class="fa fa-sync-alt"/> Actualizar
+                            </button>
+                            <button class="crfp-list-btn" t-on-click="saveQuotation"><i class="fa fa-save"/> Guardar</button>
+                            <button class="crfp-list-btn crfp-btn-new" t-on-click="newQuotation"><i class="fa fa-plus"/> Nuevo</button>
                         </div>
-                        <span class="crfp-modified-badge" t-if="state.modified"><i class="fa fa-exclamation-circle"/> Modified</span>
                     </div>
                 </header>
 
@@ -293,10 +295,10 @@
 
                 <!-- ═══ BOTTOM ACTIONS ═══ -->
                 <div class="crfp-actions">
-                    <button class="crfp-btn crfp-btn-calc" t-on-click="recalcAll"><i class="fa fa-sync-alt"/> Recalculate All</button>
-                    <button class="crfp-btn crfp-btn-save" t-on-click="saveQuotation"><i class="fa fa-save"/> Save Quotation</button>
+                    <button class="crfp-btn crfp-btn-calc" t-on-click="recalcAll"><i class="fa fa-sync-alt"/> Recalcular</button>
+                    <button class="crfp-btn crfp-btn-save" t-on-click="saveQuotation"><i class="fa fa-save"/> Guardar Cotización</button>
                     <button class="crfp-btn crfp-btn-open" t-if="state.quotationId" t-on-click="() => this.openQuotationForm()">
-                        <i class="fa fa-file-alt"/> Open Quotation
+                        <i class="fa fa-file-alt"/> Abrir Cotización
                     </button>
                 </div>
             </t>
