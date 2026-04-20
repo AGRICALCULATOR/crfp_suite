@@ -1,73 +1,85 @@
-import logging
+from markupsafe import Markup, escape
 
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
-_logger = logging.getLogger(__name__)
-
 
 class StatementSendWizard(models.TransientModel):
     _name = "statement.send.wizard"
-    _description = "Enviar estado de cuenta por correo"
+    _description = "Enviar estado de cuenta"
 
-    partner_id = fields.Many2one("res.partner", required=True, string="Cliente")
+    partner_id = fields.Many2one("res.partner", required=True)
     email_to = fields.Char(string="Para")
     email_cc = fields.Char(string="CC")
-    subject = fields.Char(string="Asunto")
-    body = fields.Html(string="Contenido", sanitize=False)
+    subject = fields.Char(required=True)
+    body = fields.Html(string="Contenido", sanitize_style=True)
 
     @api.model
     def default_get(self, fields_list):
         values = super().default_get(fields_list)
-        partner_id = values.get("partner_id") or self.env.context.get("default_partner_id")
-        if partner_id:
-            partner = self.env["res.partner"].browse(partner_id)
-            target = partner._get_statement_target_emails() if partner else {}
-            values.setdefault("partner_id", partner_id)
-            values.setdefault("email_to", target.get("email_to") or partner.email or "")
-            values.setdefault("email_cc", target.get("email_cc") or "")
+        partner = self.env["res.partner"].browse(values.get("partner_id") or self.env.context.get("default_partner_id"))
+        if partner:
+            targets = partner._get_statement_target_emails()
+            values.setdefault("email_to", targets["email_to"])
+            values.setdefault("email_cc", targets["email_cc"])
+            values.setdefault("subject", _("Estado de cuenta - %(partner)s") % {"partner": partner.name})
             values.setdefault(
-                "subject",
-                _("Estado de cuenta - %(partner)s") % {"partner": partner.display_name or ""},
+                "body",
+                _(
+                    """
+                    <p>Dear Sir or Madam, %(partner)s,</p>
+                    <p>Please find attached your account statement. If you have any questions, please do not hesitate to contact us.</p>
+                    <p>Best regards.</p>
+                    """
+                )
+                % {"partner": partner.name},
             )
-            values.setdefault("body", self._default_body(partner))
         return values
 
-    def _default_body(self, partner):
-        company = self.env.company
-        return _(
-            "<p>Estimado(a) %(partner)s,</p>"
-            "<p>Adjunto encontrará el estado de cuenta actualizado con %(company)s.</p>"
-            "<p>Si ya realizó el pago, por favor omita este aviso. "
-            "Para cualquier consulta, estamos a su disposición.</p>"
-            "<p>Saludos cordiales,<br/>%(company)s</p>"
-        ) % {"partner": partner.display_name or "", "company": company.name or ""}
 
-    def action_send(self):
+    def _validate_target_emails(self):
         self.ensure_one()
-        partner = self.partner_id
-        if not self.email_to:
-            raise UserError(
-                _('El contacto no tiene configurado un correo en "Correo para estados de cuenta".')
-            )
+        targets = self.partner_id._get_statement_target_emails()
+        if not targets["email_to"]:
+            raise UserError(_('El contacto no tiene configurado un correo en "Correo para estados de cuenta".'))
 
-        attachment = partner._render_statement_report_pdf()
-        mail_values = {
-            "subject": self.subject or _("Estado de cuenta - %(partner)s") % {"partner": partner.display_name},
-            "body_html": self.body or "",
-            "email_to": self.email_to,
-            "email_cc": self.email_cc or False,
-            "attachment_ids": [(6, 0, [attachment.id])],
-            "auto_delete": True,
-        }
-        mail = self.env["mail.mail"].create(mail_values)
+    def action_send_statement(self):
+        self.ensure_one()
+        self._validate_target_emails()
+        targets = self.partner_id._get_statement_target_emails()
+        attachment = self.partner_id._render_statement_report_pdf()
+        mail = self.env["mail.mail"].create(
+            {
+                "subject": self.subject,
+                "body_html": self.body or "",
+                "email_to": targets["email_to"],
+                "email_cc": targets["email_cc"],
+                "attachment_ids": [(4, attachment.id)],
+                "auto_delete": False,
+            }
+        )
         mail.send()
-
-        partner.message_post(
-            body=_("Se envió un estado de cuenta por correo electrónico.")
-            + _("<br/><strong>Para:</strong> ") + (self.email_to or "")
-            + (_("<br/><strong>CC:</strong> ") + self.email_cc if self.email_cc else "")
-            + _("<br/><strong>Asunto:</strong> ") + (self.subject or ""),
+        chatter_body = Markup(
+            "<p>%s</p>"
+            "<ul>"
+            "<li><strong>%s</strong> %s</li>"
+            "<li><strong>%s</strong> %s</li>"
+            "<li><strong>%s</strong> %s</li>"
+            "</ul>"
+        ) % (
+            escape(_("Se envió un estado de cuenta por correo electrónico.")),
+            escape(_("Para:")),
+            escape(targets["email_to"] or "-"),
+            escape(_("CC:")),
+            escape(targets["email_cc"] or "-"),
+            escape(_("Asunto:")),
+            escape(self.subject or "-"),
+        )
+        self.partner_id.message_post(
+            body=chatter_body,
+            body_is_html=True,
             attachment_ids=[attachment.id],
+            message_type="comment",
+            subtype_xmlid="mail.mt_note",
         )
         return {"type": "ir.actions.act_window_close"}
