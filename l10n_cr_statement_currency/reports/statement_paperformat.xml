@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <!--
-        Matches Odoo's base 'European' paperformat values exactly so the
-        Folder header renders with the same compact logo + company block
-        that the 'Vista previa del reporte externo' preview shows. Previous
-        values (40/32/35) were stretching the header to 4cm tall because
-        the Folder template fills the reserved margin_top space.
+        Body-only layout: no reliance on web.external_layout, so margins
+        go back to narrow values and no header_spacing is reserved. The
+        template draws its own compact company block at the top of each
+        page.
     -->
     <record id="paperformat_statement" model="report.paperformat">
         <field name="name">Estado de cuenta - Carta</field>
@@ -14,12 +13,12 @@
         <field name="page_height">0</field>
         <field name="page_width">0</field>
         <field name="orientation">Portrait</field>
-        <field name="margin_top">40</field>
-        <field name="margin_bottom">20</field>
-        <field name="margin_left">3</field>
-        <field name="margin_right">3</field>
+        <field name="margin_top">10</field>
+        <field name="margin_bottom">10</field>
+        <field name="margin_left">10</field>
+        <field name="margin_right">10</field>
         <field name="header_line" eval="False"/>
-        <field name="header_spacing">10</field>
+        <field name="header_spacing">0</field>
         <field name="dpi">90</field>
     </record>
 </odoo>

@@ -2,32 +2,72 @@
 <odoo>
 
     <!--
-        Body-only template. The outer "web.external_layout" call wraps this
-        content with whatever corporate layout the company has selected in
-        Settings → Document Layout (Folder / Boxed / Bold / ...). That way
-        the statement PDF matches every other document (invoice, SO, etc.)
-        — same header, logo, company block and footer — instead of fighting
-        Odoo's layout engine with a hand-rolled header.
+        Self-contained layout: we draw the company block ourselves at the
+        top of each page instead of relying on web.external_layout (Folder
+        header overlapped the body in Odoo 19).
+
+        Brand colors come from res.company.primary_color / secondary_color:
+        green #079000 and gold #af8624. Body text is black — green/gold
+        only on titles, totals and structural borders.
     -->
+    <template id="statement_layout">
+        <t t-call="web.html_container">
+            <t t-set="company" t-value="company or env.company"/>
+            <div class="article">
+                <t t-out="0"/>
+            </div>
+        </t>
+    </template>
+
     <template id="statement_document">
         <t t-set="company" t-value="data.get('company') or env.company"/>
         <t t-set="currencies" t-value="data.get('by_currency') or []"/>
         <t t-set="summary" t-value="data.get('currency_summary') or []"/>
         <t t-set="cutoff_date" t-value="data.get('cutoff_date')"/>
-        <t t-set="o" t-value="partner"/>
 
-        <t t-call="web.external_layout">
-            <div class="page o_statement_pdf" style="color: #212529; font-size: 10.5px;">
+        <t t-call="l10n_cr_statement_currency.statement_layout">
+            <div class="page" style="color: #212529; font-size: 10.5px; font-family: 'Lato', sans-serif;">
+
+                <div style="display: table; width: 100%; margin-bottom: 10px;">
+                    <div style="display: table-cell; vertical-align: middle; width: 35%;">
+                        <img t-if="company.logo"
+                             t-att-src="image_data_uri(company.logo)"
+                             alt="Logo"
+                             style="max-height: 60px; max-width: 220px; object-fit: contain;"/>
+                    </div>
+                    <div style="display: table-cell; vertical-align: middle; width: 65%; text-align: right; font-size: 9.5px; line-height: 1.35; color: #212529;">
+                        <div style="font-size: 13px; font-weight: 700; color: #212529;" t-field="company.name"/>
+                        <div>
+                            <span t-if="company.street" t-field="company.street"/>
+                            <span t-if="company.street2">, <span t-field="company.street2"/></span>
+                        </div>
+                        <div>
+                            <span t-if="company.city" t-field="company.city"/>
+                            <span t-if="company.state_id">, <span t-field="company.state_id.name"/></span>
+                            <span t-if="company.country_id"> - <span t-field="company.country_id.name"/></span>
+                        </div>
+                        <div>
+                            <span t-if="company.vat">Ced.: <span t-field="company.vat"/></span>
+                            <span t-if="company.vat and company.phone"> | </span>
+                            <span t-if="company.phone" t-field="company.phone"/>
+                        </div>
+                        <div t-if="company.email">
+                            <span t-field="company.email"/>
+                        </div>
+                    </div>
+                </div>
+
+                <hr style="border: 0; border-top: 3px solid #079000; margin: 0 0 12px 0;"/>
 
                 <div class="o_statement_title mb-3 text-center">
                     <h2 class="mb-0" style="font-size: 22px; font-weight: 700; letter-spacing: 0.06em; color: #079000;">ESTADO DE CUENTA</h2>
-                    <div class="text-muted small" style="color: #6c757d;">
+                    <div class="small" style="color: #6c757d;">
                         Fecha de corte:
                         <strong style="color: #212529;"><span t-esc="cutoff_date" t-options='{"widget": "date"}'/></strong>
                     </div>
                 </div>
 
-                <div class="o_statement_partner_box mb-3"
+                <div class="mb-3"
                      style="border: 1px solid #dee2e6; border-left: 3px solid #079000; border-radius: 3px; padding: 10px 14px; background-color: #f8f9fa;">
                     <div class="small text-uppercase" style="color: #6c757d; letter-spacing: 0.06em;">Cliente</div>
                     <div class="row">
@@ -47,17 +87,13 @@
                                 <span style="color: #6c757d;">Ced./ID:</span>
                                 <span t-field="partner.vat"/>
                             </div>
-                            <div t-if="partner.email">
-                                <span t-field="partner.email"/>
-                            </div>
-                            <div t-if="partner.phone">
-                                <span t-field="partner.phone"/>
-                            </div>
+                            <div t-if="partner.email"><span t-field="partner.email"/></div>
+                            <div t-if="partner.phone"><span t-field="partner.phone"/></div>
                         </div>
                     </div>
                 </div>
 
-                <div t-if="summary" class="o_statement_summary mb-4">
+                <div t-if="summary" class="mb-4">
                     <table class="table table-sm table-borderless mb-0" style="font-size: 10.5px;">
                         <thead>
                             <tr>
@@ -89,8 +125,7 @@
                 </t>
 
                 <t t-foreach="currencies" t-as="cur">
-                    <div class="o_statement_currency_block"
-                         style="page-break-inside: avoid; border: 1px solid #dee2e6; border-radius: 4px; padding: 12px 14px; margin-top: 14px; background-color: #ffffff; color: #212529;">
+                    <div style="page-break-inside: avoid; border: 1px solid #dee2e6; border-radius: 4px; padding: 12px 14px; margin-top: 14px; background-color: #ffffff; color: #212529;">
                         <div style="border-bottom: 2px solid #079000; padding-bottom: 4px; margin-bottom: 8px; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #079000;">
                             Movimientos en <span t-esc="cur['currency_name']"/>
                         </div>
@@ -196,7 +231,7 @@
                     </div>
                 </t>
 
-                <div class="o_statement_footer mt-4" style="border-top: 1px solid #dee2e6; padding-top: 10px; margin-top: 24px; color: #212529;">
+                <div class="mt-4" style="border-top: 1px solid #dee2e6; padding-top: 10px; margin-top: 24px; color: #212529;">
                     <div t-if="company.partner_id.bank_ids" class="mb-2">
                         <strong class="small text-uppercase" style="color: #079000; letter-spacing: 0.04em;">Datos para pago</strong>
                         <ul class="list-unstyled small mb-0" style="color: #212529;">
