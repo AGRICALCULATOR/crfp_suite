@@ -14,7 +14,7 @@ Estado de cuenta por cobrar en moneda original (Odoo 19)
     * Saldos netos por moneda
 - Envío por correo desde la ficha del contacto con plantilla editable.
 """,
-    "version": "19.0.2.0.0",
+    "version": "19.0.2.1.0",
     "category": "Accounting/Accounting",
     "license": "LGPL-3",
     "author": "FenixCR Solutions",

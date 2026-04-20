@@ -58,22 +58,62 @@ def _find_partner_reports_menu(env):
     )
 
 
+FOLLOWUP_TEMPLATE_NAMES = (
+    "Payment Reminder",
+    "Second reminder followup",
+    "Customer Statement",
+)
+
+
+def _attach_statement_pdf_to_followup_templates(env):
+    """Attach the statement PDF to every follow-up mail template.
+
+    CR Farm wants the HTML body of each follow-up (which renders the aging
+    table inline) to go out *with* the branded statement PDF attached.
+    The templates were created in the UI so they don't have stable xmlids;
+    we find them by (1) the ones linked to a followup line and (2) by name
+    for the classic set. Idempotent: won't duplicate the attachment.
+    """
+    report = env.ref(
+        "l10n_cr_statement_currency.action_partner_statement_pdf",
+        raise_if_not_found=False,
+    )
+    if not report:
+        return
+
+    followup_template_ids = env["account_followup.followup.line"].search([]).mapped(
+        "mail_template_id.id"
+    )
+    by_name = env["mail.template"].search(
+        [("model", "=", "res.partner"),
+         ("name", "in", list(FOLLOWUP_TEMPLATE_NAMES))]
+    )
+    templates = env["mail.template"].browse(followup_template_ids) | by_name
+    for template in templates:
+        if report not in template.report_template_ids:
+            template.report_template_ids = [(4, report.id)]
+            _logger.info(
+                "Attached statement PDF to follow-up mail.template '%s' (id=%s)",
+                template.name, template.id,
+            )
+
+
 def post_init_hook(env):
-    """Move the statement menu under the Partner Reports sub-menu if present."""
+    """One-time setup on fresh module install."""
     statement_menu = env.ref(
         "l10n_cr_statement_currency.menu_statement_report", raise_if_not_found=False
     )
-    if not statement_menu:
-        return
+    if statement_menu:
+        partner_menu = _find_partner_reports_menu(env)
+        if partner_menu:
+            statement_menu.parent_id = partner_menu
+            _logger.info(
+                "Statement report menu placed under %s (id=%s)",
+                partner_menu.complete_name, partner_menu.id,
+            )
+        else:
+            _logger.info(
+                "Partner Reports sub-menu not found; statement report stays under the main Reports menu."
+            )
 
-    partner_menu = _find_partner_reports_menu(env)
-    if partner_menu:
-        statement_menu.parent_id = partner_menu
-        _logger.info(
-            "Statement report menu placed under %s (id=%s)",
-            partner_menu.complete_name, partner_menu.id,
-        )
-    else:
-        _logger.info(
-            "Partner Reports sub-menu not found; statement report stays under the main Reports menu."
-        )
+    _attach_statement_pdf_to_followup_templates(env)

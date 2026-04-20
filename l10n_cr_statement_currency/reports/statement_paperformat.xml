@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!--
+        Margins sized for the 'Folder' document layout header (~35mm tall).
+        Matches the values Odoo's standard invoice paperformat uses so the
+        body never collides with the header or footer.
+    -->
     <record id="paperformat_statement" model="report.paperformat">
         <field name="name">Estado de cuenta - Carta</field>
         <field name="default" eval="False"/>
@@ -7,12 +12,12 @@
         <field name="page_height">0</field>
         <field name="page_width">0</field>
         <field name="orientation">Portrait</field>
-        <field name="margin_top">10</field>
-        <field name="margin_bottom">10</field>
-        <field name="margin_left">10</field>
-        <field name="margin_right">10</field>
+        <field name="margin_top">40</field>
+        <field name="margin_bottom">32</field>
+        <field name="margin_left">7</field>
+        <field name="margin_right">7</field>
         <field name="header_line" eval="False"/>
-        <field name="header_spacing">0</field>
+        <field name="header_spacing">35</field>
         <field name="dpi">90</field>
     </record>
 </odoo>
