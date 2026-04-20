@@ -206,7 +206,72 @@ class OutstandingOriginalCurrencyReportHandler(models.AbstractModel):
                 )
 
         self._append_pending_payments_section(report, options, lines, unfolded_lines, unfold_all)
+        self._append_grand_total_section(report, options, lines, grouped_results)
         return [(0, line) for line in lines]
+
+    def _append_grand_total_section(self, report, options, lines, grouped_results):
+        """Emit a grand-total row per currency across all partners.
+
+        The user opening this report wants one number per currency: 'cuánto
+        le deben a la empresa en USD / CRC / EUR'. Per-partner subtotals
+        answer 'quién debe qué', but not 'cuál es la cartera total'.
+        """
+        totals_by_currency = {}
+        for partner_data in grouped_results.values():
+            for currency_id, currency_payload in partner_data.items():
+                if currency_id not in totals_by_currency:
+                    totals_by_currency[currency_id] = {
+                        "currency_name": currency_payload["currency_name"],
+                        "total_original": 0.0,
+                        "total_residual": 0.0,
+                    }
+                totals_by_currency[currency_id]["total_original"] += currency_payload["subtotal_original"]
+                totals_by_currency[currency_id]["total_residual"] += currency_payload["subtotal_residual"]
+
+        if not totals_by_currency:
+            return
+
+        section_line_id = report._get_generic_line_id(
+            "account.report", report.id, markup="grand_total_section"
+        )
+        lines.append(
+            {
+                "id": section_line_id,
+                "name": _("Total general por moneda"),
+                "level": 1,
+                "class": "o_statement_original_currency_section",
+                "columns": self._empty_columns(),
+            }
+        )
+
+        for currency_id, totals in sorted(
+            totals_by_currency.items(), key=lambda item: (item[1]["currency_name"] or "")
+        ):
+            currency = self.env["res.currency"].browse(currency_id)
+            lines.append(
+                {
+                    "id": report._get_generic_line_id(
+                        "res.currency", currency_id, parent_line_id=section_line_id, markup="grand_total"
+                    ),
+                    "parent_id": section_line_id,
+                    "name": _("Total %(currency)s") % {"currency": totals["currency_name"]},
+                    "level": 2,
+                    "class": "o_statement_original_currency_subtotal",
+                    "columns": [
+                        {"name": "", "expression_label": "fecha"},
+                        {"name": "", "expression_label": "fecha_vencimiento"},
+                        {"name": "", "expression_label": "dias_vencidos"},
+                        {
+                            "expression_label": "importe_original",
+                            **self._monetary_col(report, totals["total_original"], currency),
+                        },
+                        {
+                            "expression_label": "saldo",
+                            **self._monetary_col(report, totals["total_residual"], currency),
+                        },
+                    ],
+                }
+            )
 
     def _append_pending_payments_section(self, report, options, lines, unfolded_lines, unfold_all):
         grouped_pending_payments = self._get_grouped_pending_payments(options)
