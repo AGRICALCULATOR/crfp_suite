@@ -1,4 +1,7 @@
-from . import account_move
-from . import account_report
-from . import outstanding_original_currency_report
-from . import res_partner
+from odoo import fields, models
+
+
+class AccountMove(models.Model):
+    _inherit = "account.move"
+
+    fp_consecutive_number = fields.Char(string="Consecutive Number")

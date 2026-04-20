@@ -1,4 +1,7 @@
-# Translation of l10n_cr_statement_currency for English (United States).
+# Translation of l10n_cr_statement_currency for Spanish (Costa Rica).
+# Source strings are authored in Spanish (CR), so this file mostly
+# maps each msgid to itself. Override only where Costa Rica accounting
+# terminology should differ from the default.
 #
 msgid ""
 msgstr ""
@@ -7,8 +10,8 @@ msgstr ""
 "POT-Creation-Date: 2026-04-16 00:00+0000\n"
 "PO-Revision-Date: 2026-04-16 00:00+0000\n"
 "Last-Translator: FenixCR Solutions <central@fenixcrsolutions.com>\n"
-"Language-Team: English\n"
-"Language: en_US\n"
+"Language-Team: Spanish (Costa Rica)\n"
+"Language: es_CR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
@@ -21,96 +24,96 @@ msgstr ""
 #: model:account.report,name:l10n_cr_statement_currency.statement_report
 #: model:account.report.line,name:l10n_cr_statement_currency.statement_line_base
 msgid "Estado de cuenta (moneda original)"
-msgstr "Customer Statement (original currency)"
+msgstr "Estado de cuenta (moneda original)"
 
 #. module: l10n_cr_statement_currency
 #: model_terms:ir.ui.view,arch_db:l10n_cr_statement_currency.statement_document
 msgid "ESTADO DE CUENTA"
-msgstr "CUSTOMER STATEMENT"
+msgstr "ESTADO DE CUENTA"
 
 #. module: l10n_cr_statement_currency
 #: model_terms:ir.ui.view,arch_db:l10n_cr_statement_currency.statement_document
 msgid "Fecha de corte:"
-msgstr "As of date:"
+msgstr "Fecha de corte:"
 
 #. module: l10n_cr_statement_currency
 #: model_terms:ir.ui.view,arch_db:l10n_cr_statement_currency.statement_document
 msgid "Cliente"
-msgstr "Customer"
+msgstr "Cliente"
 
 #. module: l10n_cr_statement_currency
 #: model_terms:ir.ui.view,arch_db:l10n_cr_statement_currency.statement_document
 msgid "Ced./ID:"
-msgstr "Tax ID:"
+msgstr "Céd./ID:"
 
 #. module: l10n_cr_statement_currency
 #: model_terms:ir.ui.view,arch_db:l10n_cr_statement_currency.statement_document
 msgid "Moneda"
-msgstr "Currency"
+msgstr "Moneda"
 
 #. module: l10n_cr_statement_currency
 #: model_terms:ir.ui.view,arch_db:l10n_cr_statement_currency.statement_document
 msgid "Facturas pendientes"
-msgstr "Open invoices"
+msgstr "Facturas pendientes"
 
 #. module: l10n_cr_statement_currency
 #: model_terms:ir.ui.view,arch_db:l10n_cr_statement_currency.statement_document
 msgid "Pagos sin aplicar"
-msgstr "Unapplied payments"
+msgstr "Pagos sin aplicar"
 
 #. module: l10n_cr_statement_currency
 #: model_terms:ir.ui.view,arch_db:l10n_cr_statement_currency.statement_document
 msgid "Saldo neto"
-msgstr "Net balance"
+msgstr "Saldo neto"
 
 #. module: l10n_cr_statement_currency
 #: model_terms:ir.ui.view,arch_db:l10n_cr_statement_currency.statement_document
 msgid "No hay facturas pendientes ni pagos sin aplicar a la fecha de corte."
-msgstr "No open invoices or unapplied payments as of the cutoff date."
+msgstr "No hay facturas pendientes ni pagos sin aplicar a la fecha de corte."
 
 #. module: l10n_cr_statement_currency
 #: model_terms:ir.ui.view,arch_db:l10n_cr_statement_currency.statement_document
 msgid "Movimientos en"
-msgstr "Activity in"
+msgstr "Movimientos en"
 
 #. module: l10n_cr_statement_currency
 #: model_terms:ir.ui.view,arch_db:l10n_cr_statement_currency.statement_document
 msgid "Documento"
-msgstr "Document"
+msgstr "Documento"
 
 #. module: l10n_cr_statement_currency
 #: model:account.report.column,name:l10n_cr_statement_currency.statement_col_date
 #: model_terms:ir.ui.view,arch_db:l10n_cr_statement_currency.statement_document
 msgid "Fecha"
-msgstr "Date"
+msgstr "Fecha"
 
 #. module: l10n_cr_statement_currency
 #: model_terms:ir.ui.view,arch_db:l10n_cr_statement_currency.statement_document
 msgid "Vence"
-msgstr "Due"
+msgstr "Vence"
 
 #. module: l10n_cr_statement_currency
 #: model:account.report.column,name:l10n_cr_statement_currency.statement_col_due_date
 msgid "Vencimiento"
-msgstr "Due date"
+msgstr "Vencimiento"
 
 #. module: l10n_cr_statement_currency
 #: model:account.report.column,name:l10n_cr_statement_currency.statement_col_days
 #: model_terms:ir.ui.view,arch_db:l10n_cr_statement_currency.statement_document
 msgid "Días"
-msgstr "Days"
+msgstr "Días"
 
 #. module: l10n_cr_statement_currency
 #: model:account.report.column,name:l10n_cr_statement_currency.statement_col_original
 #: model_terms:ir.ui.view,arch_db:l10n_cr_statement_currency.statement_document
 msgid "Monto original"
-msgstr "Original amount"
+msgstr "Monto original"
 
 #. module: l10n_cr_statement_currency
 #: model:account.report.column,name:l10n_cr_statement_currency.statement_col_balance
 #: model_terms:ir.ui.view,arch_db:l10n_cr_statement_currency.statement_document
 msgid "Saldo"
-msgstr "Balance"
+msgstr "Saldo"
 
 #. module: l10n_cr_statement_currency
 #: model_terms:ir.ui.view,arch_db:l10n_cr_statement_currency.statement_document
@@ -120,86 +123,86 @@ msgstr "Subtotal"
 #. module: l10n_cr_statement_currency
 #: model_terms:ir.ui.view,arch_db:l10n_cr_statement_currency.statement_document
 msgid "Pagos pendientes de aplicar"
-msgstr "Unapplied payments"
+msgstr "Pagos pendientes de aplicar"
 
 #. module: l10n_cr_statement_currency
 #: model_terms:ir.ui.view,arch_db:l10n_cr_statement_currency.statement_document
 msgid "Pago"
-msgstr "Payment"
+msgstr "Pago"
 
 #. module: l10n_cr_statement_currency
 #: model_terms:ir.ui.view,arch_db:l10n_cr_statement_currency.statement_document
 msgid "Monto"
-msgstr "Amount"
+msgstr "Monto"
 
 #. module: l10n_cr_statement_currency
 #: model_terms:ir.ui.view,arch_db:l10n_cr_statement_currency.statement_document
 msgid "Disponible"
-msgstr "Available"
+msgstr "Disponible"
 
 #. module: l10n_cr_statement_currency
 #: model_terms:ir.ui.view,arch_db:l10n_cr_statement_currency.statement_document
 msgid "Subtotal pagos"
-msgstr "Payments subtotal"
+msgstr "Subtotal pagos"
 
 #. module: l10n_cr_statement_currency
 #: model_terms:ir.ui.view,arch_db:l10n_cr_statement_currency.statement_document
 msgid "Al día"
-msgstr "Current"
+msgstr "Al día"
 
 #. module: l10n_cr_statement_currency
 #: model_terms:ir.ui.view,arch_db:l10n_cr_statement_currency.statement_document
 msgid "Saldo facturas"
-msgstr "Invoices balance"
+msgstr "Saldo facturas"
 
 #. module: l10n_cr_statement_currency
 #: model_terms:ir.ui.view,arch_db:l10n_cr_statement_currency.statement_document
 msgid "Datos para pago"
-msgstr "Payment details"
+msgstr "Datos para pago"
 
 #. module: l10n_cr_statement_currency
 #: model_terms:ir.ui.view,arch_db:l10n_cr_statement_currency.statement_document
 msgid "Página"
-msgstr "Page"
+msgstr "Página"
 
 #. module: l10n_cr_statement_currency
 #: model:ir.model.fields,field_description:l10n_cr_statement_currency.field_res_partner__statement_email
 #: model:ir.model.fields,field_description:l10n_cr_statement_currency.field_res_users__statement_email
 msgid "Correo para estados de cuenta"
-msgstr "Statement email"
+msgstr "Correo para estados de cuenta"
 
 #. module: l10n_cr_statement_currency
 #: model:ir.model.fields,field_description:l10n_cr_statement_currency.field_res_partner__statement_email_cc
 #: model:ir.model.fields,field_description:l10n_cr_statement_currency.field_res_users__statement_email_cc
 msgid "CC para estados de cuenta"
-msgstr "Statement CC"
+msgstr "CC para estados de cuenta"
 
 #. module: l10n_cr_statement_currency
 #: model:ir.model,name:l10n_cr_statement_currency.model_statement_send_wizard
 #: model:ir.actions.act_window,name:l10n_cr_statement_currency.action_statement_send_wizard
 #: model_terms:ir.ui.view,arch_db:l10n_cr_statement_currency.view_statement_send_wizard_form
 msgid "Enviar estado de cuenta"
-msgstr "Send statement"
+msgstr "Enviar estado de cuenta"
 
 #. module: l10n_cr_statement_currency
 #: model_terms:ir.ui.view,arch_db:l10n_cr_statement_currency.view_partner_form_statement_email_inherit
 msgid "Estado de cuenta"
-msgstr "Statement"
+msgstr "Estado de cuenta"
 
 #. module: l10n_cr_statement_currency
 #: model_terms:ir.ui.view,arch_db:l10n_cr_statement_currency.view_partner_form_statement_email_inherit
 msgid "Imprimir estado"
-msgstr "Print statement"
+msgstr "Imprimir estado"
 
 #. module: l10n_cr_statement_currency
 #: model_terms:ir.ui.view,arch_db:l10n_cr_statement_currency.view_partner_form_statement_email_inherit
 msgid "Enviar estado"
-msgstr "Send statement"
+msgstr "Enviar estado"
 
 #. module: l10n_cr_statement_currency
 #: model:ir.model.fields,field_description:l10n_cr_statement_currency.field_statement_send_wizard__email_to
 msgid "Para"
-msgstr "To"
+msgstr "Para"
 
 #. module: l10n_cr_statement_currency
 #: model:ir.model.fields,field_description:l10n_cr_statement_currency.field_statement_send_wizard__email_cc
@@ -209,27 +212,27 @@ msgstr "CC"
 #. module: l10n_cr_statement_currency
 #: model:ir.model.fields,field_description:l10n_cr_statement_currency.field_statement_send_wizard__body
 msgid "Contenido"
-msgstr "Body"
+msgstr "Contenido"
 
 #. module: l10n_cr_statement_currency
 #: code:addons/l10n_cr_statement_currency/wizards/statement_send_wizard.py:0
 msgid "Estado de cuenta - %(partner)s"
-msgstr "Statement - %(partner)s"
+msgstr "Estado de cuenta - %(partner)s"
 
 #. module: l10n_cr_statement_currency
 #: code:addons/l10n_cr_statement_currency/wizards/statement_send_wizard.py:0
 msgid "El contacto no tiene configurado un correo en \"Correo para estados de cuenta\"."
-msgstr "The contact has no email configured in \"Statement email\"."
+msgstr "El contacto no tiene configurado un correo en \"Correo para estados de cuenta\"."
 
 #. module: l10n_cr_statement_currency
 #: code:addons/l10n_cr_statement_currency/wizards/statement_send_wizard.py:0
 msgid "Se envió un estado de cuenta por correo electrónico."
-msgstr "A statement was sent by email."
+msgstr "Se envió un estado de cuenta por correo electrónico."
 
 #. module: l10n_cr_statement_currency
 #: code:addons/l10n_cr_statement_currency/wizards/statement_send_wizard.py:0
 msgid "Para:"
-msgstr "To:"
+msgstr "Para:"
 
 #. module: l10n_cr_statement_currency
 #: code:addons/l10n_cr_statement_currency/wizards/statement_send_wizard.py:0
@@ -239,29 +242,29 @@ msgstr "CC:"
 #. module: l10n_cr_statement_currency
 #: code:addons/l10n_cr_statement_currency/wizards/statement_send_wizard.py:0
 msgid "Asunto:"
-msgstr "Subject:"
+msgstr "Asunto:"
 
 #. module: l10n_cr_statement_currency
 #: code:addons/l10n_cr_statement_currency/models/res_partner.py:0
 msgid "Estado_de_Cuenta_%(partner)s_%(date)s.pdf"
-msgstr "Statement_%(partner)s_%(date)s.pdf"
+msgstr "Estado_de_Cuenta_%(partner)s_%(date)s.pdf"
 
 #. module: l10n_cr_statement_currency
 #: code:addons/l10n_cr_statement_currency/models/res_partner.py:0
 msgid "No Partner"
-msgstr "No Partner"
+msgstr "Sin contacto"
 
 #. module: l10n_cr_statement_currency
 #: code:addons/l10n_cr_statement_currency/models/account_report.py:0
 msgid "No hay clientes con saldo pendiente para los filtros indicados."
-msgstr "There are no customers with a pending balance for the selected filters."
+msgstr "No hay clientes con saldo pendiente para los filtros indicados."
 
 #. module: l10n_cr_statement_currency
 #: code:addons/l10n_cr_statement_currency/models/account_report.py:0
 msgid "Estado de Cuenta - %(partner)s - %(date)s.pdf"
-msgstr "Statement - %(partner)s - %(date)s.pdf"
+msgstr "Estado de Cuenta - %(partner)s - %(date)s.pdf"
 
 #. module: l10n_cr_statement_currency
 #: code:addons/l10n_cr_statement_currency/models/account_report.py:0
 msgid "Estados de Cuenta - %(date)s.pdf"
-msgstr "Statements - %(date)s.pdf"
+msgstr "Estados de Cuenta - %(date)s.pdf"

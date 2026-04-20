@@ -1,75 +1,78 @@
-<?xml version="1.0" encoding="utf-8"?>
-<odoo>
-    <record id="statement_col_date" model="account.report.column">
-        <field name="name">Fecha</field>
-        <field name="expression_label">fecha</field>
-        <field name="sequence">20</field>
-    </record>
+import logging
 
-    <record id="statement_col_due_date" model="account.report.column">
-        <field name="name">Vencimiento</field>
-        <field name="expression_label">fecha_vencimiento</field>
-        <field name="sequence">30</field>
-    </record>
+_logger = logging.getLogger(__name__)
 
-    <record id="statement_col_days" model="account.report.column">
-        <field name="name">Días</field>
-        <field name="expression_label">dias_vencidos</field>
-        <field name="sequence">35</field>
-        <field name="figure_type">integer</field>
-    </record>
+PARTNER_REPORTS_CANDIDATE_XMLIDS = (
+    "account.account_reports_partners_reports_menu",
+    "account_reports.menu_partner_reports",
+    "account_reports.menu_finance_partner_reports",
+    "account_reports.account_reports_partners_menu",
+    "account_followup.customer_statements_menu",
+)
 
-    <record id="statement_col_original" model="account.report.column">
-        <field name="name">Monto original</field>
-        <field name="expression_label">importe_original</field>
-        <field name="sequence">40</field>
-        <field name="figure_type">monetary</field>
-    </record>
+PARTNER_REPORTS_CANDIDATE_NAMES = (
+    "Partner Reports",
+    "Partner reports",
+    "Informes del contacto",
+    "Reportes del contacto",
+    "Informes de contactos",
+    "Reportes de contactos",
+)
 
-    <record id="statement_col_balance" model="account.report.column">
-        <field name="name">Saldo</field>
-        <field name="expression_label">saldo</field>
-        <field name="sequence">50</field>
-        <field name="figure_type">monetary</field>
-    </record>
 
-    <record id="statement_report" model="account.report">
-        <field name="name">Estado de cuenta (moneda original)</field>
-        <field name="filter_date_range" eval="False"/>
-        <field name="filter_journals" eval="True"/>
-        <field name="filter_partner" eval="True"/>
-        <field name="filter_unfold_all" eval="True"/>
-        <field name="filter_multi_company">selector</field>
-        <field name="default_opening_date_filter">today</field>
-        <field name="load_more_limit" eval="80"/>
-        <field name="column_ids" eval="[(6, 0, [
-            ref('statement_col_date'),
-            ref('statement_col_due_date'),
-            ref('statement_col_days'),
-            ref('statement_col_original'),
-            ref('statement_col_balance')
-        ])]"/>
-        <field name="custom_handler_model_id" ref="model_account_outstanding_original_currency_report_handler"/>
-    </record>
+def _is_under_reports(menu, reports_parent):
+    """Return True if menu is a descendant of the main Reports menu."""
+    if not reports_parent:
+        return True
+    current = menu
+    while current:
+        if current.id == reports_parent.id:
+            return True
+        current = current.parent_id
+    return False
 
-    <record id="statement_line_base" model="account.report.line">
-        <field name="name">Estado de cuenta (moneda original)</field>
-        <field name="report_id" ref="statement_report"/>
-        <field name="groupby">partner_id,id</field>
-    </record>
 
-    <record id="action_statement_report" model="ir.actions.client">
-        <field name="name">Estado de cuenta (moneda original)</field>
-        <field name="tag">account_report</field>
-        <field name="context" eval="{'report_id': ref('statement_report')}"/>
-    </record>
+def _find_partner_reports_menu(env):
+    """Locate the "Partner Reports" sub-menu across Odoo editions/languages.
 
-    <menuitem
-        id="menu_statement_report"
-        name="Estado de cuenta (moneda original)"
-        parent="account.menu_finance_reports"
-        action="action_statement_report"
-        sequence="95"
-        groups="account.group_account_readonly"
-    />
-</odoo>
+    Only accept a candidate that lives under the main Accounting > Reports
+    menu, so we never move the statement entry to unrelated sections such
+    as Configuration or Follow-up levels.
+    """
+    reports_parent = env.ref("account.menu_finance_reports", raise_if_not_found=False)
+
+    for xmlid in PARTNER_REPORTS_CANDIDATE_XMLIDS:
+        menu = env.ref(xmlid, raise_if_not_found=False)
+        if menu and menu._name == "ir.ui.menu" and _is_under_reports(menu, reports_parent):
+            return menu
+
+    if not reports_parent:
+        return env["ir.ui.menu"]
+
+    return env["ir.ui.menu"].search(
+        [
+            ("name", "in", PARTNER_REPORTS_CANDIDATE_NAMES),
+            ("parent_id", "child_of", reports_parent.id),
+        ],
+        limit=1,
+    )
+
+
+def post_init_hook(env):
+    """Move the statement menu under the Partner Reports sub-menu if present."""
+    statement_menu = env.ref(
+        "l10n_cr_statement_currency.menu_statement_report", raise_if_not_found=False
+    )
+    if not statement_menu:
+        return
+
+    partner_menu = _find_partner_reports_menu(env)
+    if partner_menu:
+        statement_menu.parent_id = partner_menu
+        _logger.info(
+            "Statement report menu placed under %s (id=%s)", partner_menu.complete_name, partner_menu.id
+        )
+    else:
+        _logger.info(
+            "Partner Reports sub-menu not found; statement report stays under the main Reports menu."
+        )
