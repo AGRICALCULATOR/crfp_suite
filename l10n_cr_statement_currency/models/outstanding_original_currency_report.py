@@ -14,7 +14,10 @@ class OutstandingOriginalCurrencyReportHandler(models.AbstractModel):
     def _custom_options_initializer(self, report, options, previous_options=None):
         super()._custom_options_initializer(report, options, previous_options=previous_options)
         self._apply_context_partner_filter(options)
-        options.setdefault("unfold_all", False)
+        # Force expanded view so invoices + days-overdue column are visible on
+        # first load. Without this, partner rows arrive collapsed and the user
+        # can't see per-invoice detail until they click every triangle.
+        options["unfold_all"] = True
         self._sync_column_labels(report, options)
 
     def _sync_column_labels(self, report, options):
@@ -465,9 +468,13 @@ class OutstandingOriginalCurrencyReportHandler(models.AbstractModel):
         return delta if delta > 0 else 0
 
     def _days_col(self, value):
+        # Always render the number, including 0 (on-time invoices). The
+        # original vendor code blanked zeros, which read as 'no data' and
+        # made users think the column was broken.
+        amount = value or 0
         return {
-            "name": str(value) if value else "",
-            "no_format": value or 0,
+            "name": str(amount),
+            "no_format": amount,
             "expression_label": "dias_vencidos",
             "figure_type": "integer",
             "class": "number",
