@@ -14,7 +14,7 @@ class OutstandingOriginalCurrencyReportHandler(models.AbstractModel):
     def _custom_options_initializer(self, report, options, previous_options=None):
         super()._custom_options_initializer(report, options, previous_options=previous_options)
         self._apply_context_partner_filter(options)
-        options.setdefault("unfold_all", False)
+        options.setdefault("unfold_all", True)
         self._sync_column_labels(report, options)
 
     def _sync_column_labels(self, report, options):
