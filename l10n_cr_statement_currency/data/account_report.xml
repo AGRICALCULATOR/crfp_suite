@@ -52,12 +52,6 @@
         <field name="custom_handler_model_id" ref="model_account_outstanding_original_currency_report_handler"/>
     </record>
 
-    <record id="statement_line_base" model="account.report.line">
-        <field name="name">Estado de cuenta (moneda original)</field>
-        <field name="report_id" ref="statement_report"/>
-        <field name="groupby">partner_id,id</field>
-    </record>
-
     <record id="action_statement_report" model="ir.actions.client">
         <field name="name">Estado de cuenta (moneda original)</field>
         <field name="tag">account_report</field>
