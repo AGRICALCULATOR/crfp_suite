@@ -1,0 +1,18 @@
+// PDF-only styles injected via web.report_assets_common
+.o_statement_pdf {
+    font-size: 10.5px;
+    color: #1f2937;
+
+    h2 {
+        font-size: 20px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+    }
+
+    table { page-break-inside: auto; }
+    tr { page-break-inside: avoid; page-break-after: auto; }
+
+    .o_statement_currency_block {
+        page-break-inside: avoid;
+    }
+}

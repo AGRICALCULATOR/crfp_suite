@@ -129,10 +129,19 @@ class ResPartner(models.Model):
     _AGING_BUCKETS = ("current", "b1_30", "b31_60", "b61_90", "b90_plus")
 
     def _statement_format_amount(self, amount, currency):
+        """Format a monetary value stripping the NBSP that formatLang emits.
+
+        Some wkhtmltopdf builds (including Cloudpepper's) treat the generated
+        HTML as Latin-1 even when UTF-8 is declared, which turns the non
+        breaking space between the currency symbol and the amount into the
+        literal glyph "Â". Use a regular ASCII space instead so the output
+        is safe across rendering stacks.
+        """
         formatted = formatLang(self.env, amount or 0.0, currency_obj=currency)
         return formatted.replace("\u00a0", " ") if isinstance(formatted, str) else formatted
 
     def _prepare_statement_data(self, cutoff_date=None):
+        """Return the dict consumed by the QWeb statement template."""
         self.ensure_one()
         cutoff_date = (
             cutoff_date
