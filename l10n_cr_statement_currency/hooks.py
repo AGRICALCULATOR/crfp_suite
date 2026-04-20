@@ -70,7 +70,8 @@ def post_init_hook(env):
     if partner_menu:
         statement_menu.parent_id = partner_menu
         _logger.info(
-            "Statement report menu placed under %s (id=%s)", partner_menu.complete_name, partner_menu.id
+            "Statement report menu placed under %s (id=%s)",
+            partner_menu.complete_name, partner_menu.id,
         )
     else:
         _logger.info(
