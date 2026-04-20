@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!--
+        Minimal layout: everything flows inside the body. We skip the
+        running header/footer divs to avoid wkhtmltopdf extraction quirks
+        (visible hairlines, vertical misalignment between logo and company
+        block). Each partner owns the full company block at the top of
+        its page, so multi-partner exports still look right.
+    -->
+    <template id="statement_layout">
+        <t t-call="web.html_container">
+            <t t-set="company" t-value="company or env.company"/>
+
+            <style>
+                .o_statement_pdf { font-size: 10.5px; color: #1f2937; }
+                .o_statement_pdf h2 { font-size: 20px; font-weight: 700; letter-spacing: 0.08em; }
+                .o_statement_pdf h4 { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: #374151; border-bottom: 2px solid #374151; padding-bottom: 3px; margin-top: 14px; margin-bottom: 6px; }
+                .o_statement_pdf h5 { font-size: 11px; font-weight: 700; text-transform: uppercase; color: #6b7280; margin-top: 10px; margin-bottom: 4px; }
+                .o_statement_pdf .o_statement_partner_box {
+                    border: 1px solid #d1d5db;
+                    border-left: 3px solid #1f2937;
+                    border-radius: 3px;
+                    padding: 10px 14px;
+                    background-color: #f9fafb;
+                }
+                .o_statement_pdf .o_statement_partner_box .text-uppercase { letter-spacing: 0.06em; }
+                .o_statement_pdf .o_statement_summary_table th {
+                    background-color: #1f2937;
+                    color: #ffffff;
+                    padding: 6px 8px;
+                    letter-spacing: 0.04em;
+                }
+                .o_statement_pdf .o_statement_summary_table td {
+                    padding: 6px 8px;
+                    border-bottom: 1px solid #e5e7eb;
+                }
+                .o_statement_pdf .o_statement_table { width: 100%; margin-bottom: 4px; }
+                .o_statement_pdf .o_statement_table thead th {
+                    background-color: #f3f4f6;
+                    color: #111827;
+                    font-weight: 700;
+                    border-top: 1px solid #9ca3af;
+                    border-bottom: 1px solid #6b7280;
+                    padding: 5px 8px;
+                    font-size: 10px;
+                    letter-spacing: 0.03em;
+                    text-transform: uppercase;
+                }
+                .o_statement_pdf .o_statement_table tbody td { padding: 4px 8px; border-bottom: 1px solid #f1f5f9; }
+                .o_statement_pdf .o_statement_table tr.o_statement_subtotal td {
+                    border-top: 1px solid #9ca3af;
+                    background-color: #f9fafb;
+                    padding-top: 6px;
+                    padding-bottom: 6px;
+                }
+                .o_statement_pdf .o_statement_aging_table {
+                    width: auto;
+                    float: right;
+                    margin-top: 4px;
+                }
+                .o_statement_pdf .o_statement_aging_table thead th {
+                    background-color: #eef2f7;
+                    color: #1f2937;
+                    font-weight: 700;
+                    text-transform: uppercase;
+                    font-size: 9.5px;
+                    letter-spacing: 0.03em;
+                    padding: 4px 10px;
+                }
+                .o_statement_pdf .o_statement_aging_table tbody td { padding: 4px 10px; border-bottom: 1px solid #e5e7eb; }
+                .o_statement_pdf td.text-end,
+                .o_statement_pdf th.text-end { white-space: nowrap; }
+                .o_statement_pdf .o_statement_net {
+                    clear: both;
+                    font-size: 11.5px;
+                    border-top: 1px solid #d1d5db;
+                    padding-top: 6px;
+                    margin-top: 8px;
+                }
+                .o_statement_pdf .o_statement_currency_block { page-break-inside: avoid; }
+                .o_statement_pdf .o_statement_footer {
+                    border-top: 1px solid #d1d5db;
+                    padding-top: 10px;
+                    margin-top: 24px;
+                }
+            </style>
+
+            <div class="article">
+                <t t-out="0"/>
+            </div>
+        </t>
+    </template>
+
+    <template id="statement_document">
+        <t t-set="company" t-value="data.get('company') or env.company"/>
+        <t t-set="currencies" t-value="data.get('by_currency') or []"/>
+        <t t-set="summary" t-value="data.get('currency_summary') or []"/>
+        <t t-set="cutoff_date" t-value="data.get('cutoff_date')"/>
+
+        <t t-call="l10n_cr_statement_currency.statement_layout">
+            <div class="page o_statement_pdf">
+
+                <div style="display: table; width: 100%; margin-bottom: 8px;">
+                    <div style="display: table-cell; vertical-align: middle; width: 35%;">
+                        <img t-if="company.logo"
+                             t-att-src="image_data_uri(company.logo)"
+                             alt="Logo"
+                             style="max-height: 55px; max-width: 200px; object-fit: contain;"/>
+                    </div>
+                    <div style="display: table-cell; vertical-align: middle; width: 65%; text-align: right; font-size: 10px; line-height: 1.3; color: #374151;">
+                        <div style="font-size: 13px; font-weight: 700; color: #111827;" t-field="company.name"/>
+                        <div>
+                            <span t-if="company.street" t-field="company.street"/>
+                            <span t-if="company.street2">, <span t-field="company.street2"/></span>
+                        </div>
+                        <div>
+                            <span t-if="company.city" t-field="company.city"/>
+                            <span t-if="company.state_id">, <span t-field="company.state_id.name"/></span>
+                            <span t-if="company.country_id"> - <span t-field="company.country_id.name"/></span>
+                        </div>
+                        <div>
+                            <span t-if="company.vat">Ced.: <span t-field="company.vat"/></span>
+                            <span t-if="company.vat and company.phone"> | </span>
+                            <span t-if="company.phone" t-field="company.phone"/>
+                            <span t-if="(company.vat or company.phone) and company.email"> | </span>
+                            <span t-if="company.email" t-field="company.email"/>
+                        </div>
+                    </div>
+                </div>
+
+                <hr style="border: 0; border-top: 2px solid #1f2937; margin: 0 0 10px 0;"/>
+
+                <div class="o_statement_title mb-3 text-center">
+                    <h2 class="mb-0">ESTADO DE CUENTA</h2>
+                    <div class="text-muted small">
+                        Fecha de corte:
+                        <strong><span t-esc="cutoff_date" t-options='{"widget": "date"}'/></strong>
+                    </div>
+                </div>
+
+                <div class="o_statement_partner_box mb-3">
+                    <div class="small text-uppercase text-muted">Cliente</div>
+                    <div class="row">
+                        <div class="col-7">
+                            <div><strong t-field="partner.name"/></div>
+                            <div t-if="partner.street" class="small" t-field="partner.street"/>
+                            <div t-if="partner.street2" class="small" t-field="partner.street2"/>
+                            <div class="small">
+                                <span t-if="partner.city" t-field="partner.city"/>
+                                <span t-if="partner.state_id">, <span t-field="partner.state_id.name"/></span>
+                                <span t-if="partner.zip"> <span t-field="partner.zip"/></span>
+                            </div>
+                            <div t-if="partner.country_id" class="small" t-field="partner.country_id.name"/>
+                        </div>
+                        <div class="col-5 small">
+                            <div t-if="partner.vat">
+                                <span class="text-muted">Ced./ID:</span>
+                                <span t-field="partner.vat"/>
+                            </div>
+                            <div t-if="partner.email">
+                                <span t-field="partner.email"/>
+                            </div>
+                            <div t-if="partner.phone">
+                                <span t-field="partner.phone"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div t-if="summary" class="o_statement_summary mb-4">
+                    <table class="table table-sm table-borderless o_statement_summary_table mb-0">
+                        <thead>
+                            <tr>
+                                <th class="text-uppercase small">Moneda</th>
+                                <th class="text-end text-uppercase small">Facturas pendientes</th>
+                                <th class="text-end text-uppercase small">Pagos sin aplicar</th>
+                                <th class="text-end text-uppercase small">Saldo neto</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="summary" t-as="row">
+                                <td><strong t-esc="row['currency_name']"/></td>
+                                <td class="text-end" t-esc="row['invoices_balance_formatted']"/>
+                                <td class="text-end" t-esc="row['pending_balance_formatted']"/>
+                                <td class="text-end"><strong t-esc="row['net_balance_formatted']"/></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <t t-if="not currencies">
+                    <div class="alert alert-info text-center">
+                        No hay facturas pendientes ni pagos sin aplicar a la fecha de corte.
+                    </div>
+                </t>
+
+                <t t-foreach="currencies" t-as="cur">
+                    <div class="o_statement_currency_block"
+                         style="page-break-inside: avoid; border: 1px solid #d1d5db; border-radius: 4px; padding: 12px 14px; margin-top: 14px; background-color: #ffffff;">
+                        <div style="border-bottom: 2px solid #1f2937; padding-bottom: 4px; margin-bottom: 8px; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #1f2937;">
+                            Movimientos en <span t-esc="cur['currency_name']"/>
+                        </div>
+
+                        <t t-if="cur['invoices']">
+                            <table class="o_statement_table" style="width: 100%; border-collapse: collapse; margin-bottom: 4px;">
+                                <thead>
+                                    <tr>
+                                        <th style="background-color: #1f2937; color: #ffffff; padding: 6px 8px; font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; font-weight: 700; text-align: left;">Documento</th>
+                                        <th style="background-color: #1f2937; color: #ffffff; padding: 6px 8px; font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; font-weight: 700; text-align: left;">Fecha</th>
+                                        <th style="background-color: #1f2937; color: #ffffff; padding: 6px 8px; font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; font-weight: 700; text-align: left;">Vence</th>
+                                        <th style="background-color: #1f2937; color: #ffffff; padding: 6px 8px; font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; font-weight: 700; text-align: right; white-space: nowrap;">D&#237;as</th>
+                                        <th style="background-color: #1f2937; color: #ffffff; padding: 6px 8px; font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; font-weight: 700; text-align: right; white-space: nowrap;">Monto original</th>
+                                        <th style="background-color: #1f2937; color: #ffffff; padding: 6px 8px; font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; font-weight: 700; text-align: right; white-space: nowrap;">Saldo</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="cur['invoices']" t-as="inv"
+                                        t-att-style="'background-color: %s;' % ('#ffffff' if inv_index %% 2 == 0 else '#f9fafb')">
+                                        <td style="padding: 5px 8px; border-bottom: 1px solid #e5e7eb;" t-esc="inv['number']"/>
+                                        <td style="padding: 5px 8px; border-bottom: 1px solid #e5e7eb; white-space: nowrap;">
+                                            <span t-esc="inv['invoice_date']" t-options='{"widget": "date"}'/>
+                                        </td>
+                                        <td style="padding: 5px 8px; border-bottom: 1px solid #e5e7eb; white-space: nowrap;">
+                                            <span t-if="inv['invoice_date_due']" t-esc="inv['invoice_date_due']" t-options='{"widget": "date"}'/>
+                                        </td>
+                                        <td t-att-style="'padding: 5px 8px; border-bottom: 1px solid #e5e7eb; text-align: right; white-space: nowrap;' + (' color: #dc2626; font-weight: 700;' if inv['days_overdue'] &gt; 0 else '')"
+                                            t-esc="inv['days_overdue']"/>
+                                        <td style="padding: 5px 8px; border-bottom: 1px solid #e5e7eb; text-align: right; white-space: nowrap;" t-esc="inv['original_formatted']"/>
+                                        <td style="padding: 5px 8px; border-bottom: 1px solid #e5e7eb; text-align: right; white-space: nowrap;" t-esc="inv['residual_formatted']"/>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="4" style="padding: 7px 8px; background-color: #1f2937; color: #ffffff; font-weight: 700; text-align: right; text-transform: uppercase; letter-spacing: 0.04em; font-size: 10.5px;">Subtotal</td>
+                                        <td style="padding: 7px 8px; background-color: #1f2937; color: #ffffff; font-weight: 700; text-align: right; white-space: nowrap;" t-esc="cur['subtotal_original_formatted']"/>
+                                        <td style="padding: 7px 8px; background-color: #1f2937; color: #ffffff; font-weight: 700; text-align: right; white-space: nowrap;" t-esc="cur['subtotal_balance_formatted']"/>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </t>
+
+                        <t t-if="cur['pending_payments']">
+                            <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: #6b7280; margin-top: 10px; margin-bottom: 4px;">
+                                Pagos pendientes de aplicar
+                            </div>
+                            <table class="o_statement_table" style="width: 100%; border-collapse: collapse; margin-bottom: 4px;">
+                                <thead>
+                                    <tr>
+                                        <th style="background-color: #6b7280; color: #ffffff; padding: 5px 8px; font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; font-weight: 700; text-align: left;">Pago</th>
+                                        <th style="background-color: #6b7280; color: #ffffff; padding: 5px 8px; font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; font-weight: 700; text-align: left;">Fecha</th>
+                                        <th style="background-color: #6b7280; color: #ffffff; padding: 5px 8px; font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; font-weight: 700; text-align: right; white-space: nowrap;">Monto</th>
+                                        <th style="background-color: #6b7280; color: #ffffff; padding: 5px 8px; font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; font-weight: 700; text-align: right; white-space: nowrap;">Disponible</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="cur['pending_payments']" t-as="pay"
+                                        t-att-style="'background-color: %s;' % ('#ffffff' if pay_index %% 2 == 0 else '#f9fafb')">
+                                        <td style="padding: 5px 8px; border-bottom: 1px solid #e5e7eb;" t-esc="pay['number']"/>
+                                        <td style="padding: 5px 8px; border-bottom: 1px solid #e5e7eb; white-space: nowrap;">
+                                            <span t-esc="pay['payment_date']" t-options='{"widget": "date"}'/>
+                                        </td>
+                                        <td style="padding: 5px 8px; border-bottom: 1px solid #e5e7eb; text-align: right; white-space: nowrap;" t-esc="pay['original_formatted']"/>
+                                        <td style="padding: 5px 8px; border-bottom: 1px solid #e5e7eb; text-align: right; white-space: nowrap;" t-esc="pay['residual_formatted']"/>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="3" style="padding: 7px 8px; background-color: #6b7280; color: #ffffff; font-weight: 700; text-align: right; text-transform: uppercase; letter-spacing: 0.04em; font-size: 10.5px;">Subtotal pagos</td>
+                                        <td style="padding: 7px 8px; background-color: #6b7280; color: #ffffff; font-weight: 700; text-align: right; white-space: nowrap;" t-esc="cur['pending_balance_formatted']"/>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </t>
+
+                        <t t-if="cur.get('aging')">
+                            <div style="margin-top: 10px; text-align: right;">
+                                <table style="display: inline-table; border-collapse: collapse; border: 1px solid #d1d5db; border-radius: 3px;">
+                                    <thead>
+                                        <tr>
+                                            <th style="background-color: #eef2f7; color: #1f2937; padding: 4px 12px; font-size: 9.5px; letter-spacing: 0.03em; text-transform: uppercase; font-weight: 700; text-align: right; white-space: nowrap;">Al d&#237;a</th>
+                                            <th style="background-color: #eef2f7; color: #1f2937; padding: 4px 12px; font-size: 9.5px; letter-spacing: 0.03em; text-transform: uppercase; font-weight: 700; text-align: right; white-space: nowrap;">1 - 30</th>
+                                            <th style="background-color: #eef2f7; color: #1f2937; padding: 4px 12px; font-size: 9.5px; letter-spacing: 0.03em; text-transform: uppercase; font-weight: 700; text-align: right; white-space: nowrap;">31 - 60</th>
+                                            <th style="background-color: #eef2f7; color: #1f2937; padding: 4px 12px; font-size: 9.5px; letter-spacing: 0.03em; text-transform: uppercase; font-weight: 700; text-align: right; white-space: nowrap;">61 - 90</th>
+                                            <th style="background-color: #eef2f7; color: #1f2937; padding: 4px 12px; font-size: 9.5px; letter-spacing: 0.03em; text-transform: uppercase; font-weight: 700; text-align: right; white-space: nowrap;">+90</th>
+                                            <th style="background-color: #1f2937; color: #ffffff; padding: 4px 12px; font-size: 9.5px; letter-spacing: 0.03em; text-transform: uppercase; font-weight: 700; text-align: right; white-space: nowrap;">Saldo</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td style="padding: 5px 12px; text-align: right; white-space: nowrap; border-top: 1px solid #e5e7eb;" t-esc="cur['aging_formatted']['current']"/>
+                                            <td style="padding: 5px 12px; text-align: right; white-space: nowrap; border-top: 1px solid #e5e7eb;" t-esc="cur['aging_formatted']['b1_30']"/>
+                                            <td style="padding: 5px 12px; text-align: right; white-space: nowrap; border-top: 1px solid #e5e7eb;" t-esc="cur['aging_formatted']['b31_60']"/>
+                                            <td style="padding: 5px 12px; text-align: right; white-space: nowrap; border-top: 1px solid #e5e7eb;" t-esc="cur['aging_formatted']['b61_90']"/>
+                                            <td style="padding: 5px 12px; text-align: right; white-space: nowrap; border-top: 1px solid #e5e7eb;" t-esc="cur['aging_formatted']['b90_plus']"/>
+                                            <td style="padding: 5px 12px; text-align: right; white-space: nowrap; border-top: 1px solid #e5e7eb; background-color: #f3f4f6; font-weight: 700;" t-esc="cur['subtotal_balance_formatted']"/>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </t>
+
+                        <div style="clear: both; text-align: right; font-size: 12px; border-top: 1px solid #d1d5db; padding-top: 8px; margin-top: 10px;">
+                            <span style="color: #6b7280;" t-out="'Saldo neto en %s:' % cur['currency_name']"/>
+                            <strong style="margin-left: 8px; color: #1f2937;" t-esc="cur['net_balance_formatted']"/>
+                        </div>
+                    </div>
+                </t>
+
+                <div class="o_statement_footer mt-4">
+                    <div t-if="company.partner_id.bank_ids" class="mb-2">
+                        <strong class="small text-uppercase">Datos para pago</strong>
+                        <ul class="list-unstyled small mb-0">
+                            <li t-foreach="company.partner_id.bank_ids" t-as="bank">
+                                <span t-field="bank.bank_id.name"/> &#8212;
+                                <span t-field="bank.acc_number"/>
+                                <span t-if="bank.acc_holder_name"> (<span t-field="bank.acc_holder_name"/>)</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <p class="small text-muted mb-0">
+                        Si ya realiz&#243; el pago, por favor omita este aviso. Para cualquier consulta escr&#237;banos a
+                        <span t-if="company.email" t-field="company.email"/>
+                        <span t-if="company.phone"> o comun&#237;quese al <span t-field="company.phone"/></span>.
+                    </p>
+                </div>
+
+            </div>
+        </t>
+    </template>
+
+    <template id="statement_report_main">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="partner">
+                <t t-set="data" t-value="partner._prepare_statement_data()"/>
+                <t t-call="l10n_cr_statement_currency.statement_document"/>
+            </t>
+        </t>
+    </template>
+
+</odoo>
