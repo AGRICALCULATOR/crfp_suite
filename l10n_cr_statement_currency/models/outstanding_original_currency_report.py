@@ -14,7 +14,14 @@ class OutstandingOriginalCurrencyReportHandler(models.AbstractModel):
     def _custom_options_initializer(self, report, options, previous_options=None):
         super()._custom_options_initializer(report, options, previous_options=previous_options)
         self._apply_context_partner_filter(options)
-        options.setdefault("unfold_all", True)
+        # Force everything unfolded on first open. The super() initializer sets
+        # unfold_all=False by default for filter_unfold_all reports, so a plain
+        # setdefault isn't enough — we have to overwrite. Preserve the user's
+        # explicit toggle if they already customised this session's options.
+        if previous_options and "unfold_all" in previous_options:
+            options["unfold_all"] = previous_options["unfold_all"]
+        else:
+            options["unfold_all"] = True
         self._sync_column_labels(report, options)
 
     def _sync_column_labels(self, report, options):
