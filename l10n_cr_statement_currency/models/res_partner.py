@@ -52,13 +52,59 @@ class ResPartner(models.Model):
     # Email configuration helpers
     # ------------------------------------------------------------------
     def _get_statement_target_emails(self):
+        """Return the email_to / email_cc that should receive the statement.
+
+        Priority:
+        1. Explicit statement_email / statement_email_cc on the partner.
+        2. Address of child contacts with type='invoice' (Odoo's "Invoice
+           Address"). If multiple invoice contacts exist, the first goes
+           to email_to and the rest join email_cc (comma-separated).
+        3. Fall back to the partner's own email.
+        """
         self.ensure_one()
         email_to = (self.statement_email or "").strip()
         email_cc = (self.statement_email_cc or "").strip()
+
+        if not email_to:
+            invoice_contacts = self._statement_invoice_contacts()
+            invoice_emails = [
+                (c.email or "").strip()
+                for c in invoice_contacts
+                if c.email
+            ]
+            if invoice_emails:
+                email_to = invoice_emails[0]
+                extra_ccs = invoice_emails[1:]
+                if extra_ccs:
+                    cc_list = [email_cc] if email_cc else []
+                    cc_list.extend(extra_ccs)
+                    email_cc = ", ".join(dict.fromkeys(filter(None, cc_list)))
+
+        if not email_to:
+            email_to = (self.email or "").strip()
+
         return {
             "email_to": email_to,
             "email_cc": email_cc,
         }
+
+    def _statement_invoice_contacts(self):
+        """Return children of this partner (and self if applicable) with type='invoice'.
+
+        If the partner is a company we look at its child contacts; if the
+        partner is a standalone individual or an invoice contact itself,
+        we include it as a fallback.
+        """
+        self.ensure_one()
+        company = self.commercial_partner_id or self
+        invoice_children = company.child_ids.filtered(
+            lambda c: c.type == "invoice" and (c.email or "").strip()
+        )
+        if invoice_children:
+            return invoice_children
+        if self.type == "invoice" and (self.email or "").strip():
+            return self
+        return self.env["res.partner"]
 
     def _get_followup_mail_recipients(self):
         """Extension hook for account_followup: prefer statement email fields."""
