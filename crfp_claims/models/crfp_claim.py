@@ -121,6 +121,10 @@ class CrfpClaim(models.Model):
                 rec.message_subscribe(partner_ids=[ceo_user.partner_id.id])
         return records
 
+    def message_post(self, **kwargs):
+        kwargs['email_from'] = 'claims@crfarmexport.com'
+        return super().message_post(**kwargs)
+
     # Auto-fill from shipment
     @api.onchange('shipment_id')
     def _onchange_shipment_id(self):
