@@ -112,7 +112,14 @@ class CrfpClaim(models.Model):
         for vals in vals_list:
             if vals.get('name', 'New') == 'New':
                 vals['name'] = self.env['ir.sequence'].next_by_code('crfp.claim') or 'New'
-        return super().create(vals_list)
+        records = super().create(vals_list)
+        # Auto-follow: Vanessa (avega@) must be follower of every new claim
+        ceo_user = self.env['res.users'].sudo().search(
+            [('login', '=', 'avega@crfarmexport.com')], limit=1)
+        if ceo_user:
+            for rec in records:
+                rec.message_subscribe(partner_ids=[ceo_user.partner_id.id])
+        return records
 
     # Auto-fill from shipment
     @api.onchange('shipment_id')
@@ -281,6 +288,7 @@ All rights reserved.</em>
                 'default_subject': subject,
                 'default_body': body,
                 'default_attachment_ids': attachment_ids,
+                'default_email_from': 'claims@crfarmexport.com',
                 'default_composition_mode': 'comment',
             },
         }
