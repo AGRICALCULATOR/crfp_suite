@@ -121,6 +121,21 @@ class CrfpClaim(models.Model):
                 rec.message_subscribe(partner_ids=[ceo_user.partner_id.id])
         return records
 
+    @api.model
+    def message_new(self, msg_dict, custom_values=None):
+        """Handle inbound emails to claims@ alias — create a draft claim."""
+        defaults = {
+            'claim_type': 'other',
+            'origin': 'customer',
+            'description': msg_dict.get('body', ''),
+        }
+        # Link sender as claimant if partner found
+        if msg_dict.get('author_id'):
+            defaults['partner_id'] = msg_dict['author_id']
+        if custom_values:
+            defaults.update(custom_values)
+        return super().message_new(msg_dict, custom_values=defaults)
+
     def message_post(self, **kwargs):
         kwargs['email_from'] = 'claims@crfarmexport.com'
         return super().message_post(**kwargs)
