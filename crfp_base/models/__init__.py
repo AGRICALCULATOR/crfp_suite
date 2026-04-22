@@ -8,3 +8,4 @@ from . import crfp_fixed_cost
 from . import crfp_settings
 
 from . import crfp_carrier  # kept as stub for backward compat
+from . import res_config_settings
