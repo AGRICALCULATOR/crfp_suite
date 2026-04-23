@@ -2367,7 +2367,9 @@ class AccountMove(models.Model):
     def _fp_validate_certificate_environment(self, certificate):
         self.ensure_one()
         company = self.company_id
-        expected_environment = company.fp_signing_certificate_environment or "auto"
+        expected_environment = (
+            getattr(company, "fp_signing_certificate_environment", False) or "auto"
+        )
         detected_environment = self._fp_detect_certificate_environment(certificate)
         is_sandbox_mode = bool(company.fp_hacienda_sandbox_mode)
 
