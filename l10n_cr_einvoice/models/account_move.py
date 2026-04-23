@@ -71,12 +71,12 @@ class AccountMove(models.Model):
     _inherit = "account.move"
 
     _FP_EMAIL_SUBJECT_DOCUMENT_LABELS = {
-        "FE": "Factura Electrónica",
-        "TE": "Tiquete Electrónico",
-        "NC": "Nota de Crédito Electrónica",
-        "ND": "Nota de Débito Electrónica",
-        "FEE": "Factura Electrónica de Exportación",
-        "FEC": "Factura Electrónica de Compra",
+        "FE": _("Factura Electrónica"),
+        "TE": _("Tiquete Electrónico"),
+        "NC": _("Nota de Crédito Electrónica"),
+        "ND": _("Nota de Débito Electrónica"),
+        "FEE": _("Factura Electrónica de Exportación"),
+        "FEC": _("Factura Electrónica de Compra"),
     }
 
     _FP_LOCKED_FIELDS_AFTER_SEND = {
@@ -123,12 +123,12 @@ class AccountMove(models.Model):
     @api.model
     def _selection_fp_document_type(self):
         labels = {
-            "FE": self.env._("Factura Electrónica"),
-            "TE": self.env._("Tiquete Electrónico"),
-            "FEE": self.env._("Factura Electrónica de Exportación"),
-            "NC": self.env._("Nota de Crédito Electrónica"),
-            "ND": self.env._("Nota de Débito Electrónica"),
-            "FEC": self.env._("Factura Electrónica de Compra"),
+            "FE": "Factura Electrónica",
+            "TE": "Tiquete Electrónico",
+            "FEE": "Factura Electrónica de Exportación",
+            "NC": "Nota de Crédito Electrónica",
+            "ND": "Nota de Débito Electrónica",
+            "FEC": "Factura Electrónica de Compra",
         }
         move_type = self.env.context.get("default_move_type")
         if not move_type and self:
@@ -454,14 +454,7 @@ class AccountMove(models.Model):
     def _fp_get_email_document_label(self):
         """Return FE document label for outbound email templates."""
         self.ensure_one()
-        partner_lang = (self.partner_id.lang or "").strip()
-        lang = partner_lang or self.env.user.lang
-        local_env = self.with_context(lang=lang).env if lang else self.env
-        labels = {
-            code: local_env._(label)
-            for code, label in self._FP_EMAIL_SUBJECT_DOCUMENT_LABELS.items()
-        }
-        return labels.get(self.fp_document_type, local_env._("Factura"))
+        return self._FP_EMAIL_SUBJECT_DOCUMENT_LABELS.get(self.fp_document_type, _("Factura"))
 
     def _fp_get_email_reference(self):
         """Return preferred reference identifier for outbound email subject."""
@@ -753,6 +746,15 @@ class AccountMove(models.Model):
         help="Detalle del motivo de referencia (Razon).",
         copy=False,
     )
+    fp_reference_exchange_rate = fields.Float(
+        string="Tipo de cambio ref. (FE)",
+        digits=(12, 5),
+        help=(
+            "Tipo de cambio del comprobante de referencia. "
+            "Para NC/ND en moneda extranjera debe coincidir con el documento origen."
+        ),
+        copy=False,
+    )
     fp_other_charge_line_ids = fields.One2many(
         "account.move.other.charge",
         "move_id",
@@ -811,47 +813,6 @@ class AccountMove(models.Model):
         copy=False,
         default=False,
     )
-
-    fp_amount_in_words = fields.Char(
-        string="Total in Words",
-        compute="_compute_fp_amount_in_words",
-    )
-
-    @api.depends("amount_total", "currency_id")
-    def _compute_fp_amount_in_words(self):
-        try:
-            from num2words import num2words as _num2words
-        except ImportError:
-            for move in self:
-                move.fp_amount_in_words = ""
-            return
-        for move in self:
-            if not move.amount_total:
-                move.fp_amount_in_words = ""
-                continue
-            currency = move.currency_id
-            amount = move.amount_total
-            integer_part = int(amount)
-            cents = round((amount - integer_part) * 100)
-            if currency and currency.name == "USD":
-                main_label = "Dollars"
-                cents_label = "Cents"
-            elif currency and currency.name == "CRC":
-                main_label = "Colones"
-                cents_label = "Céntimos"
-            elif currency and currency.name == "EUR":
-                main_label = "Euros"
-                cents_label = "Cents"
-            else:
-                main_label = currency.name if currency else ""
-                cents_label = "cents"
-            try:
-                words = _num2words(integer_part, lang="en").title()
-                move.fp_amount_in_words = (
-                    f"{words} {main_label} and {cents:02d} {cents_label}"
-                )
-            except Exception:
-                move.fp_amount_in_words = ""
 
     @api.depends("fp_other_charge_line_ids.amount")
     def _compute_fp_total_other_charges(self):
@@ -1418,6 +1379,16 @@ class AccountMove(models.Model):
         if self.currency_id == self.company_currency_id or (self.currency_id.name or "").upper() == "CRC":
             return 1.0
 
+        if self.fp_document_type in ("NC", "ND") and self.fp_reference_exchange_rate:
+            return self.fp_reference_exchange_rate
+
+        if (
+            self.fp_document_type in ("NC", "ND")
+            and self.reversed_entry_id
+            and self.reversed_entry_id.currency_id == self.currency_id
+        ):
+            return self.reversed_entry_id._fp_get_exchange_rate()
+
         inverse_company_rate = getattr(self.currency_id, "inverse_company_rate", False)
         if inverse_company_rate:
             return inverse_company_rate
@@ -1489,6 +1460,8 @@ class AccountMove(models.Model):
                 move.fp_reference_issue_datetime = datetime.combine(reference_date, datetime.min.time()).replace(
                     hour=12
                 )
+            if force or not move.fp_reference_exchange_rate:
+                move.fp_reference_exchange_rate = referenced_move._fp_get_exchange_rate()
 
             if force and not move.fp_reference_reason:
                 move.fp_reference_reason = _("Documento de referencia para nota electrónica")
@@ -1783,15 +1756,6 @@ class AccountMove(models.Model):
             )
         ]
 
-    def _fp_get_selection_map(self, field_name):
-        """Return a robust selection map for QWeb rendering."""
-        self.ensure_one()
-        if not field_name or field_name not in self._fields:
-            return {}
-        field_meta = self.fields_get([field_name]).get(field_name, {})
-        selection = field_meta.get("selection") or []
-        return dict(selection)
-
     def _fp_append_line_extra_nodes(self, detail_node, line):
         product = line.product_id.product_tmpl_id if line.product_id else False
         if not product:
@@ -1909,8 +1873,46 @@ class AccountMove(models.Model):
         self.ensure_one()
         if self.fp_document_type != "NC":
             return False
-        referenced_document_type = (self.reversed_entry_id.fp_document_type or "").strip() if self.reversed_entry_id else ""
-        return referenced_document_type == "FEE"
+        if self.reversed_entry_id:
+            referenced_document_type = (self.reversed_entry_id.fp_document_type or "").strip()
+            return referenced_document_type == "FEE"
+        return self._fp_reference_points_to_export_invoice()
+
+    def _fp_reference_points_to_export_invoice(self):
+        self.ensure_one()
+        if self.fp_document_type != "NC":
+            return False
+
+        # Caso 1: referencia explícita de Hacienda para sustitución de factura de exportación.
+        if (self.fp_reference_document_type or "").strip() == "12":
+            return True
+
+        # Caso 2: referencia externa por clave/numero (sin reversed_entry_id en Odoo).
+        reference_number = "".join(ch for ch in (self.fp_reference_number or "") if ch.isdigit())
+        if not reference_number:
+            # Caso 3: NC manual sin clave origen, inferir exportación por receptor no domiciliado.
+            # Se usa como heurística controlada para no depender de reversed_entry_id.
+            partner_identification_type = (self.partner_id.fp_identification_type or "").strip()
+            partner_country_code = (self.partner_id.country_id.code or "").strip().upper()
+            if (
+                partner_identification_type == "05"
+                and partner_country_code
+                and partner_country_code != "CR"
+                and (self.fp_reference_document_type or "").strip() in ("01", "12", "99")
+            ):
+                return True
+            return False
+
+        if len(reference_number) >= 50:
+            reference_number = self._fp_extract_consecutive_from_clave(reference_number)
+        elif len(reference_number) > 20:
+            reference_number = reference_number[-20:]
+        else:
+            reference_number = reference_number.zfill(20)
+
+        if len(reference_number) < 10:
+            return False
+        return reference_number[8:10] == "09"
 
     def _fp_validate_fe_receptor_required_data(self, receptor_partner, receptor_vat):
         self.ensure_one()
@@ -1974,7 +1976,9 @@ class AccountMove(models.Model):
 
     def _fp_format_identification_number(self, value, identification_type):
         raw_value = (value or "").strip()
-        if self.fp_document_type == "FEC" and identification_type in ("05", "06"):
+        if identification_type == "05":
+            return "".join(ch for ch in raw_value.upper() if ch.isalnum())[:20]
+        if self.fp_document_type == "FEC" and identification_type == "06":
             return raw_value[:20]
         return "".join(ch for ch in raw_value if ch.isdigit())
 
@@ -2152,6 +2156,7 @@ class AccountMove(models.Model):
 
         if not private_key or not certificate:
             raise UserError(_("El certificado FE no contiene llave privada o certificado válido."))
+        self._fp_validate_certificate_environment(certificate)
 
         parser = LET.XMLParser(remove_blank_text=True)
         root = LET.fromstring(xml_text.encode("utf-8"), parser=parser)
@@ -2343,6 +2348,58 @@ class AccountMove(models.Model):
         signature_node.insert(1, signature_value_node)
 
         return LET.tostring(root, encoding="utf-8", xml_declaration=True).decode("utf-8")
+
+    def _fp_detect_certificate_environment(self, certificate):
+        self.ensure_one()
+        issuer_text = (certificate.issuer.rfc4514_string() or "").lower()
+        subject_text = (certificate.subject.rfc4514_string() or "").lower()
+        combined_text = f"{issuer_text} {subject_text}"
+
+        staging_markers = ("stag", "sandbox", "test", "testing", "prueba")
+        production_markers = ("prod", "production", "produccion")
+
+        if any(marker in combined_text for marker in staging_markers):
+            return "staging"
+        if any(marker in combined_text for marker in production_markers):
+            return "production"
+        return False
+
+    def _fp_validate_certificate_environment(self, certificate):
+        self.ensure_one()
+        company = self.company_id
+        expected_environment = company.fp_signing_certificate_environment or "auto"
+        detected_environment = self._fp_detect_certificate_environment(certificate)
+        is_sandbox_mode = bool(company.fp_hacienda_sandbox_mode)
+
+        if expected_environment in ("staging", "production") and expected_environment != (
+            "staging" if is_sandbox_mode else "production"
+        ):
+            raise UserError(
+                _(
+                    "Configuración inconsistente: el ambiente esperado del certificado FE (%(expected)s) "
+                    "no coincide con el ambiente de Hacienda (%(hacienda)s)."
+                )
+                % {
+                    "expected": "STAGING" if expected_environment == "staging" else "PRODUCCIÓN",
+                    "hacienda": "STAGING" if is_sandbox_mode else "PRODUCCIÓN",
+                }
+            )
+
+        if expected_environment == "auto" or not detected_environment:
+            return
+
+        if detected_environment != ("staging" if is_sandbox_mode else "production"):
+            raise UserError(
+                _(
+                    "La firma del comprobante puede ser inválida: el certificado parece ser de %(cert_env)s "
+                    "pero la compañía está configurada en %(hacienda_env)s. "
+                    "Ajuste el ambiente de Hacienda o cargue el certificado correcto."
+                )
+                % {
+                    "cert_env": "STAGING" if detected_environment == "staging" else "PRODUCCIÓN",
+                    "hacienda_env": "STAGING" if is_sandbox_mode else "PRODUCCIÓN",
+                }
+            )
 
     def _fp_store_hacienda_response_xml(self, response_data):
         self.ensure_one()
