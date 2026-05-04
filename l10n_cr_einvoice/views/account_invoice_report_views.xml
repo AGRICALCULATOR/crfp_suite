@@ -465,164 +465,133 @@
 <!-- CR FARM GREEN/GOLD STYLE -->
 <t t-if="True">
     <style>
-        * { box-sizing: border-box; }
-        .crfp { font-family: 'Helvetica','Arial',sans-serif; color: #1a1a1a; font-size: 7.5pt; line-height: 1.3; max-width: 190mm; margin: 0 auto; }
-        .crfp .te { text-align: right !important; }
-        /* header */
-        .crfp-hdr { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: flex-end; padding-bottom: 5px; border-bottom: 2px solid #4CAF50; position: relative; margin-bottom: 4px; }
-        .crfp-hdr::after { content:''; position:absolute; bottom:-4px; left:0; right:0; height:1px; background:#B8924A; }
-        .crfp-bn { font-size: 13pt; font-weight: 800; color: #4CAF50; letter-spacing: -0.3px; line-height: 1; margin-bottom: 1px; }
-        .crfp-bn .au { color: #B8924A; }
-        .crfp-bl { font-size: 6pt; color: #B8924A; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 3px; }
-        .crfp-bi { font-size: 7pt; color: #444; line-height: 1.45; }
-        .crfp-dt { text-align: right; border-left: 1px solid #B8924A; padding-left: 10px; }
-        .crfp-dt .m { font-size: 11pt; font-weight: 800; color: #2E7D32; line-height: 1.05; }
-        /* logo */
-        .crfp-logo img { max-width: 65px; max-height: 48px; }
-        /* meta bar */
-        .crfp-meta { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: 1px; background: #d4cfc0; border: 1px solid #d4cfc0; margin-bottom: 4px; }
-        .crfp-mc { background: white; padding: 3px 8px; }
-        .crfp-mc.hl { background: #F5EDD8; border-left: 2px solid #B8924A; }
-        .crfp-ml { font-size: 5.8pt; color: #666; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; margin-bottom: 1px; }
-        .crfp-mv { font-size: 8pt; font-weight: 700; color: #1a1a1a; }
-        .crfp-mc.hl .crfp-mv { color: #2E7D32; }
-        /* e-key */
-        .crfp-ekey { display: flex; gap: 6px; align-items: baseline; background: #fafaf6; border: 1px solid #d4cfc0; padding: 2px 8px; margin-bottom: 4px; font-size: 6.5pt; }
-        .crfp-ekey strong { color: #4CAF50; text-transform: uppercase; letter-spacing: 0.5px; font-size: 6pt; }
-        .crfp-ekey .kv { font-family: monospace; color: #555; word-break: break-all; }
-        /* parties */
-        .crfp-parties { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-bottom: 4px; }
-        .crfp-party { border: 1px solid #d4cfc0; }
-        .crfp-phd { background: #4CAF50; color: white; padding: 2px 8px; font-size: 6.5pt; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid #B8924A; }
-        .crfp-pbd { padding: 4px 8px; }
-        .crfp-pn { font-size: 8.5pt; font-weight: 700; margin-bottom: 2px; color: #2E7D32; }
-        .crfp-pd { font-size: 7pt; line-height: 1.45; color: #333; }
-        .crfp-pd .l { color: #666; font-size: 6.5pt; font-weight: 600; margin-right: 3px; }
-        /* shipment */
-        .crfp-ship { border: 1px solid #d4cfc0; margin-bottom: 4px; }
-        .crfp-shd { background: #4CAF50; color: white; padding: 2px 8px; font-size: 6.5pt; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid #B8924A; }
-        .crfp-sgrid { display: grid; grid-template-columns: repeat(5,1fr); }
-        .crfp-sc { padding: 2px 7px; border-right: 1px solid #ececec; border-bottom: 1px solid #ececec; }
-        .crfp-sc:nth-child(5n) { border-right: none; }
-        .crfp-scl { font-size: 5.8pt; color: #666; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 0; }
-        .crfp-scv { font-size: 7.5pt; font-weight: 600; color: #1a1a1a; }
-        .crfp-scv.au { color: #B8924A; font-weight: 700; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        .crfp { font-family: 'Arial','Helvetica',sans-serif; color: #1a1a1a; font-size: 9.5px; line-height: 1.4; max-width: 190mm; margin: 0 auto; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        /* top/bottom bars */
+        .crfp-topbar { height: 5px; background: linear-gradient(90deg, #1a5c2e 0%, #C9A227 60%, #1a5c2e 100%); margin-bottom: 8px; }
+        .crfp-btmbar { height: 4px; background: linear-gradient(90deg, #C9A227 0%, #1a5c2e 50%, #C9A227 100%); margin-top: 6px; }
+        /* header row */
+        .crfp-hrow { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 6px; }
+        .crfp-hlogo { flex: 0 0 80px; }
+        .crfp-hlogo img { max-width: 80px; max-height: 62px; }
+        .crfp-hco { flex: 1; }
+        .crfp-hconame { font-size: 14px; font-weight: 800; color: #1a5c2e; text-transform: uppercase; letter-spacing: .4px; border-bottom: 2px solid #C9A227; padding-bottom: 3px; margin-bottom: 3px; }
+        .crfp-hcometa { font-size: 8.5px; color: #555; line-height: 1.6; }
+        .crfp-hcometa strong { font-weight: 700; color: #1a1a1a; }
+        .crfp-badge { flex: 0 0 128px; background: #1a5c2e; color: #fff; border-radius: 2px; padding: 7px 9px; text-align: center; }
+        .crfp-badge-type { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .4px; }
+        .crfp-badge-num { font-size: 11.5px; font-weight: 800; color: #C9A227; margin: 2px 0; }
+        .crfp-badge-date { font-size: 8px; opacity: .85; }
+        /* section title */
+        .crfp-stitle { background: #1a5c2e; color: #fff; font-size: 8.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; padding: 2px 7px; border-left: 3px solid #C9A227; }
+        /* info grid 2-col */
+        .crfp-igrid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 5px; }
+        .crfp-ibox { border: 1px solid #C9A227; border-radius: 1px; overflow: hidden; }
+        .crfp-ibody { padding: 4px 7px; background: #e8f4ec; font-size: 8.8px; line-height: 1.65; }
+        .crfp-ibody .l { font-weight: 700; color: #1a5c2e; }
+        /* shipment box */
+        .crfp-ship { border: 1px solid #C9A227; border-radius: 1px; overflow: hidden; margin-bottom: 5px; }
+        .crfp-shipbody { padding: 4px 7px; background: #fdf6e3; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0 10px; font-size: 8.8px; line-height: 1.65; }
+        .crfp-shipbody .l { font-weight: 700; color: #1a5c2e; }
         /* products table */
-        table.crfp-tbl { width: 100%; border-collapse: collapse; margin-bottom: 4px; font-size: 7.5pt; }
-        table.crfp-tbl thead tr { background: #4CAF50; }
-        table.crfp-tbl th { color: white; padding: 3px 6px; text-align: left; font-weight: 700; font-size: 6.3pt; text-transform: uppercase; letter-spacing: 0.4px; border-bottom: 1px solid #B8924A; }
-        table.crfp-tbl th.c { text-align: center; }
-        table.crfp-tbl th.r { text-align: right; }
-        table.crfp-tbl td { padding: 2px 6px; border-bottom: 1px solid #e8e8e8; vertical-align: middle; }
-        table.crfp-tbl td.c { text-align: center; }
-        table.crfp-tbl td.r { text-align: right; }
-        .crfp-pname { font-weight: 700; font-size: 7.8pt; color: #1a1a1a; }
-        table.crfp-tbl tr.tr { background: #F5EDD8; font-weight: 700; }
-        table.crfp-tbl tr.tr td { border-top: 1.5px solid #B8924A; border-bottom: 1.5px solid #B8924A; padding: 4px 6px; color: #2E7D32; }
-        /* totals block */
-        .crfp-tb { display: grid; grid-template-columns: 1.5fr 1fr; gap: 5px; margin-bottom: 4px; }
-        .crfp-addl { border: 1px solid #d4cfc0; padding: 4px 8px; }
-        .crfp-at { font-size: 6.5pt; font-weight: 700; color: #4CAF50; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 3px; border-bottom: 1px solid #B8924A; padding-bottom: 2px; }
-        .crfp-ar { font-size: 7pt; margin-bottom: 1px; color: #333; }
-        .crfp-ar .l { color: #666; font-weight: 600; margin-right: 3px; }
-        .crfp-aw { margin-top: 4px; padding-top: 4px; border-top: 1px dashed #d4cfc0; font-size: 7pt; font-style: italic; color: #444; }
-        .crfp-aw strong { color: #4CAF50; font-style: normal; text-transform: uppercase; letter-spacing: 0.4px; font-size: 6.3pt; display: block; margin-bottom: 1px; }
-        .crfp-ts { border: 1px solid #d4cfc0; overflow: hidden; }
-        .crfp-tr { display: flex; justify-content: space-between; padding: 3px 8px; border-bottom: 1px solid #ececec; font-size: 7.5pt; }
-        .crfp-tr:last-child { border-bottom: none; }
-        .crfp-tr .k { color: #666; }
-        .crfp-tr .v { font-weight: 600; font-family: monospace; }
-        .crfp-tr.sub { background: #fafaf6; font-weight: 700; }
-        .crfp-tr.sub .k, .crfp-tr.sub .v { color: #1a1a1a; }
-        .crfp-tr.grand { background: #4CAF50; padding: 5px 8px; font-size: 9.5pt; font-weight: 800; border-top: 1px solid #B8924A; }
-        .crfp-tr.grand .k, .crfp-tr.grand .v { color: white; }
+        table.crfp-tbl { width: 100%; border-collapse: collapse; font-size: 9px; margin-bottom: 5px; }
+        table.crfp-tbl thead tr { background: #1a5c2e; color: #fff; }
+        table.crfp-tbl th { padding: 4px 5px; text-align: center; font-weight: 700; font-size: 8.5px; text-transform: uppercase; letter-spacing: .3px; border-right: 1px solid #C9A227; }
+        table.crfp-tbl th:last-child { border-right: none; }
+        table.crfp-tbl th.tl { text-align: left; }
+        table.crfp-tbl tbody tr { border-bottom: 1px solid #dde8df; }
+        table.crfp-tbl tbody tr:nth-child(even) { background: #e8f4ec; }
+        table.crfp-tbl td { padding: 3px 5px; vertical-align: middle; }
+        table.crfp-tbl td.tc { text-align: center; }
+        table.crfp-tbl td.tr { text-align: right; }
+        table.crfp-tbl td.cabys { font-size: 8px; color: #555; text-align: center; }
+        table.crfp-tbl tfoot tr { background: #1a5c2e; color: #fff; font-weight: 700; }
+        table.crfp-tbl tfoot td { padding: 4px 5px; border-top: 2px solid #C9A227; }
+        table.crfp-tbl tfoot td.tr { text-align: right; color: #C9A227; }
+        table.crfp-tbl tfoot td.tc { text-align: center; }
+        /* bottom grid */
+        .crfp-bgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 5px; }
+        .crfp-words { background: #fdf6e3; border: 1px solid #C9A227; border-radius: 1px; padding: 5px 7px; font-size: 8.8px; font-style: italic; color: #1a5c2e; font-weight: 600; }
+        .crfp-words .wl { font-size: 8px; font-weight: 700; text-transform: uppercase; color: #555; font-style: normal; display: block; margin-bottom: 2px; }
+        .crfp-summary { border: 1px solid #C9A227; border-radius: 1px; overflow: hidden; }
+        table.crfp-stbl { width: 100%; border-collapse: collapse; font-size: 9px; }
+        table.crfp-stbl td { padding: 2px 7px; border-bottom: 1px solid #dde8df; }
+        table.crfp-stbl td.tr { text-align: right; }
+        table.crfp-stbl .grand { background: #1a5c2e; color: #fff; font-weight: 800; font-size: 11px; }
+        table.crfp-stbl .grand td { padding: 4px 7px; border-bottom: none; }
+        table.crfp-stbl .grand td.tr { color: #C9A227; }
         /* signature */
-        .crfp-sig { display: grid; grid-template-columns: 1fr auto 1fr; gap: 20px; align-items: end; margin: 5px auto 3px; padding: 0 8px; }
-        .crfp-sb { text-align: center; }
-        .crfp-sl { border-top: 1px solid #1a1a1a; padding-top: 2px; width: 170px; margin: 0 auto; }
-        .crfp-sn { font-size: 7.5pt; font-weight: 700; }
-        .crfp-sr { font-size: 6.3pt; color: #666; }
-        .crfp-se { text-align: center; color: #B8924A; font-family: 'Georgia',serif; font-size: 12pt; opacity: 0.6; }
+        .crfp-sig { display: grid; grid-template-columns: 1fr auto 1fr; gap: 20px; align-items: end; margin: 5px 0 4px; padding: 0 8px; }
+        .crfp-sigb { text-align: center; }
+        .crfp-sigl { border-top: 1px solid #1a1a1a; padding-top: 2px; width: 160px; margin: 0 auto; }
+        .crfp-sign { font-size: 8px; font-weight: 700; }
+        .crfp-sigr { font-size: 7px; color: #666; }
+        .crfp-sige { text-align: center; color: #C9A227; font-family: 'Georgia',serif; font-size: 12pt; opacity: .6; }
         /* legal footer */
-        .crfp-lf { margin-top: 3px; padding: 4px 10px 5px; background: #fafaf6; border-top: 2px solid #4CAF50; border-bottom: 1px solid #B8924A; border-left: 1px solid #d4cfc0; border-right: 1px solid #d4cfc0; font-size: 5.8pt; line-height: 1.4; color: #2a2a2a; }
-        .crfp-lft { font-size: 6.3pt; font-weight: 800; color: #4CAF50; text-transform: uppercase; letter-spacing: 1.2px; text-align: center; margin-bottom: 3px; padding-bottom: 2px; border-bottom: 1px solid #d4cfc0; }
-        .crfp-lfg { display: grid; grid-template-columns: 1fr 1fr; gap: 3px 12px; }
-        .crfp-lfi { display: grid; grid-template-columns: 12px 1fr; gap: 3px; }
-        .crfp-lfn { color: #B8924A; font-weight: 800; }
-        .crfp-lfc strong { color: #2E7D32; font-weight: 700; }
-        /* compliance */
-        .crfp-cpl { text-align: center; margin-top: 3px; font-size: 5.8pt; color: #999; font-style: italic; letter-spacing: 0.3px; }
+        .crfp-lf { margin-top: 3px; padding: 3px 9px 5px; background: #fafaf6; border-top: 2px solid #1a5c2e; border: 1px solid #C9A227; font-size: 5.6px; line-height: 1.4; color: #2a2a2a; }
+        .crfp-lft { font-size: 6px; font-weight: 800; color: #1a5c2e; text-transform: uppercase; letter-spacing: 1.2px; text-align: center; margin-bottom: 2px; padding-bottom: 2px; border-bottom: 1px solid #C9A227; }
+        .crfp-lfg { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 12px; }
+        .crfp-lfi { display: grid; grid-template-columns: 10px 1fr; gap: 3px; }
+        .crfp-lfn { color: #C9A227; font-weight: 800; }
+        .crfp-lfc strong { color: #1a5c2e; font-weight: 700; }
+        /* FE footer */
+        .crfp-fefooter { background: #1a5c2e; color: #fff; padding: 5px 9px; font-size: 8px; display: flex; gap: 14px; align-items: flex-start; border-top: 3px solid #C9A227; margin-top: 4px; }
+        .crfp-feblock { flex: 1; line-height: 1.55; }
+        .crfp-felbl { font-weight: 700; color: #C9A227; font-size: 7.5px; text-transform: uppercase; }
+        .crfp-fekey { font-family: monospace; font-size: 7.5px; word-break: break-all; }
     </style>
     <div class="crfp">
+        <div class="crfp-topbar"/>
 
-        <!-- HEADER -->
-        <div class="crfp-hdr">
-            <div>
+        <!-- HEADER ROW -->
+        <div class="crfp-hrow">
+            <div class="crfp-hlogo">
                 <t t-if="fp_company_partner.image_1920">
-                    <div class="crfp-logo" style="margin-bottom:4px;"><img t-att-src="image_data_uri(fp_company_partner.image_1920)"/></div>
+                    <img t-att-src="image_data_uri(fp_company_partner.image_1920)"/>
                 </t>
-                <div class="crfp-bn">CR FARM <span class="au">PRODUCTS</span></div>
-                <div class="crfp-bl">CR Farm Products V y M Sociedad Anónima</div>
-                <div class="crfp-bi">
-                    <span t-esc="fp_company_partner.street or 'Muelle de San Carlos, Alajuela, Costa Rica'"/><br/>
-                    Cédula Jurídica: <span t-esc="fp_company_partner.vat or '3-101-669016'"/> · Código Exportador MAG: EMP-EX-3313<br/>
-                    Tel: <span t-esc="fp_company_partner.phone or '+506 2462 1338'"/> · <span t-esc="fp_company_partner.email or 'facturacion@crfarmexport.com'"/> · www.crfarmexport.com
+            </div>
+            <div class="crfp-hco">
+                <div class="crfp-hconame" t-esc="fp_company_partner.name"/>
+                <div class="crfp-hcometa">
+                    <strong>VAT:</strong> <span t-esc="fp_company_partner.vat or '3-101-669016'"/> &#160;|&#160;
+                    Código Exportador MAG: EMP-EX-3313 &#160;|&#160;
+                    CEO: Vanessa Vega<br/>
+                    <span t-esc="fp_company_partner.street or 'Muelle de San Carlos, Alajuela, Costa Rica'"/> &#160;|&#160;
+                    <span t-esc="fp_company_partner.phone or '+506 2462 1338'"/> &#160;|&#160;
+                    <span t-esc="fp_company_partner.email or 'facturacion@crfarmexport.com'"/>
                 </div>
             </div>
-            <div class="crfp-dt">
-                <div class="m">COMMERCIAL EXPORT INVOICE</div>
+            <div class="crfp-badge">
+                <div class="crfp-badge-type">Commercial Export Invoice</div>
+                <div class="crfp-badge-num" t-esc="fp_consecutive_value"/>
+                <div class="crfp-badge-date">Date: <span t-field="o.invoice_date" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/></div>
+                <div class="crfp-badge-date">Due: <span t-field="o.invoice_date_due" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/></div>
             </div>
         </div>
 
-        <!-- META BAR -->
-        <div class="crfp-meta">
-            <div class="crfp-mc hl">
-                <div class="crfp-ml">Invoice No.</div>
-                <div class="crfp-mv" t-esc="fp_consecutive_value"/>
-            </div>
-            <div class="crfp-mc">
-                <div class="crfp-ml">Issue Date</div>
-                <div class="crfp-mv"><span t-field="o.invoice_date" t-options="{'widget': 'date', 'format': 'dd MMM yyyy'}"/></div>
-            </div>
-            <div class="crfp-mc">
-                <div class="crfp-ml">Due Date</div>
-                <div class="crfp-mv"><span t-field="o.invoice_date_due" t-options="{'widget': 'date', 'format': 'dd MMM yyyy'}"/></div>
-            </div>
-            <div class="crfp-mc">
-                <div class="crfp-ml">Reference / Currency</div>
-                <div class="crfp-mv"><span t-esc="fp_reference_value"/> · <span t-esc="o.currency_id.name"/></div>
-            </div>
-        </div>
-
-        <!-- ELECTRONIC KEY -->
-        <div class="crfp-ekey">
-            <strong>Electronic Key:</strong>
-            <span class="kv" t-esc="fp_electronic_key_value"/>
-        </div>
-
-        <!-- PARTIES -->
-        <div class="crfp-parties">
-            <div class="crfp-party">
-                <div class="crfp-phd">Exporter / Shipper</div>
-                <div class="crfp-pbd">
-                    <div class="crfp-pn" t-esc="fp_company_partner.name"/>
-                    <div class="crfp-pd">
-                        <span t-esc="fp_company_partner.street or ''"/><br/>
-                        <span class="l">Tax ID:</span><span t-esc="fp_company_partner.vat or '3-101-669016'"/><br/>
-                        <span class="l">MAG Code:</span>EMP-EX-3313<br/>
-                        <span class="l">CEO:</span>Vanessa Vega
-                    </div>
+        <!-- INFO GRID: Consignee + Document Details -->
+        <div class="crfp-igrid">
+            <div class="crfp-ibox">
+                <div class="crfp-stitle">Bill To / Consignee</div>
+                <div class="crfp-ibody">
+                    <span class="l">Name:</span> <span t-esc="fp_receiver_partner.name"/><br/>
+                    <span class="l">VAT/ID:</span> <span t-esc="fp_receiver_partner.vat or '-'"/> &#160;&#160;
+                    <span class="l">Email:</span> <span t-esc="fp_receiver_partner.email or '-'"/><br/>
+                    <span class="l">Address:</span> <span t-esc="fp_receiver_address or '-'"/><br/>
+                    <span class="l">Phone:</span> <span t-esc="fp_receiver_phone or '-'"/>
                 </div>
             </div>
-            <div class="crfp-party">
-                <div class="crfp-phd">Consignee / Buyer</div>
-                <div class="crfp-pbd">
-                    <div class="crfp-pn" t-esc="fp_receiver_partner.name"/>
-                    <div class="crfp-pd">
-                        <span t-esc="fp_receiver_address or ''"/><br/>
-                        <span class="l">Tax ID:</span><span t-esc="fp_receiver_partner.vat or '-'"/><br/>
-                        <span class="l">Email:</span><span t-esc="fp_receiver_partner.email or '-'"/>
-                    </div>
+            <div class="crfp-ibox">
+                <div class="crfp-stitle">Document Details</div>
+                <div class="crfp-ibody">
+                    <span class="l">Currency:</span> <span t-esc="o.currency_id.name"/> &#160;&#160;
+                    <span class="l">Reference:</span> <span t-esc="fp_reference_value"/><br/>
+                    <span class="l">Internal #:</span> <span t-esc="o.name or '-'"/><br/>
+                    <t t-if="fp_ship and fp_ship.incoterm">
+                        <span class="l">Incoterm:</span> <span t-esc="fp_ship.incoterm"/>
+                        <t t-if="fp_ship.port_destination_id"> — <span t-esc="fp_ship.port_destination_id.name"/></t><br/>
+                    </t>
+                    <span class="l">Electronic Key:</span> <span style="font-family:monospace;font-size:7.5px;" t-esc="fp_electronic_key_value"/>
                 </div>
             </div>
         </div>
@@ -630,83 +599,44 @@
         <!-- SHIPMENT INFO -->
         <t t-if="fp_ship_has_data">
             <div class="crfp-ship">
-                <div class="crfp-shd">Shipment Information</div>
-                <div class="crfp-sgrid">
+                <div class="crfp-stitle">Shipment Information</div>
+                <div class="crfp-shipbody">
                     <t t-if="fp_ship.booking_id and fp_ship.booking_id.bl_number">
-                        <div class="crfp-sc">
-                            <div class="crfp-scl">Bill of Lading</div>
-                            <div class="crfp-scv" t-esc="fp_ship.booking_id.bl_number"/>
-                        </div>
+                        <div><span class="l">Bill of Lading:</span> <span t-esc="fp_ship.booking_id.bl_number"/></div>
                     </t>
                     <t t-if="fp_ship.vessel_name">
-                        <div class="crfp-sc">
-                            <div class="crfp-scl">Vessel / Voyage</div>
-                            <div class="crfp-scv"><span t-esc="fp_ship.vessel_name"/><t t-if="fp_ship.voyage_number"> / <span t-esc="fp_ship.voyage_number"/></t></div>
-                        </div>
+                        <div><span class="l">Vessel / Voyage:</span> <span t-esc="fp_ship.vessel_name"/><t t-if="fp_ship.voyage_number"> / <span t-esc="fp_ship.voyage_number"/></t></div>
                     </t>
                     <t t-if="fp_ship.container_ids">
                         <t t-foreach="fp_ship.container_ids" t-as="cnt">
                             <t t-if="cnt.container_number">
-                                <div class="crfp-sc">
-                                    <div class="crfp-scl">Container</div>
-                                    <div class="crfp-scv" t-esc="cnt.container_number"/>
-                                </div>
+                                <div><span class="l">Container:</span> <span t-esc="cnt.container_number"/></div>
                             </t>
                             <t t-if="cnt.seal_number">
-                                <div class="crfp-sc">
-                                    <div class="crfp-scl">Seal / Marchamo</div>
-                                    <div class="crfp-scv" t-esc="cnt.seal_number"/>
-                                </div>
+                                <div><span class="l">Seal / Marchamo:</span> <span t-esc="cnt.seal_number"/></div>
                             </t>
                         </t>
                     </t>
                     <t t-if="fp_ship.shipping_company or fp_ship.carrier_partner_id">
-                        <div class="crfp-sc">
-                            <div class="crfp-scl">Shipping Co.</div>
-                            <div class="crfp-scv" t-esc="fp_ship.shipping_company or (fp_ship.carrier_partner_id.name if fp_ship.carrier_partner_id else '')"/>
-                        </div>
+                        <div><span class="l">Shipping Co.:</span> <span t-esc="fp_ship.shipping_company or (fp_ship.carrier_partner_id.name if fp_ship.carrier_partner_id else '')"/></div>
                     </t>
                     <t t-if="fp_ship.booking_id and fp_ship.booking_id.booking_reference">
-                        <div class="crfp-sc">
-                            <div class="crfp-scl">Booking No.</div>
-                            <div class="crfp-scv" t-esc="fp_ship.booking_id.booking_reference"/>
-                        </div>
+                        <div><span class="l">Booking No.:</span> <span t-esc="fp_ship.booking_id.booking_reference"/></div>
                     </t>
                     <t t-if="fp_ship.etd">
-                        <div class="crfp-sc">
-                            <div class="crfp-scl">Departure (ETD)</div>
-                            <div class="crfp-scv"><span t-field="fp_ship.etd" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/></div>
-                        </div>
+                        <div><span class="l">Departure (ETD):</span> <span t-field="fp_ship.etd" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/></div>
                     </t>
                     <t t-if="fp_ship.eta">
-                        <div class="crfp-sc">
-                            <div class="crfp-scl">Arrival (ETA)</div>
-                            <div class="crfp-scv"><span t-field="fp_ship.eta" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/></div>
-                        </div>
+                        <div><span class="l">Arrival (ETA):</span> <span t-field="fp_ship.eta" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/></div>
                     </t>
                     <t t-if="fp_ship.port_origin_id">
-                        <div class="crfp-sc">
-                            <div class="crfp-scl">Port of Loading</div>
-                            <div class="crfp-scv" t-esc="fp_ship.port_origin_id.name + (', ' + fp_ship.port_origin_id.country if fp_ship.port_origin_id.country else '')"/>
-                        </div>
+                        <div><span class="l">Port of Loading:</span> <span t-esc="fp_ship.port_origin_id.name.upper()"/><t t-if="fp_ship.port_origin_id.country">, <span t-esc="fp_ship.port_origin_id.country.upper()"/></t></div>
                     </t>
                     <t t-if="fp_ship.port_destination_id">
-                        <div class="crfp-sc">
-                            <div class="crfp-scl">Port of Discharge</div>
-                            <div class="crfp-scv" t-esc="fp_ship.port_destination_id.name + (', ' + fp_ship.port_destination_id.country if fp_ship.port_destination_id.country else '')"/>
-                        </div>
+                        <div><span class="l">Port of Discharge:</span> <span t-esc="fp_ship.port_destination_id.name.upper()"/></div>
                     </t>
                     <t t-if="fp_ship.port_origin_id and fp_ship.port_origin_id.country">
-                        <div class="crfp-sc">
-                            <div class="crfp-scl">Country of Origin</div>
-                            <div class="crfp-scv" t-esc="fp_ship.port_origin_id.country"/>
-                        </div>
-                    </t>
-                    <t t-if="fp_ship.incoterm">
-                        <div class="crfp-sc">
-                            <div class="crfp-scl">INCOTERM 2020</div>
-                            <div class="crfp-scv au"><span t-esc="fp_ship.incoterm"/><t t-if="fp_ship.port_destination_id"> <span t-esc="fp_ship.port_destination_id.name"/></t></div>
-                        </div>
+                        <div><span class="l">Country of Origin:</span> <span t-esc="fp_ship.port_origin_id.country.upper()"/></div>
                     </t>
                 </div>
             </div>
@@ -716,87 +646,84 @@
         <table class="crfp-tbl">
             <thead>
                 <tr>
-                    <th style="width:13%">HS CODE<br/><span style="font-weight:400;font-size:6pt;opacity:.85;">Partida Arancelaria</span></th>
-                    <th style="width:36%">Description</th>
-                    <th class="c" style="width:8%">Qty</th>
-                    <th class="r" style="width:11%">Net Wt (kg)</th>
-                    <th class="r" style="width:11%">Gross Wt (kg)</th>
-                    <th class="r" style="width:9%">Unit Price</th>
-                    <th class="r" style="width:12%">Subtotal</th>
+                    <th style="width:11%">Partida<br/>Aranc.</th>
+                    <th class="tl" style="width:35%">Description</th>
+                    <th style="width:7%">Qty</th>
+                    <th style="width:11%">Net Wt (kg)</th>
+                    <th style="width:11%">Gross Wt (kg)</th>
+                    <th style="width:12%">Unit Price</th>
+                    <th style="width:13%">Subtotal</th>
                 </tr>
             </thead>
             <tbody>
                 <t t-foreach="fp_product_lines" t-as="line">
                     <tr>
-                        <td t-esc="line.product_id.fp_cabys_code or '-'"/>
-                        <td><div class="crfp-pname" t-esc="line.product_id.name or line.name or '-'"/></td>
-                        <td class="c" t-esc="'%.1f' % line.quantity"/>
-                        <td class="r" t-esc="'%.3f' % (line.fp_net_weight or 0.0)"/>
-                        <td class="r" t-esc="'%.3f' % (line.fp_gross_weight or 0.0)"/>
-                        <td class="r"><span t-field="line.price_unit" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
-                        <td class="r"><span t-field="line.price_subtotal" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                        <td class="cabys" t-esc="line.product_id.fp_cabys_code or '-'"/>
+                        <td><span style="font-weight:700;" t-esc="line.product_id.name or line.name or '-'"/></td>
+                        <td class="tc" t-esc="'%.1f' % line.quantity"/>
+                        <td class="tr" t-esc="'%.3f' % (line.fp_net_weight or 0.0)"/>
+                        <td class="tr" t-esc="'%.3f' % (line.fp_gross_weight or 0.0)"/>
+                        <td class="tr"><span t-field="line.price_unit" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                        <td class="tr"><span t-field="line.price_subtotal" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
                     </tr>
                 </t>
             </tbody>
             <tfoot>
-                <tr class="tr">
-                    <td colspan="2" style="text-align:right;">TOTAL</td>
-                    <td class="c" t-esc="'%.1f' % sum(l.quantity for l in fp_product_lines)"/>
-                    <td class="r">
+                <tr>
+                    <td colspan="2" style="text-align:right;font-size:8px;letter-spacing:.3px;">TOTALS</td>
+                    <td class="tc" t-esc="'%.1f' % sum(l.quantity for l in fp_product_lines)"/>
+                    <td class="tr">
                         <t t-if="fp_ship and fp_ship.total_net_weight_actual"><span t-esc="'%.3f' % fp_ship.total_net_weight_actual"/></t>
                         <t t-else=""><span t-esc="'%.3f' % sum(l.fp_net_weight or 0.0 for l in fp_product_lines)"/></t>
                     </td>
-                    <td class="r">
+                    <td class="tr">
                         <t t-if="fp_ship and fp_ship.total_gross_weight_actual"><span t-esc="'%.3f' % fp_ship.total_gross_weight_actual"/></t>
                         <t t-else=""><span t-esc="'%.3f' % sum(l.fp_gross_weight or 0.0 for l in fp_product_lines)"/></t>
                     </td>
                     <td/>
-                    <td class="r"><span t-field="o.amount_total" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                    <td class="tr"><span t-field="o.amount_total" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
                 </tr>
             </tfoot>
         </table>
 
-        <!-- TOTALS BLOCK -->
-        <div class="crfp-tb">
-            <div class="crfp-addl">
-                <div class="crfp-at">Additional Information</div>
-                <div class="crfp-ar"><span class="l">Reference:</span><span t-esc="fp_reference_value"/></div>
-                <div class="crfp-ar"><span class="l">Internal #:</span><span t-esc="o.name or '-'"/></div>
-                <t t-if="o.narration and not fp_ship_has_data"><div class="crfp-ar"><span class="l">Observation:</span><span t-esc="(o.narration or '')[:120]"/></div></t>
-                <div class="crfp-aw">
-                    <strong>Amount in Words</strong>
-                    <span t-esc="o.fp_amount_in_words or '-'"/>
-                </div>
+        <!-- BOTTOM GRID: amount in words + summary -->
+        <div class="crfp-bgrid">
+            <div class="crfp-words">
+                <span class="wl">Amount in Words</span>
+                <span t-esc="o.fp_amount_in_words or '-'"/>
             </div>
-            <div class="crfp-ts">
-                <div class="crfp-tr sub">
-                    <span class="k">Subtotal</span>
-                    <span class="v"><span t-esc="o.currency_id.name"/> <span t-esc="'%.2f' % o.amount_untaxed"/></span>
-                </div>
-                <div class="crfp-tr">
-                    <span class="k">VAT (Tarifa 0% Cód. 11)</span>
-                    <span class="v"><span t-esc="o.currency_id.name"/> <span t-esc="'%.2f' % (o.amount_total - o.amount_untaxed)"/></span>
-                </div>
-                <div class="crfp-tr grand">
-                    <span class="k">TOTAL DUE</span>
-                    <span class="v"><span t-esc="o.currency_id.name"/> <span t-esc="'%.2f' % o.amount_total"/></span>
-                </div>
+            <div class="crfp-summary">
+                <div class="crfp-stitle">Summary</div>
+                <table class="crfp-stbl">
+                    <tr>
+                        <td>Subtotal (before tax)</td>
+                        <td class="tr"><span t-esc="o.currency_id.name"/> <span t-esc="'%.2f' % o.amount_untaxed"/></td>
+                    </tr>
+                    <tr>
+                        <td>Tax (0% — Export)</td>
+                        <td class="tr"><span t-esc="o.currency_id.name"/> <span t-esc="'%.2f' % (o.amount_total - o.amount_untaxed)"/></td>
+                    </tr>
+                    <tr class="grand">
+                        <td><span style="color:#C9A227">TOTAL DUE</span></td>
+                        <td class="tr"><span t-field="o.amount_total" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                    </tr>
+                </table>
             </div>
         </div>
 
         <!-- SIGNATURE -->
         <div class="crfp-sig">
-            <div class="crfp-sb">
-                <div class="crfp-sl">
-                    <div class="crfp-sn">Vanessa Vega</div>
-                    <div class="crfp-sr">CEO · Authorized Signature</div>
+            <div class="crfp-sigb">
+                <div class="crfp-sigl">
+                    <div class="crfp-sign">Vanessa Vega</div>
+                    <div class="crfp-sigr">CEO · Authorized Signature</div>
                 </div>
             </div>
-            <div class="crfp-se">❦</div>
-            <div class="crfp-sb">
-                <div class="crfp-sl">
-                    <div class="crfp-sn">Buyer Acknowledgment</div>
-                    <div class="crfp-sr">Name · Signature · Date</div>
+            <div class="crfp-sige">&#10086;</div>
+            <div class="crfp-sigb">
+                <div class="crfp-sigl">
+                    <div class="crfp-sign">Buyer Acknowledgment</div>
+                    <div class="crfp-sigr">Name · Signature · Date</div>
                 </div>
             </div>
         </div>
@@ -807,24 +734,40 @@
             <div class="crfp-lfg">
                 <div class="crfp-lfi">
                     <div class="crfp-lfn">1.</div>
-                    <div class="crfp-lfc"><strong>Inspection &amp; Claims Window.</strong> Buyer shall inspect the goods within 24 hours of unloading. Quality claims must be notified in writing within 48 hours, supported by an independent surveyor report (SGS, Bureau Veritas, Control Union or equivalent), photographs with metadata, datalogger reading and identification of affected boxes. Claims unsupported by such evidence shall not be processed.</div>
+                    <div class="crfp-lfc"><strong>Inspection &amp; Claims.</strong> Buyer shall inspect within 24h of unloading. Quality claims must be notified in writing within 48h, supported by independent surveyor report (SGS, Bureau Veritas, Control Union), photographs with metadata, datalogger reading and box identification. Unsupported claims shall not be processed.</div>
                 </div>
                 <div class="crfp-lfi">
                     <div class="crfp-lfn">2.</div>
-                    <div class="crfp-lfc"><strong>Payment Terms &amp; Late Interest.</strong> Late payments accrue interest at 1.5% per month from due date. Buyer shall not deduct, offset or withhold sums without prior written agreement of Seller. Payment of undisputed amounts may not be withheld due to claims on separate items or shipments.</div>
+                    <div class="crfp-lfc"><strong>Payment Terms &amp; Late Interest.</strong> Late payments accrue interest at 1.5%/month from due date. Buyer shall not deduct or offset without prior written agreement. Payment of undisputed amounts may not be withheld due to claims on separate shipments.</div>
                 </div>
                 <div class="crfp-lfi">
                     <div class="crfp-lfn">3.</div>
-                    <div class="crfp-lfc"><strong>Risk Transfer &amp; Cold Chain Custody.</strong> Risk of loss or damage passes to Buyer per the INCOTERM stated above. Maintenance of refrigeration conditions and product custody after risk transfer point is Buyer's exclusive responsibility. Maximum claim value shall not exceed FOB value of affected boxes.</div>
+                    <div class="crfp-lfc"><strong>Risk Transfer &amp; Cold Chain.</strong> Risk passes to Buyer per the INCOTERM stated. Cold chain maintenance and product custody after risk transfer is Buyer's exclusive responsibility. Maximum claim value shall not exceed FOB value of affected boxes.</div>
                 </div>
                 <div class="crfp-lfi">
                     <div class="crfp-lfn">4.</div>
-                    <div class="crfp-lfc"><strong>Title, Governing Law &amp; Disputes.</strong> Title remains with Seller until full payment in cleared funds. Governed by the laws of Costa Rica supplemented by CISG (1980). Disputes resolved by arbitration at CICA (San José) in English. Acceptance of goods, payment, or absence of timely written objection constitutes Buyer's acceptance of these terms.</div>
+                    <div class="crfp-lfc"><strong>Title, Governing Law &amp; Disputes.</strong> Title remains with Seller until full payment in cleared funds. Governed by the laws of Costa Rica supplemented by CISG (1980). Disputes resolved by arbitration at CICA (San José) in English. Acceptance of goods or payment constitutes acceptance of these terms.</div>
                 </div>
             </div>
         </div>
 
-        <div class="crfp-cpl">Emitida conforme la resolución de Facturación Electrónica de Costa Rica · Versión del documento 4.4</div>
+        <!-- FE FOOTER -->
+        <div class="crfp-fefooter">
+            <div class="crfp-feblock">
+                <div class="crfp-felbl">Clave Electrónica</div>
+                <div class="crfp-fekey" t-esc="fp_electronic_key_value"/>
+            </div>
+            <div class="crfp-feblock">
+                <div class="crfp-felbl">Consecutivo</div>
+                <div t-esc="fp_consecutive_value"/>
+            </div>
+            <div class="crfp-feblock">
+                <div class="crfp-felbl">Autorizado por</div>
+                <div>Ministerio de Hacienda — Costa Rica · FE v4.4</div>
+            </div>
+        </div>
+
+        <div class="crfp-btmbar"/>
     </div>
 </t>
 </t>
