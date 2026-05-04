@@ -481,7 +481,8 @@
         .crfp-badge { flex: 0 0 128px; background: #2E7D32; color: #fff; border-radius: 2px; padding: 7px 9px; text-align: center; }
         .crfp-badge-type { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .4px; }
         .crfp-badge-num { font-size: 11.5px; font-weight: 800; color: #C9A227; margin: 2px 0; }
-        .crfp-badge-date { font-size: 8px; opacity: .85; }
+        .crfp-badge-date { font-size: 8.5px; color: #fff !important; margin-top: 1px; }
+        .crfp-badge-date span { color: #fff !important; }
         /* section title */
         .crfp-stitle { background: #2E7D32; color: #fff; font-size: 8.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; padding: 2px 7px; border-left: 3px solid #C9A227; }
         /* info grid 2-col */
