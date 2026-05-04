@@ -491,7 +491,8 @@
         .crfp-ibody .l { font-weight: 700; color: #1a5c2e; }
         /* shipment box */
         .crfp-ship { border: 1px solid #C9A227; border-radius: 1px; overflow: hidden; margin-bottom: 5px; }
-        .crfp-shipbody { padding: 4px 7px; background: #fdf6e3; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0 10px; font-size: 8.8px; line-height: 1.65; }
+        .crfp-shipbody { padding: 4px 7px; background: #fdf6e3; font-size: 8.8px; line-height: 1.65; }
+        .crfp-shipbody div { display: inline-block; width: 32%; vertical-align: top; padding-right: 6px; }
         .crfp-shipbody .l { font-weight: 700; color: #1a5c2e; }
         /* products table */
         table.crfp-tbl { width: 100%; border-collapse: collapse; font-size: 9px; margin-bottom: 5px; }
@@ -586,6 +587,8 @@
                 <div class="crfp-ibody">
                     <span class="l">Currency:</span> <span t-esc="o.currency_id.name"/> &#160;&#160;
                     <span class="l">Reference:</span> <span t-esc="fp_reference_value"/><br/>
+                    <span class="l">Payment Terms:</span> <span t-esc="o.invoice_payment_term_id.name or '-'"/><br/>
+                    <span class="l">Due Date:</span> <span t-field="o.invoice_date_due" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/> &#160;&#160;
                     <span class="l">Internal #:</span> <span t-esc="o.name or '-'"/><br/>
                     <t t-if="fp_ship and fp_ship.incoterm">
                         <span class="l">Incoterm:</span> <span t-esc="fp_ship.incoterm"/>
