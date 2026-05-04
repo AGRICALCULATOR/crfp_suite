@@ -1784,6 +1784,14 @@ class AccountMove(models.Model):
         return False
 
 
+    def _fp_get_selection_map(self, field_name):
+        self.ensure_one()
+        if not field_name or field_name not in self._fields:
+            return {}
+        field_meta = self.fields_get([field_name]).get(field_name, {})
+        selection = field_meta.get("selection") or []
+        return dict(selection)
+
     def _fp_get_line_exoneration(self, line):
         self.ensure_one()
         partner = self.partner_id
