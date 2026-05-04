@@ -731,7 +731,25 @@
             </div>
         </div>
 
-        <!-- LEGAL FOOTER -->
+        <!-- FE FOOTER -->
+        <div class="crfp-fefooter">
+            <div class="crfp-feblock">
+                <div class="crfp-felbl">Clave Electrónica</div>
+                <div class="crfp-fekey" t-esc="fp_electronic_key_value"/>
+            </div>
+            <div class="crfp-feblock">
+                <div class="crfp-felbl">Consecutivo</div>
+                <div t-esc="fp_consecutive_value"/>
+            </div>
+            <div class="crfp-feblock">
+                <div class="crfp-felbl">Autorizado por</div>
+                <div>Ministerio de Hacienda — Costa Rica · FE v4.4</div>
+            </div>
+        </div>
+
+        <div class="crfp-btmbar"/>
+
+        <!-- LEGAL FOOTER — pie de página -->
         <div class="crfp-lf">
             <div class="crfp-lft">Terms of Sale · Términos de Venta</div>
             <div class="crfp-lfg">
@@ -753,24 +771,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- FE FOOTER -->
-        <div class="crfp-fefooter">
-            <div class="crfp-feblock">
-                <div class="crfp-felbl">Clave Electrónica</div>
-                <div class="crfp-fekey" t-esc="fp_electronic_key_value"/>
-            </div>
-            <div class="crfp-feblock">
-                <div class="crfp-felbl">Consecutivo</div>
-                <div t-esc="fp_consecutive_value"/>
-            </div>
-            <div class="crfp-feblock">
-                <div class="crfp-felbl">Autorizado por</div>
-                <div>Ministerio de Hacienda — Costa Rica · FE v4.4</div>
-            </div>
-        </div>
-
-        <div class="crfp-btmbar"/>
     </div>
 </t>
 </t>
