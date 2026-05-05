@@ -20,6 +20,7 @@ from cryptography.hazmat.primitives.serialization import pkcs12
 from lxml import etree as LET
 
 from odoo import _, api, fields, models
+from odoo.tools.translate import _lt
 from odoo.exceptions import UserError, ValidationError
 
 _logger = logging.getLogger(__name__)
@@ -71,12 +72,12 @@ class AccountMove(models.Model):
     _inherit = "account.move"
 
     _FP_EMAIL_SUBJECT_DOCUMENT_LABELS = {
-        "FE": _("Factura Electrónica"),
-        "TE": _("Tiquete Electrónico"),
-        "NC": _("Nota de Crédito Electrónica"),
-        "ND": _("Nota de Débito Electrónica"),
-        "FEE": _("Factura Electrónica de Exportación"),
-        "FEC": _("Factura Electrónica de Compra"),
+        "FE": _lt("Factura Electrónica"),
+        "TE": _lt("Tiquete Electrónico"),
+        "NC": _lt("Nota de Crédito Electrónica"),
+        "ND": _lt("Nota de Débito Electrónica"),
+        "FEE": _lt("Factura Electrónica de Exportación"),
+        "FEC": _lt("Factura Electrónica de Compra"),
     }
 
     _FP_LOCKED_FIELDS_AFTER_SEND = {
