@@ -99,18 +99,19 @@ class CrfpProduct(models.Model):
     def _notify_field_price_update(self, buyer_name, saved_count, week, year):
         """Send inbox notification to configured users after field buyer saves prices."""
         try:
-            settings = self.env['crfp.settings'].get_settings()
-            notify_partners = settings.field_price_notify_partner_ids
-            if not notify_partners:
-                return
-            self.env['res.partner'].message_notify(
-                partner_ids=notify_partners.ids,
-                subject='Precios de campo actualizados — Semana %d/%d' % (week, year),
-                body=(
-                    '<p><b>%s</b> actualizó %d precio(s) de campo para la semana %d/%d.</p>'
-                    % (buyer_name, saved_count, week, year)
-                ),
-                subtype_xmlid='mail.mt_comment',
-            )
+            with self.env.cr.savepoint():
+                settings = self.env['crfp.settings'].get_settings()
+                notify_partners = settings.field_price_notify_partner_ids
+                if not notify_partners:
+                    return
+                self.env['res.partner'].message_notify(
+                    partner_ids=notify_partners.ids,
+                    subject='Precios de campo actualizados — Semana %d/%d' % (week, year),
+                    body=(
+                        '<p><b>%s</b> actualizó %d precio(s) de campo para la semana %d/%d.</p>'
+                        % (buyer_name, saved_count, week, year)
+                    ),
+                    subtype_xmlid='mail.mt_comment',
+                )
         except Exception:
             _logger.exception('Failed to send field price update notification')
