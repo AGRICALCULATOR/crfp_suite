@@ -76,6 +76,16 @@ class CrfpSettings(models.Model):
         string='Duties (%)', default=0.0, digits=(12, 2),
     )
 
+    # ── Notifications ─────────────────────────────────────────────────────────
+    field_price_notify_partner_ids = fields.Many2many(
+        'res.partner',
+        'crfp_settings_notify_partner_rel',
+        'settings_id', 'partner_id',
+        string='Notify on Field Price Update',
+        domain=[('user_ids', '!=', False)],
+        help='Internal users who receive an Odoo notification when a field buyer saves prices.',
+    )
+
     # ── Logistics Defaults ─────────────────────────────────────────────────────
     default_port_origin_id = fields.Many2one(
         'crfp.port', string='Default Port of Origin',
