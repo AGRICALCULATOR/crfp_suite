@@ -743,7 +743,6 @@ class CrfpShipment(models.Model):
                 'default_partner_ids': [self.carrier_partner_id.id] if self.carrier_partner_id else [],
                 'default_subject': 'Booking Request - %s - %s' % (self.name, self.port_destination_id.name or ''),
                 'default_body': body,
-                'default_email_from': 'logistics@crfarmexport.com',
                 'default_composition_mode': 'comment',
             },
         }
@@ -800,7 +799,6 @@ class CrfpShipment(models.Model):
                 'default_partner_ids': [self.carrier_partner_id.id] if self.carrier_partner_id else [],
                 'default_subject': 'Shipping Instructions - %s - %s' % (self.name, booking_ref),
                 'default_body': body,
-                'default_email_from': 'logistics@crfarmexport.com',
                 'default_composition_mode': 'comment',
             },
         }
@@ -819,7 +817,6 @@ class CrfpShipment(models.Model):
                 'default_partner_ids': [self.carrier_partner_id.id] if self.carrier_partner_id else [],
                 'default_subject': '%s - Carrier Document' % self.name,
                 'default_body': '<p>Please find attached the requested document.</p>',
-                'default_email_from': 'logistics@crfarmexport.com',
                 'default_composition_mode': 'comment',
             },
         }
@@ -876,7 +873,6 @@ class CrfpShipment(models.Model):
                 'default_subject': 'Export Documents - %s - %s' % (self.name, self.partner_id.name or ''),
                 'default_body': body,
                 'default_attachment_ids': all_attachment_ids,
-                'default_email_from': 'logistics@crfarmexport.com',
                 'default_composition_mode': 'comment',
             },
         }
