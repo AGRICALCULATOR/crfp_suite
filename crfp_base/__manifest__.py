@@ -1,6 +1,6 @@
 {
     'name': 'CR Farm Products - Export Suite Base',
-    'version': '19.0.1.2.0',
+    'version': '19.0.1.3.0',
     'category': 'Sales/Export',
     'summary': 'Master data for CR Farm Products export suite',
     'description': """
