@@ -144,8 +144,16 @@
 .crfp-hist-item:hover { border-color:var(--crfp-secondary); background:var(--crfp-light); }
 .crfp-hist-item.active { border-left:4px solid var(--crfp-primary); background:#e8f5e9; }
 .crfp-hist-top { cursor:pointer; }
-.crfp-hist-item strong { font-size:13px; display:block; }
+.crfp-hist-title-row { display:flex; justify-content:space-between; align-items:center; gap:6px; }
+.crfp-hist-item strong { font-size:13px; }
 .crfp-hdate { font-size:13px; color:#888; font-family:var(--crfp-mono); }
+.crfp-state-badge { font-size:10px; font-weight:700; text-transform:uppercase;
+    padding:2px 6px; border-radius:10px; letter-spacing:.4px; flex-shrink:0; }
+.crfp-state-draft  { background:#fff3cd; color:#856404; }
+.crfp-state-confirmed { background:#cfe2ff; color:#084298; }
+.crfp-state-sent   { background:#d1e7dd; color:#0a3622; }
+.crfp-state-won    { background:#4CAF50; color:#fff; }
+.crfp-state-lost   { background:#f8d7da; color:#842029; }
 .crfp-hist-open { margin-top:5px; padding:4px 10px; background:var(--crfp-light);
     border:1px solid var(--crfp-border); border-radius:4px; font-size:13px;
     cursor:pointer; color:var(--crfp-primary); font-weight:600; }

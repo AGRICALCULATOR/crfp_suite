@@ -249,7 +249,10 @@
                                 <t t-foreach="state.quotations" t-as="q" t-key="q.id">
                                     <div class="crfp-hist-item" t-att-class="{'active': q.id === state.quotationId}">
                                         <div class="crfp-hist-top" t-on-click="() => this.loadQuotation(q.id)">
-                                            <strong t-esc="q.name"/>
+                                            <div class="crfp-hist-title-row">
+                                                <strong t-esc="q.name"/>
+                                                <span t-att-class="'crfp-state-badge crfp-state-' + q.state" t-esc="q.state"/>
+                                            </div>
                                             <span class="crfp-hdate" t-esc="q.create_date"/>
                                         </div>
                                         <button class="crfp-hist-open" t-if="q.id === state.quotationId"

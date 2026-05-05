@@ -13,7 +13,7 @@ Modulos Odoo 19 para CR Farm Products, empresa exportadora agricola de Costa Ric
 ```
 crfp_claims -> crfp_logistics -> crfp_pricing -> crfp_base -> [base, sale, product, mail]
 crfp_website -> crfp_base
-l10n_cr_einvoice (independiente, FenixCR v4.4 — NO modificar)
+l10n_cr_einvoice (independiente, FenixCR v4.4 — modificar SOLO via PR, nunca directo en GitHub web)
 ```
 
 > invoice_weight fue ELIMINADO en Fase 2 (redundante con l10n_cr_einvoice)
@@ -32,9 +32,36 @@ Flujo principal: `crfp.quotation` -> `sale.order` -> `crfp.shipment` (14 estados
 - No usar `<separator/>` ni `<group string="...">` dentro de `<search>`.
 
 ### Flujo de trabajo
-1. Desarrollar en rama feature.
-2. PR hacia `main`.
-3. Merge a `staging-test-modules` para probar en Odoo.sh.
+
+**OBLIGATORIO — todo cambio debe seguir este flujo sin excepción:**
+
+```
+feature branch (crfp_suite.git)
+    → PR a main (crfp_suite.git)
+    → merge main
+    → bump submodule en odoo-crfarm/production
+    → push a odoosh/production (Odoo.sh rebuild)
+```
+
+**Pasos detallados:**
+1. Crear rama feature en el submodule (`crfp_suite/`): `git checkout -b fix/descripcion`
+2. Desarrollar, commitear, push: `git push origin fix/descripcion`
+3. Abrir PR en GitHub hacia `main` de `crfp_suite.git`
+4. Merge PR (squash) — GitHub borra la rama automáticamente
+5. En el outer repo (`odoo-crfarm`): `git add crfp_suite && git commit -m "fix: bump crfp_suite — descripcion"` 
+6. Push al Odoo.sh: `git push odoosh production`
+
+**NUNCA desarrollar en worktrees de Claude sin crear PR.**
+Los worktrees (`.claude/worktrees/`) son temporales — si Claude crea uno, el código debe llegar a un PR antes de cerrar la sesión, o se pierde la trazabilidad. Si quedan worktrees huérfanos, limpiarlos con `git worktree remove --force` y borrar sus ramas.
+
+**Estructura de repos:**
+- `crfp_suite.git` (GitHub) = código fuente de los módulos Odoo. Ramas: `main`, `staging-test-modules`
+- `odoo-crfarm.git` (Odoo.sh, remote `odoosh`) = repo de despliegue. Usa `crfp_suite` como submodule. Ramas: `production`, `staging-test-modules`
+- El submodule local está en `crfp_suite/` dentro del outer repo
+
+**Para staging:**
+1. En `crfp_suite.git`: merge a `staging-test-modules`
+2. En outer repo, rama `staging-test-modules`: bump submodule + push a `odoosh/staging-test-modules`
 
 ---
 

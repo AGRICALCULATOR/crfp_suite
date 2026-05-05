@@ -51,20 +51,12 @@
                 <field name="fp_discount_code" optional="hide" readonly="parent.fp_api_state != 'pending'"/>
                 <field name="fp_discount_nature" optional="hide" readonly="parent.fp_api_state != 'pending'"/>
             </xpath>
-            <xpath expr="//field[@name='invoice_line_ids']/list/field[@name='quantity']" position="after">
-                <field name="fp_net_weight" optional="hide"/>
-                <field name="fp_gross_weight" optional="hide"/>
-            </xpath>
             <xpath expr="//field[@name='invoice_line_ids']/list/field[@name='price_subtotal']" position="after">
                 <field name="fp_is_other_charge_line" string="Otro cargo FE" readonly="1" optional="show"/>
             </xpath>
             <xpath expr="//field[@name='invoice_line_ids']/form//field[@name='discount']" position="after">
                 <field name="fp_discount_code" readonly="parent.fp_api_state != 'pending'"/>
                 <field name="fp_discount_nature" readonly="parent.fp_api_state != 'pending'" placeholder="Ej: Descuento general"/>
-            </xpath>
-            <xpath expr="//field[@name='invoice_line_ids']/form//field[@name='quantity']" position="after">
-                <field name="fp_net_weight"/>
-                <field name="fp_gross_weight"/>
             </xpath>
             <xpath expr="//field[@name='invoice_line_ids']/form//field[@name='price_subtotal']" position="after">
                 <field name="fp_is_other_charge_line" string="Otro cargo FE" readonly="1"/>
@@ -111,6 +103,7 @@
                         <field name="fp_reference_document_type" required="fp_document_type in ('NC', 'ND', 'FEC') and fp_is_electronic_invoice" readonly="fp_api_state != 'pending'"/>
                         <field name="fp_reference_number" required="fp_document_type in ('NC', 'ND', 'FEC') and fp_is_electronic_invoice" readonly="fp_api_state != 'pending'"/>
                         <field name="fp_reference_issue_datetime" required="fp_document_type in ('NC', 'ND', 'FEC') and fp_is_electronic_invoice" readonly="fp_api_state != 'pending'"/>
+                        <field name="fp_reference_exchange_rate" invisible="currency_id == company_currency_id or fp_document_type not in ('NC', 'ND')" readonly="fp_api_state != 'pending'"/>
                         <field name="fp_reference_code" required="fp_document_type in ('NC', 'ND', 'FEC') and fp_is_electronic_invoice" readonly="fp_api_state != 'pending'"/>
                         <field name="fp_reference_reason" required="fp_document_type in ('NC', 'ND', 'FEC') and fp_is_electronic_invoice" readonly="fp_api_state != 'pending'"/>
                     </group>
