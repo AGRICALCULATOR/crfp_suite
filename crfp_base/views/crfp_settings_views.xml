@@ -56,6 +56,15 @@
                         </group>
                     </group>
 
+                    <!-- Notifications -->
+                    <group string="Notificaciones">
+                        <group>
+                            <field name="field_price_notify_partner_ids"
+                                   widget="many2many_tags"
+                                   string="Notificar cuando comprador actualiza precios"/>
+                        </group>
+                    </group>
+
                     <!-- Logistics Defaults -->
                     <group string="Logistics Defaults">
                         <group>

@@ -167,4 +167,19 @@ class PricePortal(http.Controller):
             'Field buyer %s saved %d prices for week %d/%d',
             buyer.name, saved_count, week, year,
         )
+
+        if saved_count > 0:
+            settings = request.env['crfp.settings'].sudo().get_settings()
+            notify_partners = settings.field_price_notify_partner_ids
+            if notify_partners:
+                request.env['mail.thread'].sudo().message_notify(
+                    partner_ids=notify_partners.ids,
+                    subject='Precios de campo actualizados — Semana %d/%d' % (week, year),
+                    body=(
+                        '<p><b>%s</b> actualizó %d precio(s) de campo para la semana %d/%d.</p>'
+                        % (buyer.name, saved_count, week, year)
+                    ),
+                    subtype_xmlid='mail.mt_comment',
+                )
+
         return request.redirect('/crfp/prices/%s?success=1' % token)
