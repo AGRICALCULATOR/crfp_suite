@@ -316,10 +316,13 @@ class CrfpQuotation(models.Model):
         return self.env.ref('crfp_pricing.action_report_crfp_quotation').report_action(self)
 
     def action_send_email(self):
-        """Generate PDF, attach it, and open email composer."""
+        """Generate PDF, attach it, and open email composer. Freezes the quotation to 'sent'."""
         self.ensure_one()
         if not self.partner_id:
             raise UserError('Please select a client before sending an email.')
+
+        if self.state == 'draft':
+            self.write({'state': 'sent'})
 
         report = self.env.ref('crfp_pricing.action_report_crfp_quotation')
         pdf_content, _ = report._render_qweb_pdf(report.report_name, self.ids)
