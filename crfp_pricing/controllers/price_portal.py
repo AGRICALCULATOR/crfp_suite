@@ -169,20 +169,8 @@ class PricePortal(http.Controller):
         )
 
         if saved_count > 0:
-            try:
-                settings = request.env['crfp.settings'].sudo().get_settings()
-                notify_partners = settings.field_price_notify_partner_ids
-                if notify_partners:
-                    request.env['res.partner'].sudo().message_notify(
-                        partner_ids=notify_partners.ids,
-                        subject='Precios de campo actualizados — Semana %d/%d' % (week, year),
-                        body=(
-                            '<p><b>%s</b> actualizó %d precio(s) de campo para la semana %d/%d.</p>'
-                            % (buyer.name, saved_count, week, year)
-                        ),
-                        subtype_xmlid='mail.mt_comment',
-                    )
-            except Exception:
-                _logger.exception('Failed to send field price update notification')
+            request.env['crfp.product'].sudo()._notify_field_price_update(
+                buyer.name, saved_count, week, year,
+            )
 
         return request.redirect('/crfp/prices/%s?success=1' % token)

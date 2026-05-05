@@ -1,4 +1,7 @@
+import logging
 from odoo import models, fields, api
+
+_logger = logging.getLogger(__name__)
 
 
 class CrfpProduct(models.Model):
@@ -81,10 +84,9 @@ class CrfpProduct(models.Model):
     )
 
     def write(self, vals):
-        """BP-04: When raw_price_crc changes, update draft quotation lines."""
+        """BP-04: When raw_price_crc changes, update draft quotation lines and notify."""
         res = super().write(vals)
         if 'raw_price_crc' in vals:
-            # Find draft quotation lines referencing these products
             lines = self.env['crfp.quotation.line'].search([
                 ('crfp_product_id', 'in', self.ids),
                 ('quotation_id.state', '=', 'draft'),
@@ -93,3 +95,22 @@ class CrfpProduct(models.Model):
                 lines.write({'raw_price_crc': vals['raw_price_crc']})
                 lines._compute_all_prices()
         return res
+
+    def _notify_field_price_update(self, buyer_name, saved_count, week, year):
+        """Send inbox notification to configured users after field buyer saves prices."""
+        try:
+            settings = self.env['crfp.settings'].get_settings()
+            notify_partners = settings.field_price_notify_partner_ids
+            if not notify_partners:
+                return
+            self.env['res.partner'].message_notify(
+                partner_ids=notify_partners.ids,
+                subject='Precios de campo actualizados — Semana %d/%d' % (week, year),
+                body=(
+                    '<p><b>%s</b> actualizó %d precio(s) de campo para la semana %d/%d.</p>'
+                    % (buyer_name, saved_count, week, year)
+                ),
+                subtype_xmlid='mail.mt_comment',
+            )
+        except Exception:
+            _logger.exception('Failed to send field price update notification')
